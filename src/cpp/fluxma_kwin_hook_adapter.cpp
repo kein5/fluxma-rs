@@ -95,6 +95,9 @@ void KfiKwinHookAdapter::on_render_loop_frame_presented(
     if (!output_policy_.accepts_output(event.output_id)) {
         return;
     }
+    if (!output_policy_.supports_present_event(event)) {
+        return;
+    }
 
     output_controller_.on_present_feedback(
         present_feedback_tap_.capture(to_present_feedback(event))

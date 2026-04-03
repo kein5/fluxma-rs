@@ -40,6 +40,13 @@ bool KfiOutputPolicy::supports_present_hook_context(
     return false;
 }
 
+bool KfiOutputPolicy::supports_present_event(
+    const PresentCompletedEvent& event
+) const noexcept {
+    return event.frame_id != 0 && event.presented_timestamp_ns != 0 &&
+        event.refresh_interval_ns != 0;
+}
+
 bool KfiOutputPolicy::supports_frame_event(
     const FinalComposedFrameEvent& event
 ) const noexcept {

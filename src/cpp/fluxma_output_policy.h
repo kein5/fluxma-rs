@@ -5,6 +5,7 @@
 namespace fluxma {
 
 struct FinalComposedFrameEvent;
+struct PresentCompletedEvent;
 struct KwinFrameHookContext;
 struct KwinPresentHookContext;
 
@@ -18,6 +19,9 @@ class KfiOutputPolicy {
     ) const noexcept;
     [[nodiscard]] bool supports_present_hook_context(
         const KwinPresentHookContext& context
+    ) const noexcept;
+    [[nodiscard]] bool supports_present_event(
+        const PresentCompletedEvent& event
     ) const noexcept;
     [[nodiscard]] bool supports_frame_event(
         const FinalComposedFrameEvent& event
