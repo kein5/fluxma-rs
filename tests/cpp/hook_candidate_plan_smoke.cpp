@@ -35,5 +35,55 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    const auto ready_frame = fluxma::KfiKwinHookCandidates::assess(
+        compositor,
+        fluxma::KwinCompositorFrameInputs {
+            .output_id = 0,
+            .frame_id = 1,
+            .timestamp_ns = 2,
+            .width = 1920,
+            .height = 1080,
+            .gpu_handle = fluxma::GpuFrameHandle {.backend_kind = 0, .handle_id = 9},
+        }
+    );
+    if (!ready_frame.ready || ready_frame.missing_fields != fluxma::KwinFrameInputField::None) {
+        std::cerr << "complete compositor inputs must satisfy candidate readiness\n";
+        return EXIT_FAILURE;
+    }
+
+    const auto missing_frame = fluxma::KfiKwinHookCandidates::assess(
+        compositor,
+        fluxma::KwinCompositorFrameInputs {
+            .output_id = 0,
+            .frame_id = 1,
+            .timestamp_ns = 2,
+            .width = 1920,
+            .height = 1080,
+        }
+    );
+    if (missing_frame.ready ||
+        !fluxma::has_flag(missing_frame.missing_fields, fluxma::KwinFrameInputField::GpuHandle)) {
+        std::cerr << "candidate readiness must surface missing gpu handle\n";
+        return EXIT_FAILURE;
+    }
+
+    const auto missing_present = fluxma::KfiKwinHookCandidates::assess(
+        output_frame,
+        fluxma::KwinPresentFeedbackInputs {
+            .output_id = 0,
+            .frame_id = 7,
+            .presented_timestamp_ns = 8,
+            .refresh_interval_ns = 0,
+        }
+    );
+    if (missing_present.ready ||
+        !fluxma::has_flag(
+            missing_present.missing_fields,
+            fluxma::KwinPresentInputField::RefreshInterval
+        )) {
+        std::cerr << "present candidate readiness must surface missing refresh interval\n";
+        return EXIT_FAILURE;
+    }
+
     return EXIT_SUCCESS;
 }

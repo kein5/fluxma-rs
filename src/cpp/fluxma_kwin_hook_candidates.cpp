@@ -106,4 +106,32 @@ KwinPresentHookCandidatePlan KfiKwinHookCandidates::render_loop_frame_presented(
     };
 }
 
+KwinFrameHookReadiness KfiKwinHookCandidates::assess(
+    const KwinFrameHookCandidatePlan& plan,
+    const KwinCompositorFrameInputs& inputs
+) noexcept {
+    const auto missing = KfiKwinFrameBuilder::missing_required_fields(inputs);
+    return KwinFrameHookReadiness {
+        .plan = plan,
+        .missing_fields = static_cast<KwinFrameInputField>(
+            raw(missing) & raw(plan.required_fields)
+        ),
+        .ready = (raw(missing) & raw(plan.required_fields)) == 0,
+    };
+}
+
+KwinPresentHookReadiness KfiKwinHookCandidates::assess(
+    const KwinPresentHookCandidatePlan& plan,
+    const KwinPresentFeedbackInputs& inputs
+) noexcept {
+    const auto missing = KfiKwinPresentBuilder::missing_required_fields(inputs);
+    return KwinPresentHookReadiness {
+        .plan = plan,
+        .missing_fields = static_cast<KwinPresentInputField>(
+            raw(missing) & raw(plan.required_fields)
+        ),
+        .ready = (raw(missing) & raw(plan.required_fields)) == 0,
+    };
+}
+
 }  // namespace fluxma
