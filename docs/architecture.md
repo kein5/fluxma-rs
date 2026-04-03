@@ -79,6 +79,7 @@ Fluxma は次の 2 層で構成する。
 責務:
 - KWin internal hook
 - output frame の受け取り
+- KWin event から internal frame/present struct への変換
 - GPU resource lifetime 管理
 - shader dispatch
 - HUD 描画
@@ -126,7 +127,11 @@ Fluxma は次の 2 層で構成する。
 主な構成要素:
 
 - `KfiOutputController`
+- `KfiKwinHookAdapter`
+- `KfiOutputPolicy`
+- `KfiBypassPipeline`
 - `KfiFrameTap`
+- `KfiPresentFeedbackTap`
 - `KfiGpuServices`
 - `RustOutputCore`
 - `KfiHudRenderer`
@@ -144,12 +149,25 @@ Rust に渡す output frame の記述子。
 含める情報:
 - frame id
 - timestamp
+- target presentation timestamp
+- predicted render time
 - width / height
 - pixel format
 - color space / range
+- content type
 - protected flag
 - damage ratio
 - cursor visible / position / velocity
+
+現在の C++ adapter では、KWin 実境界に寄せるために
+`FinalComposedFrameMetadata` と `FinalComposedFramePayload` を分けて受け、
+それを `FrameDescriptor` に束ねる。
+present feedback 側も `PresentCompletedMetadata` と `PresentCompletedStatus` に分けて受け、
+`PresentFeedback` に束ねる。
+さらに `KwinFrameHookContext` / `KwinPresentHookContext` で、
+どの private/internal 境界から来た情報かを明示できるようにしている。
+実 hook 実装時は `KwinCompositorFrameInputs` / `KwinPresentFeedbackInputs` を埋めて、
+builder 経由で adapter へ流す前提にしている。
 
 ## 7.2 GpuFrameHandle
 
@@ -164,8 +182,12 @@ GPU resource を Rust が直接所有しないための opaque handle。
 
 - presented timestamp
 - refresh interval
+- presentation mode
 - present success/failure
 - dropped synthetic info
+
+現段階の skeleton では、controller 側に small history を持ち、
+直近の submitted frame id 群と照合して mismatch を検出する。
 
 ## 7.4 MetricsSnapshot
 
@@ -177,6 +199,10 @@ HUD / logging 用の実行状態。
 - current decision
 - bypass reason
 - protected flag
+- content type
+- presentation mode
+- target presentation timestamp
+- predicted render time
 - flow time
 - synth time
 - deadline miss count
@@ -205,6 +231,9 @@ output ごとの状態は次の enum で表現する。
 
 ### 基本原則
 失敗や不確実性がある場合は、上位状態へ無理に進まず **Bypass へ戻す**。
+
+adapter 層で未対応 output / 未対応 frame event を検出した場合も、
+controller や GPU path を無理に進めず bypass を返す。
 
 ---
 

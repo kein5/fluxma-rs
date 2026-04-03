@@ -1,0 +1,260 @@
+#pragma once
+
+#include <cstdint>
+#include <string>
+#include <string_view>
+
+#include "fluxma_rs_core.h"
+
+namespace fluxma {
+
+enum class OutputState : std::uint8_t {
+    Disabled = FLUXMA_RUST_OUTPUT_STATE_DISABLED,
+    Bypass = FLUXMA_RUST_OUTPUT_STATE_BYPASS,
+    Warmup = FLUXMA_RUST_OUTPUT_STATE_WARMUP,
+    Active2x = FLUXMA_RUST_OUTPUT_STATE_ACTIVE_2X,
+    Degraded = FLUXMA_RUST_OUTPUT_STATE_DEGRADED,
+    ProtectedBypass = FLUXMA_RUST_OUTPUT_STATE_PROTECTED_BYPASS,
+    Faulted = FLUXMA_RUST_OUTPUT_STATE_FAULTED,
+};
+
+enum class BypassReason : std::uint8_t {
+    None = FLUXMA_RUST_BYPASS_REASON_NONE,
+    Disabled = FLUXMA_RUST_BYPASS_REASON_DISABLED,
+    ProtectedContent = FLUXMA_RUST_BYPASS_REASON_PROTECTED_CONTENT,
+    HookUnavailable = FLUXMA_RUST_BYPASS_REASON_HOOK_UNAVAILABLE,
+    UnsupportedOutput = FLUXMA_RUST_BYPASS_REASON_UNSUPPORTED_OUTPUT,
+    GpuPathNotReady = FLUXMA_RUST_BYPASS_REASON_GPU_PATH_NOT_READY,
+    Fault = FLUXMA_RUST_BYPASS_REASON_FAULT,
+};
+
+enum class PresentationMode : std::uint8_t {
+    VSync = FLUXMA_RUST_PRESENTATION_MODE_VSYNC,
+    AdaptiveSync = FLUXMA_RUST_PRESENTATION_MODE_ADAPTIVE_SYNC,
+    Async = FLUXMA_RUST_PRESENTATION_MODE_ASYNC,
+    AdaptiveAsync = FLUXMA_RUST_PRESENTATION_MODE_ADAPTIVE_ASYNC,
+};
+
+enum class ContentType : std::uint8_t {
+    None = FLUXMA_RUST_CONTENT_TYPE_NONE,
+    Photo = FLUXMA_RUST_CONTENT_TYPE_PHOTO,
+    Video = FLUXMA_RUST_CONTENT_TYPE_VIDEO,
+    Game = FLUXMA_RUST_CONTENT_TYPE_GAME,
+};
+
+struct GpuFrameHandle {
+    std::uint32_t backend_kind = 0;
+    std::uint64_t handle_id = 0;
+};
+
+struct FrameDescriptor {
+    std::uint64_t frame_id = 0;
+    std::uint64_t timestamp_ns = 0;
+    std::uint64_t target_presentation_timestamp_ns = 0;
+    std::uint64_t predicted_render_time_ns = 0;
+    std::uint32_t width = 0;
+    std::uint32_t height = 0;
+    std::uint32_t pixel_format = 0;
+    std::uint32_t color_space = 0;
+    ContentType content_type = ContentType::None;
+    bool protected_content = false;
+    double damage_ratio = 0.0;
+    bool cursor_visible = false;
+    double cursor_x = 0.0;
+    double cursor_y = 0.0;
+    double cursor_velocity_x = 0.0;
+    double cursor_velocity_y = 0.0;
+    GpuFrameHandle gpu_handle {};
+
+    [[nodiscard]] FluxmaRustFrameDescriptor to_ffi() const noexcept {
+        return FluxmaRustFrameDescriptor {
+            .frame_id = frame_id,
+            .timestamp_ns = timestamp_ns,
+            .target_presentation_timestamp_ns = target_presentation_timestamp_ns,
+            .predicted_render_time_ns = predicted_render_time_ns,
+            .width = width,
+            .height = height,
+            .pixel_format = pixel_format,
+            .color_space = color_space,
+            .content_type = static_cast<FluxmaRustContentType>(content_type),
+            .protected_content = static_cast<std::uint8_t>(protected_content ? 1 : 0),
+            .reserved = {0, 0},
+            .damage_ratio = damage_ratio,
+            .cursor_visible = static_cast<std::uint8_t>(cursor_visible ? 1 : 0),
+            .cursor_reserved = {0, 0, 0, 0, 0, 0, 0},
+            .cursor_x = cursor_x,
+            .cursor_y = cursor_y,
+            .cursor_velocity_x = cursor_velocity_x,
+            .cursor_velocity_y = cursor_velocity_y,
+            .gpu_handle =
+                FluxmaRustGpuFrameHandle {
+                    .backend_kind = gpu_handle.backend_kind,
+                    .handle_id = gpu_handle.handle_id,
+                },
+        };
+    }
+};
+
+struct PresentFeedback {
+    std::uint64_t frame_id = 0;
+    std::uint64_t presented_timestamp_ns = 0;
+    std::uint64_t refresh_interval_ns = 0;
+    PresentationMode presentation_mode = PresentationMode::VSync;
+    bool present_success = false;
+    bool dropped_synthetic = false;
+
+    [[nodiscard]] FluxmaRustPresentFeedback to_ffi() const noexcept {
+        return FluxmaRustPresentFeedback {
+            .frame_id = frame_id,
+            .presented_timestamp_ns = presented_timestamp_ns,
+            .refresh_interval_ns = refresh_interval_ns,
+            .presentation_mode = static_cast<FluxmaRustPresentationMode>(presentation_mode),
+            .present_success = static_cast<std::uint8_t>(present_success ? 1 : 0),
+            .dropped_synthetic = static_cast<std::uint8_t>(dropped_synthetic ? 1 : 0),
+            .reserved = {0, 0, 0, 0, 0},
+        };
+    }
+};
+
+struct OutputDecision {
+    OutputState state = OutputState::Bypass;
+    BypassReason bypass_reason = BypassReason::None;
+    bool passthrough_only = true;
+
+    [[nodiscard]] static OutputDecision from_ffi(FluxmaRustDecision decision) noexcept {
+        return OutputDecision {
+            .state = static_cast<OutputState>(decision.state),
+            .bypass_reason = static_cast<BypassReason>(decision.bypass_reason),
+            .passthrough_only = decision.passthrough_only != 0,
+        };
+    }
+};
+
+struct MetricsSnapshot {
+    OutputState state = OutputState::Bypass;
+    BypassReason bypass_reason = BypassReason::None;
+    bool protected_content = false;
+    bool passthrough_only = true;
+    std::uint64_t frame_tap_count = 0;
+    std::uint64_t present_feedback_count = 0;
+    std::uint64_t deadline_miss_count = 0;
+    std::uint64_t dropped_synthetic_count = 0;
+    std::uint64_t last_presented_frame_id = 0;
+    std::uint64_t last_presented_timestamp_ns = 0;
+    std::uint64_t refresh_interval_ns = 0;
+    std::uint64_t last_target_presentation_timestamp_ns = 0;
+    std::uint64_t last_predicted_render_time_ns = 0;
+    PresentationMode last_presentation_mode = PresentationMode::VSync;
+    ContentType last_content_type = ContentType::None;
+
+    [[nodiscard]] static MetricsSnapshot from_ffi(
+        FluxmaRustMetricsSnapshot snapshot
+    ) noexcept {
+        return MetricsSnapshot {
+            .state = static_cast<OutputState>(snapshot.state),
+            .bypass_reason = static_cast<BypassReason>(snapshot.bypass_reason),
+            .protected_content = snapshot.protected_content != 0,
+            .passthrough_only = snapshot.passthrough_only != 0,
+            .frame_tap_count = snapshot.frame_tap_count,
+            .present_feedback_count = snapshot.present_feedback_count,
+            .deadline_miss_count = snapshot.deadline_miss_count,
+            .dropped_synthetic_count = snapshot.dropped_synthetic_count,
+            .last_presented_frame_id = snapshot.last_presented_frame_id,
+            .last_presented_timestamp_ns = snapshot.last_presented_timestamp_ns,
+            .refresh_interval_ns = snapshot.refresh_interval_ns,
+            .last_target_presentation_timestamp_ns =
+                snapshot.last_target_presentation_timestamp_ns,
+            .last_predicted_render_time_ns = snapshot.last_predicted_render_time_ns,
+            .last_presentation_mode =
+                static_cast<PresentationMode>(snapshot.last_presentation_mode),
+            .last_content_type = static_cast<ContentType>(snapshot.last_content_type),
+        };
+    }
+};
+
+struct PassthroughSubmission {
+    std::uint32_t output_id = 0;
+    std::uint64_t frame_id = 0;
+    GpuFrameHandle source_frame {};
+    bool accepted = false;
+    bool protected_content = false;
+    BypassReason bypass_reason = BypassReason::None;
+};
+
+[[nodiscard]] inline std::string_view to_string(OutputState state) noexcept {
+    switch (state) {
+    case OutputState::Disabled:
+        return "disabled";
+    case OutputState::Bypass:
+        return "bypass";
+    case OutputState::Warmup:
+        return "warmup";
+    case OutputState::Active2x:
+        return "active-2x";
+    case OutputState::Degraded:
+        return "degraded";
+    case OutputState::ProtectedBypass:
+        return "protected-bypass";
+    case OutputState::Faulted:
+        return "faulted";
+    }
+
+    return "unknown";
+}
+
+[[nodiscard]] inline std::string_view to_string(BypassReason reason) noexcept {
+    switch (reason) {
+    case BypassReason::None:
+        return "none";
+    case BypassReason::Disabled:
+        return "disabled";
+    case BypassReason::ProtectedContent:
+        return "protected-content";
+    case BypassReason::HookUnavailable:
+        return "hook-unavailable";
+    case BypassReason::UnsupportedOutput:
+        return "unsupported-output";
+    case BypassReason::GpuPathNotReady:
+        return "gpu-path-not-ready";
+    case BypassReason::Fault:
+        return "fault";
+    }
+
+    return "unknown";
+}
+
+[[nodiscard]] inline std::string_view to_string(PresentationMode mode) noexcept {
+    switch (mode) {
+    case PresentationMode::VSync:
+        return "vsync";
+    case PresentationMode::AdaptiveSync:
+        return "adaptive-sync";
+    case PresentationMode::Async:
+        return "async";
+    case PresentationMode::AdaptiveAsync:
+        return "adaptive-async";
+    }
+
+    return "unknown";
+}
+
+[[nodiscard]] inline std::string_view to_string(ContentType content_type) noexcept {
+    switch (content_type) {
+    case ContentType::None:
+        return "none";
+    case ContentType::Photo:
+        return "photo";
+    case ContentType::Video:
+        return "video";
+    case ContentType::Game:
+        return "game";
+    }
+
+    return "unknown";
+}
+
+[[nodiscard]] inline std::string to_bool_string(bool value) {
+    return value ? "yes" : "no";
+}
+
+}  // namespace fluxma

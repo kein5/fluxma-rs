@@ -1,0 +1,132 @@
+#pragma once
+
+#include "fluxma_kwin_hook_adapter.h"
+
+namespace fluxma {
+
+struct KwinCompositorFrameInputs {
+    std::uint32_t output_id = 0;
+    std::uint64_t frame_id = 0;
+    std::uint64_t timestamp_ns = 0;
+    std::uint64_t target_presentation_timestamp_ns = 0;
+    std::uint64_t predicted_render_time_ns = 0;
+    ContentType content_type = ContentType::None;
+    std::uint32_t width = 0;
+    std::uint32_t height = 0;
+    std::uint32_t pixel_format = 0;
+    std::uint32_t color_space = 0;
+    bool protected_content = false;
+    double damage_ratio = 0.0;
+    bool cursor_visible = false;
+    double cursor_x = 0.0;
+    double cursor_y = 0.0;
+    double cursor_velocity_x = 0.0;
+    double cursor_velocity_y = 0.0;
+    GpuFrameHandle gpu_handle {};
+    bool cursor_composited_in_frame = true;
+    bool overlay_promoted = false;
+};
+
+struct KwinPresentFeedbackInputs {
+    std::uint32_t output_id = 0;
+    std::uint64_t frame_id = 0;
+    std::uint64_t presented_timestamp_ns = 0;
+    std::uint64_t refresh_interval_ns = 0;
+    PresentationMode presentation_mode = PresentationMode::VSync;
+    bool present_success = false;
+    bool dropped_synthetic = false;
+};
+
+struct KwinResolvedFrameHook {
+    KwinFrameHookContext context {};
+    FinalComposedFrameEvent event {};
+};
+
+struct KwinResolvedPresentHook {
+    KwinPresentHookContext context {};
+    PresentCompletedEvent event {};
+};
+
+class KfiKwinFrameBuilder {
+  public:
+    // Use when the hook is placed in Compositor::composite(RenderLoop *) after OutputFrame
+    // construction and before BackendOutput::present(..., frame).
+    [[nodiscard]] static KwinFrameHookContext compositor_output_frame_ready() noexcept;
+    // Use when the hook is placed at backend present handoff where cursor/overlay promotion
+    // may already be known.
+    [[nodiscard]] static KwinFrameHookContext backend_present_handoff(
+        bool cursor_composited_in_frame,
+        bool overlay_promoted
+    ) noexcept;
+
+    [[nodiscard]] static FinalComposedFrameMetadata compositor_metadata(
+        std::uint64_t frame_id,
+        std::uint64_t timestamp_ns,
+        std::uint64_t target_presentation_timestamp_ns,
+        std::uint64_t predicted_render_time_ns,
+        ContentType content_type
+    ) noexcept;
+
+    [[nodiscard]] static FinalComposedFramePayload payload(
+        std::uint32_t width,
+        std::uint32_t height,
+        std::uint32_t pixel_format,
+        std::uint32_t color_space,
+        bool protected_content,
+        double damage_ratio,
+        bool cursor_visible,
+        double cursor_x,
+        double cursor_y,
+        double cursor_velocity_x,
+        double cursor_velocity_y,
+        GpuFrameHandle gpu_handle
+    ) noexcept;
+
+    [[nodiscard]] static KwinFrameHookContext compositor_context(
+        const KwinCompositorFrameInputs& inputs
+    ) noexcept;
+    [[nodiscard]] static FinalComposedFrameEvent compositor_event(
+        const KwinCompositorFrameInputs& inputs
+    ) noexcept;
+    [[nodiscard]] static KwinResolvedFrameHook compositor_bundle(
+        const KwinCompositorFrameInputs& inputs
+    ) noexcept;
+};
+
+class KfiKwinPresentBuilder {
+  public:
+    // Use when the hook is placed near OutputFrame::presented(...).
+    [[nodiscard]] static KwinPresentHookContext output_frame_presented() noexcept;
+    // Use when the hook is placed near RenderLoop::framePresented(...).
+    [[nodiscard]] static KwinPresentHookContext render_loop_frame_presented() noexcept;
+
+    [[nodiscard]] static PresentCompletedMetadata metadata(
+        std::uint64_t frame_id,
+        std::uint64_t presented_timestamp_ns,
+        std::uint64_t refresh_interval_ns,
+        PresentationMode presentation_mode
+    ) noexcept;
+
+    [[nodiscard]] static PresentCompletedStatus status(
+        bool present_success,
+        bool dropped_synthetic
+    ) noexcept;
+
+    [[nodiscard]] static KwinPresentHookContext output_frame_presented_context() noexcept;
+    [[nodiscard]] static KwinPresentHookContext render_loop_presented_context() noexcept;
+    [[nodiscard]] static PresentCompletedEvent output_frame_presented_event(
+        const KwinPresentFeedbackInputs& inputs
+    ) noexcept;
+
+    [[nodiscard]] static PresentCompletedEvent render_loop_presented_event(
+        const KwinPresentFeedbackInputs& inputs
+    ) noexcept;
+    [[nodiscard]] static KwinResolvedPresentHook output_frame_presented_bundle(
+        const KwinPresentFeedbackInputs& inputs
+    ) noexcept;
+    [[nodiscard]] static KwinResolvedPresentHook render_loop_presented_bundle(
+        const KwinPresentFeedbackInputs& inputs
+    ) noexcept;
+};
+
+}  // namespace fluxma

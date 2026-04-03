@@ -1,0 +1,17 @@
+#pragma once
+
+#include <string>
+
+#include "fluxma_types.h"
+
+namespace fluxma {
+
+class KfiHudRenderer {
+  public:
+    [[nodiscard]] std::string compose_text(
+        std::uint32_t output_id,
+        const MetricsSnapshot& snapshot
+    ) const;
+};
+
+}  // namespace fluxma

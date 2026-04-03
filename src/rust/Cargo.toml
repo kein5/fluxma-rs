@@ -1,0 +1,13 @@
+[package]
+name = "fluxma-rs-core"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+publish = false
+build = "build.rs"
+
+[lib]
+name = "fluxma_rs_core"
+crate-type = ["staticlib"]
+
+[dependencies]
