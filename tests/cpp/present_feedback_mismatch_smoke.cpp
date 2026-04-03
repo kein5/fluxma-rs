@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <iostream>
 
+#include "fluxma_kwin_hook_builders.h"
 #include "fluxma_plugin_root.h"
 
 int main() {
@@ -43,17 +44,17 @@ int main() {
     }
 
     hook_adapter.on_render_loop_frame_presented(
-        0,
-        fluxma::PresentCompletedMetadata {
-            .frame_id = 99,
-            .presented_timestamp_ns = 21'000'000,
-            .refresh_interval_ns = 16'666'667,
-            .presentation_mode = fluxma::PresentationMode::VSync,
-        },
-        fluxma::PresentCompletedStatus {
-            .present_success = true,
-            .dropped_synthetic = false,
-        }
+        fluxma::KfiKwinPresentBuilder::render_loop_presented_bundle(
+            fluxma::KwinPresentFeedbackInputs {
+                .output_id = 0,
+                .frame_id = 99,
+                .presented_timestamp_ns = 21'000'000,
+                .refresh_interval_ns = 16'666'667,
+                .presentation_mode = fluxma::PresentationMode::VSync,
+                .present_success = true,
+                .dropped_synthetic = false,
+            }
+        )
     );
 
     const auto snapshot = output.snapshot_metrics();
@@ -105,30 +106,30 @@ int main() {
     }
 
     hook_adapter.on_render_loop_frame_presented(
-        0,
-        fluxma::PresentCompletedMetadata {
-            .frame_id = 42,
-            .presented_timestamp_ns = 24'000'000,
-            .refresh_interval_ns = 16'666'667,
-            .presentation_mode = fluxma::PresentationMode::VSync,
-        },
-        fluxma::PresentCompletedStatus {
-            .present_success = true,
-            .dropped_synthetic = false,
-        }
+        fluxma::KfiKwinPresentBuilder::render_loop_presented_bundle(
+            fluxma::KwinPresentFeedbackInputs {
+                .output_id = 0,
+                .frame_id = 42,
+                .presented_timestamp_ns = 24'000'000,
+                .refresh_interval_ns = 16'666'667,
+                .presentation_mode = fluxma::PresentationMode::VSync,
+                .present_success = true,
+                .dropped_synthetic = false,
+            }
+        )
     );
     hook_adapter.on_render_loop_frame_presented(
-        0,
-        fluxma::PresentCompletedMetadata {
-            .frame_id = 41,
-            .presented_timestamp_ns = 23'000'000,
-            .refresh_interval_ns = 16'666'667,
-            .presentation_mode = fluxma::PresentationMode::VSync,
-        },
-        fluxma::PresentCompletedStatus {
-            .present_success = true,
-            .dropped_synthetic = false,
-        }
+        fluxma::KfiKwinPresentBuilder::render_loop_presented_bundle(
+            fluxma::KwinPresentFeedbackInputs {
+                .output_id = 0,
+                .frame_id = 41,
+                .presented_timestamp_ns = 23'000'000,
+                .refresh_interval_ns = 16'666'667,
+                .presentation_mode = fluxma::PresentationMode::VSync,
+                .present_success = true,
+                .dropped_synthetic = false,
+            }
+        )
     );
 
     const auto delayed_logs = output.log_messages();

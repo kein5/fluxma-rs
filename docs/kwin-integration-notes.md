@@ -109,6 +109,7 @@ KWin source 上の観察:
 - adapter には `KwinFrameHookContext` / `KwinPresentHookContext` も追加し、`Compositor` 境界なのか `OutputFrame` / `RenderLoop` 境界なのかを API 上で明示できるようにした
 - `KfiKwinFrameBuilder` / `KfiKwinPresentBuilder` を追加し、各 KWin 境界で埋める metadata/status/context の組を helper として固定した
 - `KwinCompositorFrameInputs` / `KwinPresentFeedbackInputs` を追加し、実 hook 実装時にどの field を埋めるべきかを input struct として固定した
+- builder から `KwinResolvedFrameHook` / `KwinResolvedPresentHook` をまとめて作れるようにし、実 hook 側は `inputs -> bundle -> adapter` の形で流せるようにした
 - `KfiOutputPolicy` は provenance context も見るようにし、MVP で未対応な frame hook 境界は `HookUnavailable` bypass、unknown present hook 境界は ignore に倒す
 - adapter 層では width/height/gpu handle の最低限 validation を行い、未対応入力は `unsupported-output` bypass に倒す
 - MVP の単一出力制約に合わせ、target output 以外の event は adapter 層で無視または `unsupported-output` bypass に倒す
