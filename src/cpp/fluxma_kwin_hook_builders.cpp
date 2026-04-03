@@ -167,6 +167,40 @@ KwinResolvedFrameHook KfiKwinFrameBuilder::compositor_bundle(
     };
 }
 
+KwinFrameFieldSources KfiKwinFrameBuilder::compositor_field_sources() noexcept {
+    return KwinFrameFieldSources {
+        .frame_id = KwinFrameFieldSource::CompositorHook,
+        .timestamp_ns = KwinFrameFieldSource::CompositorHook,
+        .target_presentation_timestamp_ns = KwinFrameFieldSource::OutputFrame,
+        .predicted_render_time_ns = KwinFrameFieldSource::OutputFrame,
+        .content_type = KwinFrameFieldSource::CompositorHook,
+        .width = KwinFrameFieldSource::OutputFrame,
+        .height = KwinFrameFieldSource::OutputFrame,
+        .pixel_format = KwinFrameFieldSource::OutputFrame,
+        .color_space = KwinFrameFieldSource::OutputFrame,
+        .damage_ratio = KwinFrameFieldSource::CompositorHook,
+        .cursor_state = KwinFrameFieldSource::CursorSceneState,
+        .gpu_handle = KwinFrameFieldSource::BackendPresentPath,
+    };
+}
+
+KwinFrameFieldSources KfiKwinFrameBuilder::backend_present_handoff_field_sources() noexcept {
+    return KwinFrameFieldSources {
+        .frame_id = KwinFrameFieldSource::BackendPresentPath,
+        .timestamp_ns = KwinFrameFieldSource::CompositorHook,
+        .target_presentation_timestamp_ns = KwinFrameFieldSource::OutputFrame,
+        .predicted_render_time_ns = KwinFrameFieldSource::OutputFrame,
+        .content_type = KwinFrameFieldSource::CompositorHook,
+        .width = KwinFrameFieldSource::BackendPresentPath,
+        .height = KwinFrameFieldSource::BackendPresentPath,
+        .pixel_format = KwinFrameFieldSource::BackendPresentPath,
+        .color_space = KwinFrameFieldSource::BackendPresentPath,
+        .damage_ratio = KwinFrameFieldSource::CompositorHook,
+        .cursor_state = KwinFrameFieldSource::CursorSceneState,
+        .gpu_handle = KwinFrameFieldSource::BackendPresentPath,
+    };
+}
+
 KwinPresentInputField KfiKwinPresentBuilder::missing_required_fields(
     const KwinPresentFeedbackInputs& inputs
 ) noexcept {
@@ -266,6 +300,28 @@ KwinResolvedPresentHook KfiKwinPresentBuilder::render_loop_presented_bundle(
     return KwinResolvedPresentHook {
         .context = render_loop_presented_context(),
         .event = render_loop_presented_event(inputs),
+    };
+}
+
+KwinPresentFieldSources KfiKwinPresentBuilder::output_frame_presented_field_sources() noexcept {
+    return KwinPresentFieldSources {
+        .frame_id = KwinPresentFieldSource::OutputFramePresented,
+        .presented_timestamp_ns = KwinPresentFieldSource::OutputFramePresented,
+        .refresh_interval_ns = KwinPresentFieldSource::OutputFramePresented,
+        .presentation_mode = KwinPresentFieldSource::OutputFramePresented,
+        .present_success = KwinPresentFieldSource::OutputFramePresented,
+        .dropped_synthetic = KwinPresentFieldSource::OutputFramePresented,
+    };
+}
+
+KwinPresentFieldSources KfiKwinPresentBuilder::render_loop_presented_field_sources() noexcept {
+    return KwinPresentFieldSources {
+        .frame_id = KwinPresentFieldSource::RenderLoopPresented,
+        .presented_timestamp_ns = KwinPresentFieldSource::RenderLoopPresented,
+        .refresh_interval_ns = KwinPresentFieldSource::RenderLoopPresented,
+        .presentation_mode = KwinPresentFieldSource::RenderLoopPresented,
+        .present_success = KwinPresentFieldSource::RenderLoopPresented,
+        .dropped_synthetic = KwinPresentFieldSource::RenderLoopPresented,
     };
 }
 

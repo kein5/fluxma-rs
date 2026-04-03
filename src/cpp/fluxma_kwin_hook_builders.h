@@ -63,6 +63,45 @@ enum class KwinPresentInputField : std::uint32_t {
     RefreshInterval = 1u << 2,
 };
 
+enum class KwinFrameFieldSource : std::uint8_t {
+    Unknown = 0,
+    CompositorHook = 1,
+    OutputFrame = 2,
+    BackendPresentPath = 3,
+    CursorSceneState = 4,
+};
+
+enum class KwinPresentFieldSource : std::uint8_t {
+    Unknown = 0,
+    OutputFramePresented = 1,
+    RenderLoopPresented = 2,
+    BackendPageFlip = 3,
+};
+
+struct KwinFrameFieldSources {
+    KwinFrameFieldSource frame_id = KwinFrameFieldSource::Unknown;
+    KwinFrameFieldSource timestamp_ns = KwinFrameFieldSource::Unknown;
+    KwinFrameFieldSource target_presentation_timestamp_ns = KwinFrameFieldSource::Unknown;
+    KwinFrameFieldSource predicted_render_time_ns = KwinFrameFieldSource::Unknown;
+    KwinFrameFieldSource content_type = KwinFrameFieldSource::Unknown;
+    KwinFrameFieldSource width = KwinFrameFieldSource::Unknown;
+    KwinFrameFieldSource height = KwinFrameFieldSource::Unknown;
+    KwinFrameFieldSource pixel_format = KwinFrameFieldSource::Unknown;
+    KwinFrameFieldSource color_space = KwinFrameFieldSource::Unknown;
+    KwinFrameFieldSource damage_ratio = KwinFrameFieldSource::Unknown;
+    KwinFrameFieldSource cursor_state = KwinFrameFieldSource::Unknown;
+    KwinFrameFieldSource gpu_handle = KwinFrameFieldSource::Unknown;
+};
+
+struct KwinPresentFieldSources {
+    KwinPresentFieldSource frame_id = KwinPresentFieldSource::Unknown;
+    KwinPresentFieldSource presented_timestamp_ns = KwinPresentFieldSource::Unknown;
+    KwinPresentFieldSource refresh_interval_ns = KwinPresentFieldSource::Unknown;
+    KwinPresentFieldSource presentation_mode = KwinPresentFieldSource::Unknown;
+    KwinPresentFieldSource present_success = KwinPresentFieldSource::Unknown;
+    KwinPresentFieldSource dropped_synthetic = KwinPresentFieldSource::Unknown;
+};
+
 class KfiKwinFrameBuilder {
   public:
     [[nodiscard]] static KwinFrameInputField missing_required_fields(
@@ -112,6 +151,8 @@ class KfiKwinFrameBuilder {
     [[nodiscard]] static KwinResolvedFrameHook compositor_bundle(
         const KwinCompositorFrameInputs& inputs
     ) noexcept;
+    [[nodiscard]] static KwinFrameFieldSources compositor_field_sources() noexcept;
+    [[nodiscard]] static KwinFrameFieldSources backend_present_handoff_field_sources() noexcept;
 };
 
 class KfiKwinPresentBuilder {
@@ -153,6 +194,8 @@ class KfiKwinPresentBuilder {
     [[nodiscard]] static KwinResolvedPresentHook render_loop_presented_bundle(
         const KwinPresentFeedbackInputs& inputs
     ) noexcept;
+    [[nodiscard]] static KwinPresentFieldSources output_frame_presented_field_sources() noexcept;
+    [[nodiscard]] static KwinPresentFieldSources render_loop_presented_field_sources() noexcept;
 };
 
 }  // namespace fluxma

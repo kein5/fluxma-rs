@@ -170,6 +170,9 @@ present feedback 側も `PresentCompletedMetadata` と `PresentCompletedStatus` 
 builder 経由で adapter へ流す前提にしている。
 また builder には `is_complete()` を持たせ、不完全な hook 入力からは
 sentinel event しか生成しないことで、欠損 metadata をそのまま adapter に流さない。
+さらに field source plan helper を持たせ、frame/present の各必須値を
+`Compositor` / `OutputFrame` / `RenderLoop` / backend present path のどこから
+埋める想定かを型として保持している。
 
 ## 7.2 GpuFrameHandle
 
