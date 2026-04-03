@@ -111,6 +111,7 @@ KWin source 上の観察:
 - `KwinCompositorFrameInputs` / `KwinPresentFeedbackInputs` を追加し、実 hook 実装時にどの field を埋めるべきかを input struct として固定した
 - builder から `KwinResolvedFrameHook` / `KwinResolvedPresentHook` をまとめて作れるようにし、実 hook 側は `inputs -> bundle -> adapter` の形で流せるようにした
 - builder には `is_complete()` を追加し、`frame_id/timestamp/size/gpu_handle` や `frame_id/presented_timestamp/refresh_interval` が欠けた入力は sentinel event に畳むようにした
+- builder には `missing_required_fields()` も追加し、実 hook 実装時にどの必須 field が未取得なのかを bitmask で追えるようにした
 - `KfiOutputPolicy` は provenance context も見るようにし、MVP で未対応な frame hook 境界は `HookUnavailable` bypass、unknown present hook 境界は ignore に倒す
 - present feedback では `frame_id/presented_timestamp_ns/refresh_interval_ns` が欠けた入力も ignore に倒し、欠損 metadata を Rust metrics に流さない
 - adapter 層では width/height/gpu handle の最低限 validation を行い、未対応入力は `unsupported-output` bypass に倒す

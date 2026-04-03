@@ -47,8 +47,27 @@ struct KwinResolvedPresentHook {
     PresentCompletedEvent event {};
 };
 
+enum class KwinFrameInputField : std::uint32_t {
+    None = 0,
+    FrameId = 1u << 0,
+    Timestamp = 1u << 1,
+    Width = 1u << 2,
+    Height = 1u << 3,
+    GpuHandle = 1u << 4,
+};
+
+enum class KwinPresentInputField : std::uint32_t {
+    None = 0,
+    FrameId = 1u << 0,
+    PresentedTimestamp = 1u << 1,
+    RefreshInterval = 1u << 2,
+};
+
 class KfiKwinFrameBuilder {
   public:
+    [[nodiscard]] static KwinFrameInputField missing_required_fields(
+        const KwinCompositorFrameInputs& inputs
+    ) noexcept;
     [[nodiscard]] static bool is_complete(const KwinCompositorFrameInputs& inputs) noexcept;
 
     // Use when the hook is placed in Compositor::composite(RenderLoop *) after OutputFrame
@@ -97,6 +116,9 @@ class KfiKwinFrameBuilder {
 
 class KfiKwinPresentBuilder {
   public:
+    [[nodiscard]] static KwinPresentInputField missing_required_fields(
+        const KwinPresentFeedbackInputs& inputs
+    ) noexcept;
     [[nodiscard]] static bool is_complete(const KwinPresentFeedbackInputs& inputs) noexcept;
 
     // Use when the hook is placed near OutputFrame::presented(...).

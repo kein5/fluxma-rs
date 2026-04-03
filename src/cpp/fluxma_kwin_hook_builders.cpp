@@ -2,9 +2,50 @@
 
 namespace fluxma {
 
+namespace {
+
+constexpr std::uint32_t raw(KwinFrameInputField field) noexcept {
+    return static_cast<std::uint32_t>(field);
+}
+
+constexpr std::uint32_t raw(KwinPresentInputField field) noexcept {
+    return static_cast<std::uint32_t>(field);
+}
+
+constexpr KwinFrameInputField frame_mask(std::uint32_t value) noexcept {
+    return static_cast<KwinFrameInputField>(value);
+}
+
+constexpr KwinPresentInputField present_mask(std::uint32_t value) noexcept {
+    return static_cast<KwinPresentInputField>(value);
+}
+
+}  // namespace
+
+KwinFrameInputField KfiKwinFrameBuilder::missing_required_fields(
+    const KwinCompositorFrameInputs& inputs
+) noexcept {
+    std::uint32_t missing = raw(KwinFrameInputField::None);
+    if (inputs.frame_id == 0) {
+        missing |= raw(KwinFrameInputField::FrameId);
+    }
+    if (inputs.timestamp_ns == 0) {
+        missing |= raw(KwinFrameInputField::Timestamp);
+    }
+    if (inputs.width == 0) {
+        missing |= raw(KwinFrameInputField::Width);
+    }
+    if (inputs.height == 0) {
+        missing |= raw(KwinFrameInputField::Height);
+    }
+    if (inputs.gpu_handle.handle_id == 0) {
+        missing |= raw(KwinFrameInputField::GpuHandle);
+    }
+    return frame_mask(missing);
+}
+
 bool KfiKwinFrameBuilder::is_complete(const KwinCompositorFrameInputs& inputs) noexcept {
-    return inputs.frame_id != 0 && inputs.timestamp_ns != 0 && inputs.width != 0 &&
-        inputs.height != 0 && inputs.gpu_handle.handle_id != 0;
+    return missing_required_fields(inputs) == KwinFrameInputField::None;
 }
 
 KwinFrameHookContext KfiKwinFrameBuilder::compositor_output_frame_ready() noexcept {
@@ -126,9 +167,24 @@ KwinResolvedFrameHook KfiKwinFrameBuilder::compositor_bundle(
     };
 }
 
+KwinPresentInputField KfiKwinPresentBuilder::missing_required_fields(
+    const KwinPresentFeedbackInputs& inputs
+) noexcept {
+    std::uint32_t missing = raw(KwinPresentInputField::None);
+    if (inputs.frame_id == 0) {
+        missing |= raw(KwinPresentInputField::FrameId);
+    }
+    if (inputs.presented_timestamp_ns == 0) {
+        missing |= raw(KwinPresentInputField::PresentedTimestamp);
+    }
+    if (inputs.refresh_interval_ns == 0) {
+        missing |= raw(KwinPresentInputField::RefreshInterval);
+    }
+    return present_mask(missing);
+}
+
 bool KfiKwinPresentBuilder::is_complete(const KwinPresentFeedbackInputs& inputs) noexcept {
-    return inputs.frame_id != 0 && inputs.presented_timestamp_ns != 0 &&
-        inputs.refresh_interval_ns != 0;
+    return missing_required_fields(inputs) == KwinPresentInputField::None;
 }
 
 KwinPresentHookContext KfiKwinPresentBuilder::output_frame_presented() noexcept {
