@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <iostream>
 
+#include "fluxma_kwin_hook_builders.h"
 #include "fluxma_plugin_root.h"
 
 int main() {
@@ -50,17 +51,17 @@ int main() {
     }
 
     hook_adapter.on_render_loop_frame_presented(
-        1,
-        fluxma::PresentCompletedMetadata {
-            .frame_id = 77,
-            .presented_timestamp_ns = 15'000'000,
-            .refresh_interval_ns = 16'666'667,
-            .presentation_mode = fluxma::PresentationMode::VSync,
-        },
-        fluxma::PresentCompletedStatus {
-            .present_success = false,
-            .dropped_synthetic = true,
-        }
+        fluxma::KfiKwinPresentBuilder::render_loop_presented_bundle(
+            fluxma::KwinPresentFeedbackInputs {
+                .output_id = 1,
+                .frame_id = 77,
+                .presented_timestamp_ns = 15'000'000,
+                .refresh_interval_ns = 16'666'667,
+                .presentation_mode = fluxma::PresentationMode::VSync,
+                .present_success = false,
+                .dropped_synthetic = true,
+            }
+        )
     );
 
     const auto snapshot = output.snapshot_metrics();

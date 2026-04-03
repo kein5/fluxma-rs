@@ -168,6 +168,8 @@ present feedback 側も `PresentCompletedMetadata` と `PresentCompletedStatus` 
 どの private/internal 境界から来た情報かを明示できるようにしている。
 実 hook 実装時は `KwinCompositorFrameInputs` / `KwinPresentFeedbackInputs` を埋めて、
 builder 経由で adapter へ流す前提にしている。
+また builder には `is_complete()` を持たせ、不完全な hook 入力からは
+sentinel event しか生成しないことで、欠損 metadata をそのまま adapter に流さない。
 
 ## 7.2 GpuFrameHandle
 

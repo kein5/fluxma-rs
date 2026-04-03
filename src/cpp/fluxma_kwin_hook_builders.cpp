@@ -2,6 +2,11 @@
 
 namespace fluxma {
 
+bool KfiKwinFrameBuilder::is_complete(const KwinCompositorFrameInputs& inputs) noexcept {
+    return inputs.frame_id != 0 && inputs.timestamp_ns != 0 && inputs.width != 0 &&
+        inputs.height != 0 && inputs.gpu_handle.handle_id != 0;
+}
+
 KwinFrameHookContext KfiKwinFrameBuilder::compositor_output_frame_ready() noexcept {
     return KwinFrameHookContext {
         .hook_point = KwinFrameHookPoint::CompositorOutputFrameReady,
@@ -80,6 +85,10 @@ KwinFrameHookContext KfiKwinFrameBuilder::compositor_context(
 FinalComposedFrameEvent KfiKwinFrameBuilder::compositor_event(
     const KwinCompositorFrameInputs& inputs
 ) noexcept {
+    if (!is_complete(inputs)) {
+        return {};
+    }
+
     return FinalComposedFrameEvent {
         .output_id = inputs.output_id,
         .metadata =
@@ -115,6 +124,11 @@ KwinResolvedFrameHook KfiKwinFrameBuilder::compositor_bundle(
         .context = compositor_context(inputs),
         .event = compositor_event(inputs),
     };
+}
+
+bool KfiKwinPresentBuilder::is_complete(const KwinPresentFeedbackInputs& inputs) noexcept {
+    return inputs.frame_id != 0 && inputs.presented_timestamp_ns != 0 &&
+        inputs.refresh_interval_ns != 0;
 }
 
 KwinPresentHookContext KfiKwinPresentBuilder::output_frame_presented() noexcept {
@@ -160,6 +174,10 @@ KwinPresentHookContext KfiKwinPresentBuilder::render_loop_presented_context() no
 PresentCompletedEvent KfiKwinPresentBuilder::output_frame_presented_event(
     const KwinPresentFeedbackInputs& inputs
 ) noexcept {
+    if (!is_complete(inputs)) {
+        return {};
+    }
+
     return PresentCompletedEvent {
         .output_id = inputs.output_id,
         .frame_id = inputs.frame_id,

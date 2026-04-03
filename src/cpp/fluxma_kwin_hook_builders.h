@@ -49,6 +49,8 @@ struct KwinResolvedPresentHook {
 
 class KfiKwinFrameBuilder {
   public:
+    [[nodiscard]] static bool is_complete(const KwinCompositorFrameInputs& inputs) noexcept;
+
     // Use when the hook is placed in Compositor::composite(RenderLoop *) after OutputFrame
     // construction and before BackendOutput::present(..., frame).
     [[nodiscard]] static KwinFrameHookContext compositor_output_frame_ready() noexcept;
@@ -95,6 +97,8 @@ class KfiKwinFrameBuilder {
 
 class KfiKwinPresentBuilder {
   public:
+    [[nodiscard]] static bool is_complete(const KwinPresentFeedbackInputs& inputs) noexcept;
+
     // Use when the hook is placed near OutputFrame::presented(...).
     [[nodiscard]] static KwinPresentHookContext output_frame_presented() noexcept;
     // Use when the hook is placed near RenderLoop::framePresented(...).
