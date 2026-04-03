@@ -1,4 +1,5 @@
 #include "fluxma_kwin_hook_adapter.h"
+#include "fluxma_kwin_hook_builders.h"
 
 namespace fluxma {
 
@@ -76,6 +77,17 @@ OutputDecision KfiKwinHookAdapter::on_compositor_output_frame_ready(
     return on_compositor_output_frame_ready(make_frame_event(output_id, metadata, payload));
 }
 
+OutputDecision KfiKwinHookAdapter::on_compositor_output_frame_ready(
+    const KwinResolvedFrameHook& hook
+) noexcept {
+    return on_compositor_output_frame_ready(
+        hook.context,
+        hook.event.output_id,
+        hook.event.metadata,
+        hook.event.payload
+    );
+}
+
 void KfiKwinHookAdapter::on_render_loop_frame_presented(
     const PresentCompletedEvent& event
 ) noexcept {
@@ -116,6 +128,25 @@ void KfiKwinHookAdapter::on_render_loop_frame_presented(
     on_render_loop_frame_presented(make_present_completed_event(output_id, metadata, status));
 }
 
+void KfiKwinHookAdapter::on_render_loop_frame_presented(
+    const KwinResolvedPresentHook& hook
+) noexcept {
+    on_render_loop_frame_presented(
+        hook.context,
+        hook.event.output_id,
+        PresentCompletedMetadata {
+            .frame_id = hook.event.frame_id,
+            .presented_timestamp_ns = hook.event.presented_timestamp_ns,
+            .refresh_interval_ns = hook.event.refresh_interval_ns,
+            .presentation_mode = hook.event.presentation_mode,
+        },
+        PresentCompletedStatus {
+            .present_success = hook.event.present_success,
+            .dropped_synthetic = hook.event.dropped_synthetic,
+        }
+    );
+}
+
 void KfiKwinHookAdapter::on_output_frame_presented(
     std::uint32_t output_id,
     const PresentCompletedMetadata& metadata,
@@ -127,6 +158,10 @@ void KfiKwinHookAdapter::on_output_frame_presented(
         metadata,
         status
     );
+}
+
+void KfiKwinHookAdapter::on_output_frame_presented(const KwinResolvedPresentHook& hook) noexcept {
+    on_render_loop_frame_presented(hook);
 }
 
 FinalComposedFrameEvent KfiKwinHookAdapter::make_frame_event(

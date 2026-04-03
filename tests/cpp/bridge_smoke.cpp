@@ -60,14 +60,9 @@ int main() {
     auto& output = plugin_root.primary_output();
     auto& hook_adapter = plugin_root.primary_output_hook_adapter();
     const auto normal_frame_inputs = make_frame_inputs(false);
-    const auto normal_frame_event =
-        fluxma::KfiKwinFrameBuilder::compositor_event(normal_frame_inputs);
-    const auto normal = hook_adapter.on_compositor_output_frame_ready(
-        fluxma::KfiKwinFrameBuilder::compositor_context(normal_frame_inputs),
-        normal_frame_inputs.output_id,
-        normal_frame_event.metadata,
-        normal_frame_event.payload
-    );
+    const auto normal_frame_hook =
+        fluxma::KfiKwinFrameBuilder::compositor_bundle(normal_frame_inputs);
+    const auto normal = hook_adapter.on_compositor_output_frame_ready(normal_frame_hook);
     if (!normal.passthrough_only ||
         normal.bypass_reason != fluxma::BypassReason::GpuPathNotReady) {
         std::cerr << "unexpected normal decision: "
@@ -89,19 +84,9 @@ int main() {
         true,
         false
     );
-    hook_adapter.on_output_frame_presented(
-        first_present.output_id,
-        fluxma::KfiKwinPresentBuilder::metadata(
-            first_present.frame_id,
-            first_present.presented_timestamp_ns,
-            first_present.refresh_interval_ns,
-            first_present.presentation_mode
-        ),
-        fluxma::KfiKwinPresentBuilder::status(
-            first_present.present_success,
-            first_present.dropped_synthetic
-        )
-    );
+    const auto first_present_hook =
+        fluxma::KfiKwinPresentBuilder::output_frame_presented_bundle(first_present);
+    hook_adapter.on_output_frame_presented(first_present_hook);
     const auto second_present = make_present_inputs(
         8,
         3'000'000,
@@ -109,28 +94,14 @@ int main() {
         false,
         true
     );
-    hook_adapter.on_output_frame_presented(
-        second_present.output_id,
-        fluxma::KfiKwinPresentBuilder::metadata(
-            second_present.frame_id,
-            second_present.presented_timestamp_ns,
-            second_present.refresh_interval_ns,
-            second_present.presentation_mode
-        ),
-        fluxma::KfiKwinPresentBuilder::status(
-            second_present.present_success,
-            second_present.dropped_synthetic
-        )
-    );
+    const auto second_present_hook =
+        fluxma::KfiKwinPresentBuilder::output_frame_presented_bundle(second_present);
+    hook_adapter.on_output_frame_presented(second_present_hook);
 
     const auto protected_frame_inputs = make_frame_inputs(true);
-    const auto protected_frame_event =
-        fluxma::KfiKwinFrameBuilder::compositor_event(protected_frame_inputs);
-    const auto protected_frame = hook_adapter.on_compositor_output_frame_ready(
-        protected_frame_inputs.output_id,
-        protected_frame_event.metadata,
-        protected_frame_event.payload
-    );
+    const auto protected_frame_hook =
+        fluxma::KfiKwinFrameBuilder::compositor_bundle(protected_frame_inputs);
+    const auto protected_frame = hook_adapter.on_compositor_output_frame_ready(protected_frame_hook);
     if (!protected_frame.passthrough_only ||
         protected_frame.bypass_reason != fluxma::BypassReason::ProtectedContent) {
         std::cerr << "protected content must remain passthrough-only\n";

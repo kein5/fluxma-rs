@@ -108,6 +108,15 @@ FinalComposedFrameEvent KfiKwinFrameBuilder::compositor_event(
     };
 }
 
+KwinResolvedFrameHook KfiKwinFrameBuilder::compositor_bundle(
+    const KwinCompositorFrameInputs& inputs
+) noexcept {
+    return KwinResolvedFrameHook {
+        .context = compositor_context(inputs),
+        .event = compositor_event(inputs),
+    };
+}
+
 KwinPresentHookContext KfiKwinPresentBuilder::output_frame_presented() noexcept {
     return KwinPresentHookContext {.hook_point = KwinPresentHookPoint::OutputFramePresented};
 }
@@ -166,6 +175,24 @@ PresentCompletedEvent KfiKwinPresentBuilder::render_loop_presented_event(
     const KwinPresentFeedbackInputs& inputs
 ) noexcept {
     return output_frame_presented_event(inputs);
+}
+
+KwinResolvedPresentHook KfiKwinPresentBuilder::output_frame_presented_bundle(
+    const KwinPresentFeedbackInputs& inputs
+) noexcept {
+    return KwinResolvedPresentHook {
+        .context = output_frame_presented_context(),
+        .event = output_frame_presented_event(inputs),
+    };
+}
+
+KwinResolvedPresentHook KfiKwinPresentBuilder::render_loop_presented_bundle(
+    const KwinPresentFeedbackInputs& inputs
+) noexcept {
+    return KwinResolvedPresentHook {
+        .context = render_loop_presented_context(),
+        .event = render_loop_presented_event(inputs),
+    };
 }
 
 }  // namespace fluxma

@@ -29,6 +29,9 @@ struct KwinPresentHookContext {
     KwinPresentHookPoint hook_point = KwinPresentHookPoint::Unknown;
 };
 
+struct KwinResolvedFrameHook;
+struct KwinResolvedPresentHook;
+
 struct FinalComposedFrameMetadata {
     std::uint64_t frame_id = 0;
     std::uint64_t timestamp_ns = 0;
@@ -98,6 +101,9 @@ class KfiKwinHookAdapter {
         const FinalComposedFrameMetadata& metadata,
         const FinalComposedFramePayload& payload
     ) noexcept;
+    [[nodiscard]] OutputDecision on_compositor_output_frame_ready(
+        const KwinResolvedFrameHook& hook
+    ) noexcept;
     void on_render_loop_frame_presented(const PresentCompletedEvent& event) noexcept;
     void on_render_loop_frame_presented(
         std::uint32_t output_id,
@@ -110,11 +116,13 @@ class KfiKwinHookAdapter {
         const PresentCompletedMetadata& metadata,
         const PresentCompletedStatus& status
     ) noexcept;
+    void on_render_loop_frame_presented(const KwinResolvedPresentHook& hook) noexcept;
     void on_output_frame_presented(
         std::uint32_t output_id,
         const PresentCompletedMetadata& metadata,
         const PresentCompletedStatus& status
     ) noexcept;
+    void on_output_frame_presented(const KwinResolvedPresentHook& hook) noexcept;
 
     [[nodiscard]] OutputDecision on_final_composed_frame(
         const FinalComposedFrameEvent& event
