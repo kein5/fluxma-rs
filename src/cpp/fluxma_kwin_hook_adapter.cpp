@@ -1,5 +1,6 @@
 #include "fluxma_kwin_hook_adapter.h"
 #include "fluxma_kwin_hook_builders.h"
+#include "fluxma_kwin_hook_candidates.h"
 
 namespace fluxma {
 
@@ -26,10 +27,12 @@ OutputDecision KfiKwinHookAdapter::on_compositor_output_frame_ready(
 ) noexcept {
     // TODO: Replace this neutral event adapter with the confirmed KWin 6 internal/native hook.
     // The real implementation must annotate any private/internal hook usage explicitly.
-    // Current KWin 6 source candidates look like:
-    // 1. Compositor::composite(RenderLoop *) after OutputFrame construction in src/compositor.cpp
+    // Current KWin 6 source candidates are tracked in KfiKwinHookCandidates so the code path and
+    // docs stay aligned:
+    // 1. WaylandCompositor::composite(RenderLoop *) in src/compositor_wayland.cpp
     // 2. BackendOutput::present(..., frame) and backend-specific present() handoff
     // 3. OutputFrame::presented(...) -> RenderLoopPrivate::notifyFrameCompleted(...) feedback path
+    (void)KfiKwinHookCandidates::compositor_output_frame_ready();
     const auto policy_decision = output_policy_.classify_frame_event(event);
     if (policy_decision.bypass_reason == BypassReason::UnsupportedOutput ||
         policy_decision.bypass_reason == BypassReason::ProtectedContent) {
@@ -92,6 +95,9 @@ void KfiKwinHookAdapter::on_render_loop_frame_presented(
     const PresentCompletedEvent& event
 ) noexcept {
     // TODO: Wire this to the actual KWin present feedback callback once the hook is confirmed.
+    // Prefer KfiKwinHookCandidates::output_frame_presented(), then fall back to
+    // KfiKwinHookCandidates::render_loop_frame_presented() if backend-specific metadata requires it.
+    (void)KfiKwinHookCandidates::output_frame_presented();
     if (!output_policy_.accepts_output(event.output_id)) {
         return;
     }

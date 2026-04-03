@@ -13,6 +13,7 @@ Epic 1〜2 skeleton の次に着手する順序を固定する。
 - `KfiKwinFrameBuilder::is_complete()` を満たす field が KWin 実 hook から埋まることを確認する
 - `KfiKwinFrameBuilder::missing_required_fields()` で不足 field を絞り込めるように、hook ごとの埋め元をコメントに残す
 - field source plan helper と KWin 実ソースを突き合わせて、想定 source enum を TODO から確定候補へ更新する
+- `KfiKwinHookCandidates::compositor_output_frame_ready()` の plan を起点に、`WaylandCompositor::composite(RenderLoop *)` で実際に取れる field を確認する
 - provenance context が `HookUnavailable` にならない形で final composed frame 境界を確認する
 - private/internal hook 利用箇所へ明示コメントを入れる
 
@@ -27,6 +28,7 @@ Epic 1〜2 skeleton の次に着手する順序を固定する。
 - `KfiKwinPresentBuilder::is_complete()` を満たす feedback field が backend ごとに取れることを確認する
 - `KfiKwinPresentBuilder::missing_required_fields()` で不足 field を backend ごとに記録する
 - present 側の field source plan helper を backend ごとの実 callback と照合する
+- `KfiKwinHookCandidates::output_frame_presented()` / `render_loop_frame_presented()` の plan を起点に backend ごとの差分を洗い出す
 - unknown ではない present hook context を backend ごとに選び、ignore path を実 hook で踏まないようにする
 
 ## 3. bypass-only path をクラッシュしない最小経路にする

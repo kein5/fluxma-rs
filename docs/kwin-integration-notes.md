@@ -113,6 +113,7 @@ KWin source 上の観察:
 - builder には `is_complete()` を追加し、`frame_id/timestamp/size/gpu_handle` や `frame_id/presented_timestamp/refresh_interval` が欠けた入力は sentinel event に畳むようにした
 - builder には `missing_required_fields()` も追加し、実 hook 実装時にどの必須 field が未取得なのかを bitmask で追えるようにした
 - builder には field source plan helper も追加し、`Compositor` / `OutputFrame` / `RenderLoop` / backend present path のどこから各 field を埋める想定かを enum で保持するようにした
+- `KfiKwinHookCandidates` を追加し、現時点の一次情報ベースの候補を `source_file + symbol + note + required_fields` としてコードで固定した
 - `KfiOutputPolicy` は provenance context も見るようにし、MVP で未対応な frame hook 境界は `HookUnavailable` bypass、unknown present hook 境界は ignore に倒す
 - present feedback では `frame_id/presented_timestamp_ns/refresh_interval_ns` が欠けた入力も ignore に倒し、欠損 metadata を Rust metrics に流さない
 - adapter 層では width/height/gpu handle の最低限 validation を行い、未対応入力は `unsupported-output` bypass に倒す
@@ -125,3 +126,20 @@ KWin source 上の観察:
 - present feedback の `frame_id` は metrics に保持し、last submission と食い違う場合は mismatch log を出す
 - HUD は `KfiHudRenderer` で文字列生成のみを行い、state / bypass reason / protected flag / refresh interval を表示できる
 - synthetic frame 生成、shader dispatch、KConfig/KCM 本実装はまだ入れない
+
+## KWin 6.3.6 source cross-check
+
+以下は 2026-04-03 時点で確認した一次情報ベースの候補であり、まだ決め打ちではない。
+
+- `src/compositor_wayland.cpp::WaylandCompositor::composite(RenderLoop *)`
+  - `OutputFrame` の生成は `frame = std::make_shared<OutputFrame>(...)`
+  - `frame->setContentType(...)`、`frame->setPresentationMode(...)`、`m_backend->present(output, frame)` が同じ関数内にある
+  - MVP の frame tap 候補として最有力
+- `src/core/renderbackend.cpp::OutputFrame::presented(...)`
+  - present completion を `OutputFrame` 単位で受ける候補
+- `src/core/renderloop.cpp::RenderLoopPrivate::notifyFrameCompleted(...)`
+  - `OutputFrame` 側で不足した backend 差分を吸収する fallback 候補
+
+backend present handoff は `m_backend->present(output, frame)` の先にある各 backend 実装であり、
+frame handle や page flip completion の埋め元候補ではあるが、MVP では final composed semantics が
+確定するまで `HookUnavailable` 扱いを維持する。
