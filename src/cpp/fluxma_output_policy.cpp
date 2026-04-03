@@ -11,11 +11,58 @@ bool KfiOutputPolicy::accepts_output(std::uint32_t output_id) const noexcept {
     return output_id == target_output_id_;
 }
 
+bool KfiOutputPolicy::supports_frame_hook_context(
+    const KwinFrameHookContext& context
+) const noexcept {
+    switch (context.hook_point) {
+    case KwinFrameHookPoint::CompositorOutputFrameReady:
+        return context.cursor_composited_in_frame && !context.overlay_promoted;
+    case KwinFrameHookPoint::BackendPresentHandoff:
+        return false;
+    case KwinFrameHookPoint::Unknown:
+        return false;
+    }
+
+    return false;
+}
+
+bool KfiOutputPolicy::supports_present_hook_context(
+    const KwinPresentHookContext& context
+) const noexcept {
+    switch (context.hook_point) {
+    case KwinPresentHookPoint::OutputFramePresented:
+    case KwinPresentHookPoint::RenderLoopFramePresented:
+        return true;
+    case KwinPresentHookPoint::Unknown:
+        return false;
+    }
+
+    return false;
+}
+
 bool KfiOutputPolicy::supports_frame_event(
     const FinalComposedFrameEvent& event
 ) const noexcept {
     return event.payload.width > 0 && event.payload.height > 0 &&
         event.payload.gpu_handle.handle_id != 0;
+}
+
+OutputDecision KfiOutputPolicy::classify_frame_hook_context(
+    const KwinFrameHookContext& context
+) const noexcept {
+    if (supports_frame_hook_context(context)) {
+        return OutputDecision {
+            .state = OutputState::Bypass,
+            .bypass_reason = BypassReason::None,
+            .passthrough_only = true,
+        };
+    }
+
+    return OutputDecision {
+        .state = OutputState::Bypass,
+        .bypass_reason = BypassReason::HookUnavailable,
+        .passthrough_only = true,
+    };
 }
 
 OutputDecision KfiOutputPolicy::classify_frame_event(

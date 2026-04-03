@@ -66,9 +66,13 @@ OutputDecision KfiKwinHookAdapter::on_compositor_output_frame_ready(
     const FinalComposedFrameMetadata& metadata,
     const FinalComposedFramePayload& payload
 ) noexcept {
-    (void)context;
-    // TODO: Once the real KWin hook is connected, use hook_point/cursor/overlay context to
-    // reject unsupported boundaries instead of assuming the neutral skeleton path.
+    const auto hook_decision = output_policy_.classify_frame_hook_context(context);
+    if (hook_decision.bypass_reason == BypassReason::HookUnavailable) {
+        return hook_decision;
+    }
+
+    // TODO: When the real KWin hook is connected, extend this with boundary-specific checks
+    // for scanout promotion, cursor-only updates, and backend-specific layer layouts.
     return on_compositor_output_frame_ready(make_frame_event(output_id, metadata, payload));
 }
 
@@ -104,7 +108,10 @@ void KfiKwinHookAdapter::on_render_loop_frame_presented(
     const PresentCompletedMetadata& metadata,
     const PresentCompletedStatus& status
 ) noexcept {
-    (void)context;
+    if (!output_policy_.supports_present_hook_context(context)) {
+        return;
+    }
+
     // TODO: Distinguish RenderLoop feedback from OutputFrame feedback once the real hook lands.
     on_render_loop_frame_presented(make_present_completed_event(output_id, metadata, status));
 }
