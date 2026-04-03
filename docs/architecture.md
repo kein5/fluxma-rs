@@ -1,0 +1,394 @@
+# Fluxma 詳細設計書
+
+## 1. 目的
+
+Fluxma は、Wayland 上の KWin に **post-display frame interpolation** を組み込むためのモジュールである。  
+目的は、**フルスクリーン動画視聴時の最終合成フレーム**に対して 2x の補間を行い、表示を滑らかにすることにある。
+
+本プロジェクトは以下を対象とする。
+
+- Plasma 6 / KWin 6
+- Wayland セッション
+- KWin 内部レンダーパイプライン
+- 単一出力
+- フルスクリーン動画視聴
+
+本プロジェクトは以下を対象としない。
+
+- QML の desktop effect
+- アプリ内部の動画デコードパイプライン
+- protected content の抽出や回避
+- 録画、保存、再配布
+
+---
+
+## 2. 設計の基本方針
+
+### 2.1 基本原則
+
+Fluxma は、**アプリ内部の映像ストリームではなく、KWin が output 用に最終合成したフレーム**を対象に処理する。
+
+したがって設計上の主眼は次の 4 つである。
+
+- output frame の取得
+- 補間可否の判定
+- 中間フレームの生成
+- 安全な提示スケジューリング
+
+### 2.2 protected content の扱い
+
+protected content に対しては、**補間を行わず passthrough-only** とする。  
+この点は設計上の必須条件であり、例外を設けない。
+
+### 2.3 実装方式
+
+本機能は **KWin の公開 QML effect API ではなく、KWin 内部 hook を用いる native module** として実装する。
+
+---
+
+## 3. MVP の範囲
+
+### 3.1 対応
+- Wayland のみ
+- 単一出力
+- フルスクリーン動画視聴
+- 2x 補間のみ
+- cursor passthrough
+- subtitle / UI 保護の初期対応
+- protected content の即時バイパス
+
+### 3.2 非対応
+- X11
+- multi-monitor
+- HDR
+- 高度な color management
+- 3x 以上の補間
+- AI backend（RIFE など）
+- 録画 / 保存
+- browser 個別最適化
+
+---
+
+## 4. 全体アーキテクチャ
+
+## 4.1 レイヤ構成
+
+Fluxma は次の 2 層で構成する。
+
+### C++ / Qt / KWin shim 層
+責務:
+- KWin internal hook
+- output frame の受け取り
+- GPU resource lifetime 管理
+- shader dispatch
+- HUD 描画
+- KConfig / KCM
+- 最終提示
+
+### Rust core 層
+責務:
+- state machine
+- cadence estimator
+- classifier
+- governor
+- scheduler
+- flow / synth orchestration
+- metrics
+
+### 境界方針
+- Rust は KWin object を直接持たない
+- Rust は GPU resource lifetime を持たない
+- GPU handle は opaque handle として Rust に渡す
+- 実際の GPU リソース管理は C++ 側で行う
+
+---
+
+## 5. レンダーパイプライン上の位置
+
+概念上の処理順序は次の通り。
+
+1. KWin が scene graph を更新
+2. output 向けに通常の合成を実行
+3. final per-output frame を得る
+4. Fluxma が補間可否を判定
+5. 必要なら中間フレームを生成
+6. cursor / 一部 overlay を後段で再合成
+7. output へ提示
+
+重要なのは、**cursor を補間しない**ことと、**最終提示直前に補間を差し込む**ことである。
+
+---
+
+## 6. 出力ごとの構成
+
+各 output ごとに独立した controller を持つ。
+
+主な構成要素:
+
+- `KfiOutputController`
+- `KfiFrameTap`
+- `KfiGpuServices`
+- `RustOutputCore`
+- `KfiHudRenderer`
+
+MVP では単一出力のみ対象とするが、内部的には output ごとの controller で持つ設計にする。
+
+---
+
+## 7. 主要データ構造
+
+## 7.1 FrameDescriptor
+
+Rust に渡す output frame の記述子。
+
+含める情報:
+- frame id
+- timestamp
+- width / height
+- pixel format
+- color space / range
+- protected flag
+- damage ratio
+- cursor visible / position / velocity
+
+## 7.2 GpuFrameHandle
+
+GPU resource を Rust が直接所有しないための opaque handle。
+
+- backend kind
+- handle id
+
+## 7.3 PresentFeedback
+
+実際の提示タイミングを scheduler に返すための情報。
+
+- presented timestamp
+- refresh interval
+- present success/failure
+- dropped synthetic info
+
+## 7.4 MetricsSnapshot
+
+HUD / logging 用の実行状態。
+
+- state
+- source fps
+- output hz
+- current decision
+- bypass reason
+- protected flag
+- flow time
+- synth time
+- deadline miss count
+
+---
+
+## 8. 状態機械
+
+output ごとの状態は次の enum で表現する。
+
+- `Disabled`
+- `Bypass`
+- `Warmup`
+- `Active2x`
+- `Degraded`
+- `ProtectedBypass`
+- `Faulted`
+
+### 遷移方針
+- 初期状態は `Bypass`
+- cadence 安定後に `Warmup`
+- 安定継続で `Active2x`
+- deadline miss が増えたら `Degraded`
+- protected flag で `ProtectedBypass`
+- GPU fault や import 失敗で `Faulted`
+
+### 基本原則
+失敗や不確実性がある場合は、上位状態へ無理に進まず **Bypass へ戻す**。
+
+---
+
+## 9. cadence estimator
+
+cadence estimator は、presentation feedback から source fps の安定性を推定する。
+
+主な役割:
+- 24 / 25 / 30 / 50 / 60fps 付近へのスナップ
+- jitter の算出
+- 安定 / 不安定の判定
+
+安定していない場合は補間を行わない。
+
+---
+
+## 10. classifier
+
+classifier は、この区間で補間を行うべきか判定する。
+
+入力:
+- cadence stability
+- damage ratio
+- scene cut score
+- cursor velocity
+- deadline pressure
+- protected flag
+
+出力:
+- `Bypass(reason)`
+- `Interpolate2x`
+
+主な bypass 理由:
+- disabled
+- protected content
+- cadence unstable
+- scene cut
+- cursor fast motion
+- deadline pressure
+- gpu fault
+
+---
+
+## 11. governor
+
+governor は、負荷や deadline miss に応じて品質を段階的に落とし、必要なら bypass に戻す。
+
+MVP では次のような単純な段階で十分。
+
+- `QualityHigh`
+- `QualityMedium`
+- `QualityLow`
+- `Bypass`
+
+初期実装では、品質低下よりまず bypass を優先してもよい。
+
+---
+
+## 12. scheduler
+
+scheduler は、real frame と synthetic frame の提示順序を決める。
+
+MVP は 2x のみなので、基本形は次の通り。
+
+- 30fps -> 60Hz: `A -> AB -> B`
+- 24fps -> 48Hz: `A -> AB -> B`
+- 60fps -> 120Hz: `A -> AB -> B`
+
+ルール:
+- synthetic frame が deadline に間に合わなければ捨てる
+- 連続 miss で degrade または bypass
+- 不安定なら real frame のみ出す
+
+---
+
+## 13. flow / synth
+
+### 13.1 MVP 方針
+MVP の最初から本物の optical flow を作らない。  
+まずは以下の順序で進める。
+
+1. bypass-only
+2. fake synth frame
+3. low-resolution optical flow
+4. midframe synthesis
+
+### 13.2 初期実装
+初期版では、軽量な low-resolution flow または block matching を想定する。  
+RIFE のような AI backend は後回しにする。
+
+---
+
+## 14. cursor / subtitle / overlay 保護
+
+### cursor
+cursor は補間しない。  
+補間後に現在位置で再合成する。
+
+### subtitle
+画面下部の字幕帯は heuristic で検出し、その領域では current frame 側を強く優先する。
+
+### overlay
+一時的な OSD や UI は、可能なら補間対象から除外する。  
+ただし MVP では完全な semantic 分離を目指さない。
+
+---
+
+## 15. protected content ポリシー
+
+protected content の区間では、次の動作のみ許可する。
+
+- 元フレームをそのまま提示
+- 補間を無効化
+- HUD / log に debug 情報を出す
+
+次は禁止する。
+
+- 補間の試行
+- ストリーム抽出
+- 保存・書き出し
+- DRM 回避前提の設計
+
+---
+
+## 16. スレッド方針
+
+### render thread
+- KWin 側のレンダリング
+- frame tap
+- final submit
+- cursor / overlay 再合成
+
+### worker / GPU 側
+- luma pyramid
+- flow
+- synth
+
+### control 側
+- cadence
+- classifier
+- governor
+- scheduler
+- metrics
+
+原則:
+- render hot path に重い判断や QObject-heavy 処理を置かない
+- Rust は orchestration を担う
+- GPU resource の所有は C++ 側
+
+---
+
+## 17. 最初の到達点
+
+最初の実装ターゲットは次の通り。
+
+1. mixed build を通す
+2. Rust/C++ bridge の最小往復を通す
+3. KWin integration point の候補を特定する
+4. bypass-only output stage を成立させる
+5. HUD と metrics を出す
+
+この時点では、まだ optical flow や real synthesis を入れない。
+
+---
+
+## 18. 成功条件
+
+MVP 初期段階の成功条件は次の通り。
+
+- KWin がクラッシュせず起動する
+- module の on/off が可能
+- bypass-only path が動く
+- HUD に state と bypass reason が出る
+- cadence estimator の骨格ができる
+- protected content は常に bypass される
+
+---
+
+## 19. 実装メモ
+
+実装時は以下を守ること。
+
+- private/internal hook 使用箇所には必ずコメントを付ける
+- 未確定な KWin 統合点は TODO として残す
+- 先に動く skeleton を作る
+- 後から詳細化する
+- 不明点がある場合は拡張より bypass を選ぶ
