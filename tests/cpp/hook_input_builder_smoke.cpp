@@ -89,6 +89,11 @@ int main() {
         std::cerr << "missing frame input fields must identify gpu handle\n";
         return EXIT_FAILURE;
     }
+    const auto incomplete_frame_names = fluxma::describe(incomplete_frame_fields);
+    if (incomplete_frame_names[4] != "gpu-handle") {
+        std::cerr << "missing frame input field names must stay stable\n";
+        return EXIT_FAILURE;
+    }
     const auto incomplete_frame_hook =
         fluxma::KfiKwinFrameBuilder::compositor_bundle(incomplete_frame_inputs);
     if (incomplete_frame_hook.event.output_id != 0 || incomplete_frame_hook.event.metadata.frame_id != 0 ||
@@ -128,6 +133,11 @@ int main() {
     if (static_cast<std::uint32_t>(incomplete_present_fields) !=
         static_cast<std::uint32_t>(fluxma::KwinPresentInputField::RefreshInterval)) {
         std::cerr << "missing present input fields must identify refresh interval\n";
+        return EXIT_FAILURE;
+    }
+    const auto incomplete_present_names = fluxma::describe(incomplete_present_fields);
+    if (incomplete_present_names[2] != "refresh-interval-ns") {
+        std::cerr << "missing present input field names must stay stable\n";
         return EXIT_FAILURE;
     }
     const auto incomplete_present_hook =

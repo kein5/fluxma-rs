@@ -1,5 +1,8 @@
 #pragma once
 
+#include <array>
+#include <string_view>
+
 #include "fluxma_kwin_hook_adapter.h"
 
 namespace fluxma {
@@ -197,5 +200,10 @@ class KfiKwinPresentBuilder {
     [[nodiscard]] static KwinPresentFieldSources output_frame_presented_field_sources() noexcept;
     [[nodiscard]] static KwinPresentFieldSources render_loop_presented_field_sources() noexcept;
 };
+
+[[nodiscard]] bool has_flag(KwinFrameInputField mask, KwinFrameInputField flag) noexcept;
+[[nodiscard]] bool has_flag(KwinPresentInputField mask, KwinPresentInputField flag) noexcept;
+[[nodiscard]] std::array<std::string_view, 5> describe(KwinFrameInputField mask) noexcept;
+[[nodiscard]] std::array<std::string_view, 3> describe(KwinPresentInputField mask) noexcept;
 
 }  // namespace fluxma

@@ -20,6 +20,10 @@ constexpr KwinPresentInputField present_mask(std::uint32_t value) noexcept {
     return static_cast<KwinPresentInputField>(value);
 }
 
+constexpr bool has(std::uint32_t mask, std::uint32_t flag) noexcept {
+    return (mask & flag) == flag;
+}
+
 }  // namespace
 
 KwinFrameInputField KfiKwinFrameBuilder::missing_required_fields(
@@ -322,6 +326,32 @@ KwinPresentFieldSources KfiKwinPresentBuilder::render_loop_presented_field_sourc
         .presentation_mode = KwinPresentFieldSource::RenderLoopPresented,
         .present_success = KwinPresentFieldSource::RenderLoopPresented,
         .dropped_synthetic = KwinPresentFieldSource::RenderLoopPresented,
+    };
+}
+
+bool has_flag(KwinFrameInputField mask, KwinFrameInputField flag) noexcept {
+    return has(raw(mask), raw(flag));
+}
+
+bool has_flag(KwinPresentInputField mask, KwinPresentInputField flag) noexcept {
+    return has(raw(mask), raw(flag));
+}
+
+std::array<std::string_view, 5> describe(KwinFrameInputField mask) noexcept {
+    return {
+        has_flag(mask, KwinFrameInputField::FrameId) ? "frame-id" : "",
+        has_flag(mask, KwinFrameInputField::Timestamp) ? "timestamp-ns" : "",
+        has_flag(mask, KwinFrameInputField::Width) ? "width" : "",
+        has_flag(mask, KwinFrameInputField::Height) ? "height" : "",
+        has_flag(mask, KwinFrameInputField::GpuHandle) ? "gpu-handle" : "",
+    };
+}
+
+std::array<std::string_view, 3> describe(KwinPresentInputField mask) noexcept {
+    return {
+        has_flag(mask, KwinPresentInputField::FrameId) ? "frame-id" : "",
+        has_flag(mask, KwinPresentInputField::PresentedTimestamp) ? "presented-timestamp-ns" : "",
+        has_flag(mask, KwinPresentInputField::RefreshInterval) ? "refresh-interval-ns" : "",
     };
 }
 
