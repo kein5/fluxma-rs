@@ -25,6 +25,13 @@ int main() {
         std::cerr << "native bridge must reuse adapter preferred candidates\n";
         return EXIT_FAILURE;
     }
+    const auto frame_checklist = bridge.frame_checklist();
+    const auto present_checklist = bridge.present_checklist();
+    if (frame_checklist[0] != "confirm final composed frame-id provenance" ||
+        present_checklist[0] != "confirm presented frame-id still correlates with submitted frame") {
+        std::cerr << "native bridge must expose preferred candidate checklists\n";
+        return EXIT_FAILURE;
+    }
 
     const auto report = bridge.build_report(
         fluxma::KwinCompositorFrameInputs {
@@ -46,6 +53,13 @@ int main() {
         report.frame_summary.find("hook=compositor-output-frame-ready") == std::string::npos ||
         report.present_summary.find("hook=output-frame-presented") == std::string::npos) {
         std::cerr << "native bridge report must surface preferred candidate summaries\n";
+        return EXIT_FAILURE;
+    }
+    const auto combined = report.combined_summary();
+    if (combined.find("state=placeholder-only") == std::string::npos ||
+        combined.find("frame{hook=compositor-output-frame-ready") == std::string::npos ||
+        combined.find("present{hook=output-frame-presented") == std::string::npos) {
+        std::cerr << "native bridge combined summary must stay stable\n";
         return EXIT_FAILURE;
     }
 

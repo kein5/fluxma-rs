@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <string>
 
 #include "fluxma_kwin_hook_adapter.h"
@@ -15,6 +16,8 @@ struct KwinNativeBringupReport {
     KwinNativeBridgeState state = KwinNativeBridgeState::PlaceholderOnly;
     std::string frame_summary {};
     std::string present_summary {};
+
+    [[nodiscard]] std::string combined_summary() const;
 };
 
 class KfiKwinNativeBridge {
@@ -25,6 +28,8 @@ class KfiKwinNativeBridge {
     [[nodiscard]] bool is_installed() const noexcept;
     [[nodiscard]] KwinFrameHookCandidatePlan frame_candidate() const noexcept;
     [[nodiscard]] KwinPresentHookCandidatePlan present_candidate() const noexcept;
+    [[nodiscard]] std::array<std::string_view, 5> frame_checklist() const noexcept;
+    [[nodiscard]] std::array<std::string_view, 3> present_checklist() const noexcept;
     [[nodiscard]] KwinNativeBringupReport build_report(
         const KwinCompositorFrameInputs& frame_inputs,
         const KwinPresentFeedbackInputs& present_inputs

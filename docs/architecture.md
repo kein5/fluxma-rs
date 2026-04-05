@@ -179,6 +179,8 @@ checklist と readiness summary も adapter から直接引けるため、
 bring-up 時の診断は candidate helper を直接辿らず adapter API で閉じる。
 さらに `KfiKwinNativeBridge` を placeholder-only で追加し、
 native/internal hook の将来差し替え先を plugin root 配下に固定した。
+bridge は preferred candidate, checklist, readiness summary を集約して返すため、
+plugin root から native bring-up 状態を一段で観測できる。
 
 ## 7.2 GpuFrameHandle
 
