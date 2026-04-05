@@ -15,6 +15,19 @@ std::string KwinNativeBringupReport::combined_summary() const {
     return summary;
 }
 
+std::string KwinNativeInstallReport::summary() const {
+    std::string output;
+    output += "result=";
+    output += std::string(to_string(result));
+    output += " reason=";
+    output += reason;
+    output += " frame=";
+    output += frame_candidate;
+    output += " present=";
+    output += present_candidate;
+    return output;
+}
+
 KfiKwinNativeBridge::KfiKwinNativeBridge(KfiKwinHookAdapter& hook_adapter) noexcept
     : hook_adapter_(hook_adapter) {}
 
@@ -42,6 +55,15 @@ std::array<std::string_view, 3> KfiKwinNativeBridge::present_checklist() const n
     return hook_adapter_.preferred_present_checklist();
 }
 
+KwinNativeInstallReport KfiKwinNativeBridge::install_stub() const {
+    return KwinNativeInstallReport {
+        .result = KwinNativeInstallResult::Deferred,
+        .reason = "native bridge is still placeholder-only",
+        .frame_candidate = std::string(to_string(frame_candidate().hook_point)),
+        .present_candidate = std::string(to_string(present_candidate().hook_point)),
+    };
+}
+
 KwinNativeBringupReport KfiKwinNativeBridge::build_report(
     const KwinCompositorFrameInputs& frame_inputs,
     const KwinPresentFeedbackInputs& present_inputs
@@ -59,6 +81,17 @@ std::string_view to_string(KwinNativeBridgeState state) noexcept {
         return "placeholder-only";
     case KwinNativeBridgeState::Hooked:
         return "hooked";
+    }
+
+    return "unknown";
+}
+
+std::string_view to_string(KwinNativeInstallResult result) noexcept {
+    switch (result) {
+    case KwinNativeInstallResult::Deferred:
+        return "deferred";
+    case KwinNativeInstallResult::Installed:
+        return "installed";
     }
 
     return "unknown";

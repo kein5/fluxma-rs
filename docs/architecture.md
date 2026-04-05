@@ -181,6 +181,8 @@ bring-up 時の診断は candidate helper を直接辿らず adapter API で閉�
 native/internal hook の将来差し替え先を plugin root 配下に固定した。
 bridge は preferred candidate, checklist, readiness summary を集約して返すため、
 plugin root から native bring-up 状態を一段で観測できる。
+install 経路も stub 化してあり、placeholder-only の間は deferred reason を
+明示的に返して実差し替え前の責務境界を固定している。
 
 ## 7.2 GpuFrameHandle
 

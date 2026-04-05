@@ -124,6 +124,7 @@ KWin source 上の観察:
 - adapter 自体も preferred frame/present candidate と readiness helper を公開し、将来の実 hook 差し替え点を adapter 境界に寄せた
 - `KfiKwinNativeBridge` を placeholder-only で追加し、plugin root から native hook bring-up report を引けるようにした
 - bridge report には combined summary もあり、state/frame/present の診断文字列を 1 行で扱える
+- install 経路は `install_stub()` として先に固定し、placeholder-only の間は deferred reason と候補名を返す
 - `KfiOutputPolicy` は provenance context も見るようにし、MVP で未対応な frame hook 境界は `HookUnavailable` bypass、unknown present hook 境界は ignore に倒す
 - present feedback では `frame_id/presented_timestamp_ns/refresh_interval_ns` が欠けた入力も ignore に倒し、欠損 metadata を Rust metrics に流さない
 - adapter 層では width/height/gpu handle の最低限 validation を行い、未対応入力は `unsupported-output` bypass に倒す

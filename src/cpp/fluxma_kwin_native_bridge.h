@@ -12,12 +12,26 @@ enum class KwinNativeBridgeState : std::uint8_t {
     Hooked = 1,
 };
 
+enum class KwinNativeInstallResult : std::uint8_t {
+    Deferred = 0,
+    Installed = 1,
+};
+
 struct KwinNativeBringupReport {
     KwinNativeBridgeState state = KwinNativeBridgeState::PlaceholderOnly;
     std::string frame_summary {};
     std::string present_summary {};
 
     [[nodiscard]] std::string combined_summary() const;
+};
+
+struct KwinNativeInstallReport {
+    KwinNativeInstallResult result = KwinNativeInstallResult::Deferred;
+    std::string reason {};
+    std::string frame_candidate {};
+    std::string present_candidate {};
+
+    [[nodiscard]] std::string summary() const;
 };
 
 class KfiKwinNativeBridge {
@@ -30,6 +44,7 @@ class KfiKwinNativeBridge {
     [[nodiscard]] KwinPresentHookCandidatePlan present_candidate() const noexcept;
     [[nodiscard]] std::array<std::string_view, 5> frame_checklist() const noexcept;
     [[nodiscard]] std::array<std::string_view, 3> present_checklist() const noexcept;
+    [[nodiscard]] KwinNativeInstallReport install_stub() const;
     [[nodiscard]] KwinNativeBringupReport build_report(
         const KwinCompositorFrameInputs& frame_inputs,
         const KwinPresentFeedbackInputs& present_inputs
@@ -40,5 +55,6 @@ class KfiKwinNativeBridge {
 };
 
 [[nodiscard]] std::string_view to_string(KwinNativeBridgeState state) noexcept;
+[[nodiscard]] std::string_view to_string(KwinNativeInstallResult result) noexcept;
 
 }  // namespace fluxma

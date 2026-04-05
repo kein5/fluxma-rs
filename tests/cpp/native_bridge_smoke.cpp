@@ -63,5 +63,21 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    const auto install = bridge.install_stub();
+    if (install.result != fluxma::KwinNativeInstallResult::Deferred ||
+        install.reason != "native bridge is still placeholder-only" ||
+        install.frame_candidate != "compositor-output-frame-ready" ||
+        install.present_candidate != "output-frame-presented") {
+        std::cerr << "native bridge install stub must surface deferred state\n";
+        return EXIT_FAILURE;
+    }
+    const auto install_summary = install.summary();
+    if (install_summary.find("result=deferred") == std::string::npos ||
+        install_summary.find("frame=compositor-output-frame-ready") == std::string::npos ||
+        install_summary.find("present=output-frame-presented") == std::string::npos) {
+        std::cerr << "native bridge install summary must stay stable\n";
+        return EXIT_FAILURE;
+    }
+
     return EXIT_SUCCESS;
 }
