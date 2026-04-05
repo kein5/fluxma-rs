@@ -17,6 +17,7 @@ Epic 1〜2 skeleton の次に着手する順序を固定する。
 - `KfiKwinHookCandidates::compositor_output_frame_ready()` の plan を起点に、`WaylandCompositor::composite(RenderLoop *)` で実際に取れる field を確認する
 - `KfiKwinHookAdapter::assess_frame_candidate()` で incomplete field を開発時に即確認できるようにする
 - `unresolved_fields` を 0 にできる候補だけを実差し替え対象に進める
+- bring-up 時は `summarize(KfiKwinHookAdapter::assess_frame_candidate(...))` を 1 回記録して候補状態を残す
 - provenance context が `HookUnavailable` にならない形で final composed frame 境界を確認する
 - private/internal hook 利用箇所へ明示コメントを入れる
 
@@ -35,6 +36,7 @@ Epic 1〜2 skeleton の次に着手する順序を固定する。
 - `KfiKwinHookCandidates::output_frame_presented()` / `render_loop_frame_presented()` の plan を起点に backend ごとの差分を洗い出す
 - `KfiKwinHookAdapter::assess_present_candidate()` で incomplete feedback field を開発時に即確認できるようにする
 - `unresolved_fields` を backend ごとに削って、実際に採用する present callback を絞り込む
+- bring-up 時は `summarize(KfiKwinHookAdapter::assess_present_candidate(...))` を 1 回記録して候補状態を残す
 - unknown ではない present hook context を backend ごとに選び、ignore path を実 hook で踏まないようにする
 
 ## 3. bypass-only path をクラッシュしない最小経路にする

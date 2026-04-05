@@ -52,6 +52,8 @@ OutputDecision KfiKwinHookAdapter::on_compositor_output_frame_ready(
     // 1. WaylandCompositor::composite(RenderLoop *) in src/compositor_wayland.cpp
     // 2. BackendOutput::present(..., frame) and backend-specific present() handoff
     // 3. OutputFrame::presented(...) -> RenderLoopPrivate::notifyFrameCompleted(...) feedback path
+    // TODO: When wiring the real hook, log summarize(assess_frame_candidate(inputs)) once per
+    // candidate revision so missing vs unresolved fields are visible during bring-up.
     (void)preferred_frame_candidate();
     const auto policy_decision = output_policy_.classify_frame_event(event);
     if (policy_decision.bypass_reason == BypassReason::UnsupportedOutput ||
@@ -117,6 +119,8 @@ void KfiKwinHookAdapter::on_render_loop_frame_presented(
     // TODO: Wire this to the actual KWin present feedback callback once the hook is confirmed.
     // Prefer KfiKwinHookCandidates::output_frame_presented(), then fall back to
     // KfiKwinHookCandidates::render_loop_frame_presented() if backend-specific metadata requires it.
+    // TODO: When wiring the real hook, log summarize(assess_present_candidate(inputs)) once per
+    // candidate revision so missing vs unresolved feedback fields are visible during bring-up.
     (void)preferred_present_candidate();
     if (!output_policy_.accepts_output(event.output_id)) {
         return;
