@@ -27,6 +27,8 @@ std::string KwinNativeInstallReport::summary() const {
     output += source_file;
     output += " symbol=";
     output += symbol;
+    output += " checklist_hint=";
+    output += checklist_hint;
     return output;
 }
 
@@ -69,23 +71,27 @@ std::array<std::string_view, 3> KfiKwinNativeBridge::present_checklist() const n
 
 KwinNativeInstallReport KfiKwinNativeBridge::install_frame_stub() const {
     const auto candidate = frame_candidate();
+    const auto checklist = frame_checklist();
     return KwinNativeInstallReport {
         .result = KwinNativeInstallResult::Deferred,
         .reason = "native bridge is still placeholder-only",
         .target = std::string(to_string(candidate.hook_point)),
         .source_file = std::string(candidate.source_file),
         .symbol = std::string(candidate.symbol),
+        .checklist_hint = std::string(checklist[0]),
     };
 }
 
 KwinNativeInstallReport KfiKwinNativeBridge::install_present_stub() const {
     const auto candidate = present_candidate();
+    const auto checklist = present_checklist();
     return KwinNativeInstallReport {
         .result = KwinNativeInstallResult::Deferred,
         .reason = "native bridge is still placeholder-only",
         .target = std::string(to_string(candidate.hook_point)),
         .source_file = std::string(candidate.source_file),
         .symbol = std::string(candidate.symbol),
+        .checklist_hint = std::string(checklist[0]),
     };
 }
 
