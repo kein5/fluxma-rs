@@ -71,12 +71,16 @@ int main() {
         frame_install.source_file != "src/compositor_wayland.cpp" ||
         frame_install.symbol != "WaylandCompositor::composite(RenderLoop *)" ||
         frame_install.checklist_hint != "confirm final composed frame-id provenance" ||
+        frame_install.checklist_hint_secondary !=
+            "confirm compositor timestamp maps to final output frame" ||
         present_install.result != fluxma::KwinNativeInstallResult::Deferred ||
         present_install.target != "output-frame-presented" ||
         present_install.source_file != "src/core/renderbackend.cpp" ||
         present_install.symbol != "OutputFrame::presented(...)" ||
         present_install.checklist_hint !=
-            "confirm presented frame-id still correlates with submitted frame") {
+            "confirm presented frame-id still correlates with submitted frame" ||
+        present_install.checklist_hint_secondary !=
+            "confirm backend completion timestamp semantics across backends") {
         std::cerr << "native bridge install stubs must surface deferred state\n";
         return EXIT_FAILURE;
     }
@@ -89,10 +93,16 @@ int main() {
         frame_install_summary.find(
             "checklist_hint=confirm final composed frame-id provenance"
         ) == std::string::npos ||
+        frame_install_summary.find(
+            "checklist_hint_secondary=confirm compositor timestamp maps to final output frame"
+        ) == std::string::npos ||
         present_install_summary.find("target=output-frame-presented") == std::string::npos ||
         present_install_summary.find("source=src/core/renderbackend.cpp") == std::string::npos ||
         present_install_summary.find(
             "checklist_hint=confirm presented frame-id still correlates with submitted frame"
+        ) == std::string::npos ||
+        present_install_summary.find(
+            "checklist_hint_secondary=confirm backend completion timestamp semantics across backends"
         ) == std::string::npos ||
         install_summary.find("frame{result=deferred") == std::string::npos ||
         install_summary.find("present{result=deferred") == std::string::npos) {

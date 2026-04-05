@@ -188,6 +188,7 @@ frame hook と present hook の install stub は分離してあり、将来の b
 各 install stub は target 名だけでなく `source_file` と `symbol` も返すため、
 実際にどの KWin entry point を触る前提なのかを bridge 側で固定できる。
 さらに `checklist_hint` も返すので、最初に潰す確認事項を install 導線から直接見られる。
+`checklist_hint_secondary` も持たせてあり、最初の 2 手まで install report から追える。
 
 ## 7.2 GpuFrameHandle
 

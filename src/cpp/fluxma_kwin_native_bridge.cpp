@@ -29,6 +29,8 @@ std::string KwinNativeInstallReport::summary() const {
     output += symbol;
     output += " checklist_hint=";
     output += checklist_hint;
+    output += " checklist_hint_secondary=";
+    output += checklist_hint_secondary;
     return output;
 }
 
@@ -79,6 +81,7 @@ KwinNativeInstallReport KfiKwinNativeBridge::install_frame_stub() const {
         .source_file = std::string(candidate.source_file),
         .symbol = std::string(candidate.symbol),
         .checklist_hint = std::string(checklist[0]),
+        .checklist_hint_secondary = std::string(checklist[1]),
     };
 }
 
@@ -92,6 +95,7 @@ KwinNativeInstallReport KfiKwinNativeBridge::install_present_stub() const {
         .source_file = std::string(candidate.source_file),
         .symbol = std::string(candidate.symbol),
         .checklist_hint = std::string(checklist[0]),
+        .checklist_hint_secondary = std::string(checklist[1]),
     };
 }
 
