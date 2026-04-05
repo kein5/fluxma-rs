@@ -23,6 +23,12 @@ int main() {
         std::cerr << "compositor unresolved fields must stay named\n";
         return EXIT_FAILURE;
     }
+    const auto compositor_checklist = fluxma::describe_checklist(compositor);
+    if (compositor_checklist[0] != "confirm final composed frame-id provenance" ||
+        compositor_checklist[4] != "confirm stable gpu handle ownership at present handoff") {
+        std::cerr << "compositor checklist must stay explicit\n";
+        return EXIT_FAILURE;
+    }
 
     const auto backend = fluxma::KfiKwinHookCandidates::backend_present_handoff();
     if (backend.hook_point != fluxma::KwinFrameHookPoint::BackendPresentHandoff ||
@@ -43,6 +49,14 @@ int main() {
     if (output_frame_required_names[0] != "frame-id" ||
         output_frame_required_names[2] != "refresh-interval-ns") {
         std::cerr << "present required fields must stay named\n";
+        return EXIT_FAILURE;
+    }
+    const auto output_frame_checklist = fluxma::describe_checklist(output_frame);
+    if (output_frame_checklist[0] !=
+            "confirm presented frame-id still correlates with submitted frame" ||
+        output_frame_checklist[2] !=
+            "confirm refresh interval is available without backend-specific fallback") {
+        std::cerr << "present checklist must stay explicit\n";
         return EXIT_FAILURE;
     }
 
@@ -148,6 +162,8 @@ int main() {
         compositor_summary.find("ready=no") == std::string::npos ||
         compositor_summary.find("missing=none") == std::string::npos ||
         compositor_summary.find("unresolved=frame-id,timestamp-ns,width,height,gpu-handle") ==
+            std::string::npos ||
+        compositor_summary.find("checklist=confirm final composed frame-id provenance") ==
             std::string::npos) {
         std::cerr << "frame readiness summary must stay stable\n";
         return EXIT_FAILURE;
@@ -158,6 +174,9 @@ int main() {
         present_summary.find("missing=refresh-interval-ns") == std::string::npos ||
         present_summary.find(
             "unresolved=frame-id,presented-timestamp-ns,refresh-interval-ns"
+        ) == std::string::npos ||
+        present_summary.find(
+            "checklist=confirm presented frame-id still correlates with submitted frame"
         ) == std::string::npos) {
         std::cerr << "present readiness summary must stay stable\n";
         return EXIT_FAILURE;

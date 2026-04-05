@@ -119,6 +119,7 @@ KWin source 上の観察:
 - hook point と required field 名は string helper でも固定し、将来の debug log や TODO を enum 値に依存させないようにした
 - candidate plan には `unresolved_fields` も持たせ、入力が揃っていても final composed semantics や backend 差分が未確定な項目を別軸で追えるようにした
 - readiness は `summarize(...)` でそのまま文字列化できるようにし、将来の debug log / developer HUD に流しやすくした
+- candidate plan には unresolved checklist も持たせ、`unresolved_fields` を減らすために何を確認すべきかを field 単位で固定した
 - incomplete input を builder の resolved bundle path に流しても、adapter/controller metrics が汚れないことを smoke test で固定した
 - adapter 自体も preferred frame/present candidate と readiness helper を公開し、将来の実 hook 差し替え点を adapter 境界に寄せた
 - `KfiOutputPolicy` は provenance context も見るようにし、MVP で未対応な frame hook 境界は `HookUnavailable` bypass、unknown present hook 境界は ignore に倒す

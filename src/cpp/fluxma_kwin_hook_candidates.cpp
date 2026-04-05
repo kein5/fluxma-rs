@@ -71,6 +71,13 @@ KwinFrameHookCandidatePlan KfiKwinHookCandidates::compositor_output_frame_ready(
             KwinFrameInputField::Height,
             KwinFrameInputField::GpuHandle
         ),
+        .unresolved_checklist = {
+            "confirm final composed frame-id provenance",
+            "confirm compositor timestamp maps to final output frame",
+            "confirm width/height after output transform and scanout rules",
+            "confirm width/height after output transform and scanout rules",
+            "confirm stable gpu handle ownership at present handoff",
+        },
     };
 }
 
@@ -97,6 +104,13 @@ KwinFrameHookCandidatePlan KfiKwinHookCandidates::backend_present_handoff() noex
             KwinFrameInputField::Height,
             KwinFrameInputField::GpuHandle
         ),
+        .unresolved_checklist = {
+            "prove backend handoff still refers to final composed frame",
+            "confirm backend timestamp remains aligned with final output frame",
+            "confirm backend width/height matches output-presented image",
+            "confirm backend width/height matches output-presented image",
+            "confirm gpu handle can be passed without moving lifetime into Rust",
+        },
     };
 }
 
@@ -119,6 +133,11 @@ KwinPresentHookCandidatePlan KfiKwinHookCandidates::output_frame_presented() noe
             KwinPresentInputField::PresentedTimestamp,
             KwinPresentInputField::RefreshInterval
         ),
+        .unresolved_checklist = {
+            "confirm presented frame-id still correlates with submitted frame",
+            "confirm backend completion timestamp semantics across backends",
+            "confirm refresh interval is available without backend-specific fallback",
+        },
     };
 }
 
@@ -141,6 +160,11 @@ KwinPresentHookCandidatePlan KfiKwinHookCandidates::render_loop_frame_presented(
             KwinPresentInputField::PresentedTimestamp,
             KwinPresentInputField::RefreshInterval
         ),
+        .unresolved_checklist = {
+            "confirm render loop callback preserves frame-id correlation",
+            "confirm render loop completion timestamp semantics across backends",
+            "confirm render loop refresh interval matches output completion cadence",
+        },
     };
 }
 
@@ -216,6 +240,14 @@ std::array<std::string_view, 3> describe_unresolved(KwinPresentHookCandidatePlan
     return describe(plan.unresolved_fields);
 }
 
+std::array<std::string_view, 5> describe_checklist(KwinFrameHookCandidatePlan plan) noexcept {
+    return plan.unresolved_checklist;
+}
+
+std::array<std::string_view, 3> describe_checklist(KwinPresentHookCandidatePlan plan) noexcept {
+    return plan.unresolved_checklist;
+}
+
 namespace {
 
 template <std::size_t N>
@@ -254,6 +286,8 @@ std::string summarize(KwinFrameHookReadiness readiness) {
     summary += join_names(describe(readiness.missing_fields));
     summary += " unresolved=";
     summary += join_names(describe(readiness.unresolved_fields));
+    summary += " checklist=";
+    summary += join_names(describe_checklist(readiness.plan));
     return summary;
 }
 
@@ -271,6 +305,8 @@ std::string summarize(KwinPresentHookReadiness readiness) {
     summary += join_names(describe(readiness.missing_fields));
     summary += " unresolved=";
     summary += join_names(describe(readiness.unresolved_fields));
+    summary += " checklist=";
+    summary += join_names(describe_checklist(readiness.plan));
     return summary;
 }
 

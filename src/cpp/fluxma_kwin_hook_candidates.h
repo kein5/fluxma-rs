@@ -16,6 +16,7 @@ struct KwinFrameHookCandidatePlan {
     KwinFrameFieldSources field_sources {};
     KwinFrameInputField required_fields = KwinFrameInputField::None;
     KwinFrameInputField unresolved_fields = KwinFrameInputField::None;
+    std::array<std::string_view, 5> unresolved_checklist {};
 };
 
 struct KwinPresentHookCandidatePlan {
@@ -26,6 +27,7 @@ struct KwinPresentHookCandidatePlan {
     KwinPresentFieldSources field_sources {};
     KwinPresentInputField required_fields = KwinPresentInputField::None;
     KwinPresentInputField unresolved_fields = KwinPresentInputField::None;
+    std::array<std::string_view, 3> unresolved_checklist {};
 };
 
 struct KwinFrameHookReadiness {
@@ -70,6 +72,12 @@ class KfiKwinHookCandidates {
     KwinFrameHookCandidatePlan plan
 ) noexcept;
 [[nodiscard]] std::array<std::string_view, 3> describe_unresolved(
+    KwinPresentHookCandidatePlan plan
+) noexcept;
+[[nodiscard]] std::array<std::string_view, 5> describe_checklist(
+    KwinFrameHookCandidatePlan plan
+) noexcept;
+[[nodiscard]] std::array<std::string_view, 3> describe_checklist(
     KwinPresentHookCandidatePlan plan
 ) noexcept;
 [[nodiscard]] std::string summarize(KwinFrameHookReadiness readiness);
