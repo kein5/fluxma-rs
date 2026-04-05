@@ -200,6 +200,8 @@ KWin version と backend の gate を placeholder 分岐とは別に注入でき
 止めているのかを install report 上で切り替えて観測できる。
 加えて `context_summary` も report に保持し、gate 判定時の KWin version / backend 名と
 support 状態を install summary 1 本で確認できるようにしている。
+同じ gate 判定は `assess_install_gate(KwinNativeInstallContext)` にも切り出し、
+将来の real installer が report 生成と同じ条件分岐を共有できるようにしている。
 
 ## 7.2 GpuFrameHandle
 

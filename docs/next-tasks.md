@@ -21,6 +21,7 @@ Epic 1〜2 skeleton の次に着手する順序を固定する。
 - bring-up 時は `summarize(KfiKwinHookAdapter::assess_frame_candidate(...))` を 1 回記録して候補状態を残す
 - frame hook は candidate checklist を上から潰し、`final composed frame-id provenance` と `gpu handle ownership` を先に確定する
 - `KfiKwinNativeBridge::install_frame_stub(KwinNativeInstallContext)` で version gate / backend gate を明示しながら bring-up を進める
+- gate 条件の切り分け自体は `assess_install_gate(KwinNativeInstallContext)` を使って installer 実装と共有する
 - provenance context が `HookUnavailable` にならない形で final composed frame 境界を確認する
 - private/internal hook 利用箇所へ明示コメントを入れる
 

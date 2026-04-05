@@ -102,6 +102,23 @@ int main() {
         return EXIT_FAILURE;
     }
     const auto install = bridge.install_stub();
+    const auto placeholder_gate = bridge.assess_install_gate(fluxma::KwinNativeInstallContext {});
+    const auto version_gate = bridge.assess_install_gate(
+        fluxma::KwinNativeInstallContext {
+            .kwin_version_supported = false,
+            .backend_supported = true,
+            .kwin_version = "6.3.80",
+            .backend_name = "drm",
+        }
+    );
+    const auto backend_gate = bridge.assess_install_gate(
+        fluxma::KwinNativeInstallContext {
+            .kwin_version_supported = true,
+            .backend_supported = false,
+            .kwin_version = "6.3.80",
+            .backend_name = "wayland",
+        }
+    );
     const auto version_gate_install = bridge.install_stub(
         fluxma::KwinNativeInstallContext {
             .kwin_version_supported = false,
@@ -129,6 +146,9 @@ int main() {
     const auto frame_install_summary = frame_install.summary();
     const auto present_install_summary = present_install.summary();
     const auto install_summary = install.summary();
+    const auto placeholder_gate_summary = placeholder_gate.summary();
+    const auto version_gate_assessment_summary = version_gate.summary();
+    const auto backend_gate_assessment_summary = backend_gate.summary();
     const auto version_gate_summary = version_gate_install.summary();
     const auto backend_gate_summary = backend_gate_install.summary();
     const auto precedence_summary = precedence_install.summary();
@@ -164,6 +184,17 @@ int main() {
         ) == std::string::npos ||
         install_summary.find("frame{result=deferred") == std::string::npos ||
         install_summary.find("present{result=deferred") == std::string::npos ||
+        placeholder_gate.deferred_reason != fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        placeholder_gate.version_blocked || placeholder_gate.backend_blocked ||
+        placeholder_gate_summary.find("deferred_reason=placeholder-only") == std::string::npos ||
+        version_gate.deferred_reason != fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        !version_gate.version_blocked || version_gate.backend_blocked ||
+        version_gate_assessment_summary.find("version_blocked=true") == std::string::npos ||
+        version_gate_assessment_summary.find("backend_blocked=false") == std::string::npos ||
+        backend_gate.deferred_reason != fluxma::KwinNativeDeferredReason::BackendGate ||
+        backend_gate.version_blocked || !backend_gate.backend_blocked ||
+        backend_gate_assessment_summary.find("version_blocked=false") == std::string::npos ||
+        backend_gate_assessment_summary.find("backend_blocked=true") == std::string::npos ||
         version_gate_install.frame.deferred_reason != fluxma::KwinNativeDeferredReason::KwinVersionGate ||
         version_gate_install.present.deferred_reason != fluxma::KwinNativeDeferredReason::KwinVersionGate ||
         version_gate_install.frame.reason != "kwin version gate blocked install for 6.3.80" ||

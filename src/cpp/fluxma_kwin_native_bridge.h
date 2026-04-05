@@ -55,6 +55,16 @@ struct KwinNativeInstallReport {
     [[nodiscard]] std::string summary() const;
 };
 
+struct KwinNativeInstallGateAssessment {
+    KwinNativeDeferredReason deferred_reason = KwinNativeDeferredReason::PlaceholderOnly;
+    std::string reason {};
+    std::string context_summary {};
+    bool version_blocked = false;
+    bool backend_blocked = false;
+
+    [[nodiscard]] std::string summary() const;
+};
+
 struct KwinNativeCombinedInstallReport {
     KwinNativeInstallReport frame {};
     KwinNativeInstallReport present {};
@@ -74,6 +84,9 @@ class KfiKwinNativeBridge {
     [[nodiscard]] std::string_view present_installer_entry() const noexcept;
     [[nodiscard]] std::array<std::string_view, 5> frame_checklist() const noexcept;
     [[nodiscard]] std::array<std::string_view, 3> present_checklist() const noexcept;
+    [[nodiscard]] KwinNativeInstallGateAssessment assess_install_gate(
+        const KwinNativeInstallContext& context
+    ) const;
     [[nodiscard]] KwinNativeInstallReport install_frame_stub() const;
     [[nodiscard]] KwinNativeInstallReport install_frame_stub(
         const KwinNativeInstallContext& context

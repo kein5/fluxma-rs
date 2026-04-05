@@ -65,7 +65,7 @@ std::string build_install_context_summary(const KwinNativeInstallContext& contex
 }
 
 KwinNativeInstallReport make_deferred_install_report(
-    const KwinNativeInstallContext& context,
+    const KwinNativeInstallGateAssessment& assessment,
     const std::string_view target,
     const std::string_view installer_entry,
     const std::string_view source_file,
@@ -74,46 +74,10 @@ KwinNativeInstallReport make_deferred_install_report(
     const std::string_view checklist_hint_secondary,
     const std::string& checklist_all
 ) {
-    const auto context_summary = build_install_context_summary(context);
-
-    if (!context.kwin_version_supported) {
-        std::string reason = "kwin version gate blocked install for ";
-        reason += context.kwin_version;
-        return make_install_report(
-            KwinNativeDeferredReason::KwinVersionGate,
-            reason,
-            context_summary,
-            target,
-            installer_entry,
-            source_file,
-            symbol,
-            checklist_hint,
-            checklist_hint_secondary,
-            checklist_all
-        );
-    }
-
-    if (!context.backend_supported) {
-        std::string reason = "backend gate blocked install for ";
-        reason += context.backend_name;
-        return make_install_report(
-            KwinNativeDeferredReason::BackendGate,
-            reason,
-            context_summary,
-            target,
-            installer_entry,
-            source_file,
-            symbol,
-            checklist_hint,
-            checklist_hint_secondary,
-            checklist_all
-        );
-    }
-
     return make_install_report(
-        KwinNativeDeferredReason::PlaceholderOnly,
-        "native bridge is still placeholder-only",
-        context_summary,
+        assessment.deferred_reason,
+        assessment.reason,
+        assessment.context_summary,
         target,
         installer_entry,
         source_file,
@@ -165,6 +129,21 @@ std::string KwinNativeInstallReport::summary() const {
     return output;
 }
 
+std::string KwinNativeInstallGateAssessment::summary() const {
+    std::string output;
+    output += "deferred_reason=";
+    output += std::string(to_string(deferred_reason));
+    output += " reason=";
+    output += reason;
+    output += " context=";
+    output += context_summary;
+    output += " version_blocked=";
+    output += version_blocked ? "true" : "false";
+    output += " backend_blocked=";
+    output += backend_blocked ? "true" : "false";
+    return output;
+}
+
 std::string KwinNativeCombinedInstallReport::summary() const {
     std::string output;
     output += "frame{";
@@ -210,6 +189,34 @@ std::array<std::string_view, 3> KfiKwinNativeBridge::present_checklist() const n
     return hook_adapter_.preferred_present_checklist();
 }
 
+KwinNativeInstallGateAssessment KfiKwinNativeBridge::assess_install_gate(
+    const KwinNativeInstallContext& context
+) const {
+    KwinNativeInstallGateAssessment assessment {
+        .context_summary = build_install_context_summary(context),
+        .version_blocked = !context.kwin_version_supported,
+        .backend_blocked = !context.backend_supported,
+    };
+
+    if (assessment.version_blocked) {
+        assessment.deferred_reason = KwinNativeDeferredReason::KwinVersionGate;
+        assessment.reason = "kwin version gate blocked install for ";
+        assessment.reason += context.kwin_version;
+        return assessment;
+    }
+
+    if (assessment.backend_blocked) {
+        assessment.deferred_reason = KwinNativeDeferredReason::BackendGate;
+        assessment.reason = "backend gate blocked install for ";
+        assessment.reason += context.backend_name;
+        return assessment;
+    }
+
+    assessment.deferred_reason = KwinNativeDeferredReason::PlaceholderOnly;
+    assessment.reason = "native bridge is still placeholder-only";
+    return assessment;
+}
+
 KwinNativeInstallReport KfiKwinNativeBridge::install_frame_stub() const {
     return install_frame_stub(KwinNativeInstallContext {});
 }
@@ -219,8 +226,9 @@ KwinNativeInstallReport KfiKwinNativeBridge::install_frame_stub(
 ) const {
     const auto candidate = frame_candidate();
     const auto checklist = frame_checklist();
+    const auto assessment = assess_install_gate(context);
     return make_deferred_install_report(
-        context,
+        assessment,
         to_string(candidate.hook_point),
         frame_installer_entry(),
         candidate.source_file,
@@ -240,8 +248,9 @@ KwinNativeInstallReport KfiKwinNativeBridge::install_present_stub(
 ) const {
     const auto candidate = present_candidate();
     const auto checklist = present_checklist();
+    const auto assessment = assess_install_gate(context);
     return make_deferred_install_report(
-        context,
+        assessment,
         to_string(candidate.hook_point),
         present_installer_entry(),
         candidate.source_file,
