@@ -22,6 +22,7 @@ Epic 1〜2 skeleton の次に着手する順序を固定する。
 - frame hook は candidate checklist を上から潰し、`final composed frame-id provenance` と `gpu handle ownership` を先に確定する
 - `KfiKwinNativeBridge::install_frame_stub(KwinNativeInstallContext)` で version gate / backend gate を明示しながら bring-up を進める
 - gate 条件の切り分け自体は `assess_install_gate(KwinNativeInstallContext)` を使って installer 実装と共有する
+- install 前の候補確認は `preflight_frame_install(KwinNativeInstallContext)` で残し、stub 実行と切り分ける
 - provenance context が `HookUnavailable` にならない形で final composed frame 境界を確認する
 - private/internal hook 利用箇所へ明示コメントを入れる
 
@@ -43,6 +44,7 @@ Epic 1〜2 skeleton の次に着手する順序を固定する。
 - bring-up 時は `summarize(KfiKwinHookAdapter::assess_present_candidate(...))` を 1 回記録して候補状態を残す
 - present hook は candidate checklist を上から潰し、`frame-id correlation` と `refresh interval semantics` を先に確定する
 - `KfiKwinNativeBridge::install_present_stub(KwinNativeInstallContext)` で version/backend 条件を切り分けた report を残す
+- install 前の候補確認は `preflight_present_install(KwinNativeInstallContext)` で残し、stub 実行と切り分ける
 - unknown ではない present hook context を backend ごとに選び、ignore path を実 hook で踏まないようにする
 
 ## 3. bypass-only path をクラッシュしない最小経路にする

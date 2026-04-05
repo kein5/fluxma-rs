@@ -202,6 +202,8 @@ KWin version と backend の gate を placeholder 分岐とは別に注入でき
 support 状態を install summary 1 本で確認できるようにしている。
 同じ gate 判定は `assess_install_gate(KwinNativeInstallContext)` にも切り出し、
 将来の real installer が report 生成と同じ条件分岐を共有できるようにしている。
+さらに `preflight_frame_install()` / `preflight_present_install()` を用意し、
+install 実行前でも `gate + target + source/symbol + checklist` を 1 本の report として確認できる。
 
 ## 7.2 GpuFrameHandle
 

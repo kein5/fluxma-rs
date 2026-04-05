@@ -144,6 +144,24 @@ std::string KwinNativeInstallGateAssessment::summary() const {
     return output;
 }
 
+std::string KwinNativeInstallPreflightReport::summary() const {
+    std::string output;
+    output += gate.summary();
+    output += " target=";
+    output += target;
+    output += " installer_entry=";
+    output += installer_entry;
+    output += " source=";
+    output += source_file;
+    output += " symbol=";
+    output += symbol;
+    output += " checklist_hint=";
+    output += checklist_hint;
+    output += " checklist_hint_secondary=";
+    output += checklist_hint_secondary;
+    return output;
+}
+
 std::string KwinNativeCombinedInstallReport::summary() const {
     std::string output;
     output += "frame{";
@@ -215,6 +233,38 @@ KwinNativeInstallGateAssessment KfiKwinNativeBridge::assess_install_gate(
     assessment.deferred_reason = KwinNativeDeferredReason::PlaceholderOnly;
     assessment.reason = "native bridge is still placeholder-only";
     return assessment;
+}
+
+KwinNativeInstallPreflightReport KfiKwinNativeBridge::preflight_frame_install(
+    const KwinNativeInstallContext& context
+) const {
+    const auto candidate = frame_candidate();
+    const auto checklist = frame_checklist();
+    return KwinNativeInstallPreflightReport {
+        .gate = assess_install_gate(context),
+        .target = std::string(to_string(candidate.hook_point)),
+        .installer_entry = std::string(frame_installer_entry()),
+        .source_file = std::string(candidate.source_file),
+        .symbol = std::string(candidate.symbol),
+        .checklist_hint = std::string(checklist[0]),
+        .checklist_hint_secondary = std::string(checklist[1]),
+    };
+}
+
+KwinNativeInstallPreflightReport KfiKwinNativeBridge::preflight_present_install(
+    const KwinNativeInstallContext& context
+) const {
+    const auto candidate = present_candidate();
+    const auto checklist = present_checklist();
+    return KwinNativeInstallPreflightReport {
+        .gate = assess_install_gate(context),
+        .target = std::string(to_string(candidate.hook_point)),
+        .installer_entry = std::string(present_installer_entry()),
+        .source_file = std::string(candidate.source_file),
+        .symbol = std::string(candidate.symbol),
+        .checklist_hint = std::string(checklist[0]),
+        .checklist_hint_secondary = std::string(checklist[1]),
+    };
 }
 
 KwinNativeInstallReport KfiKwinNativeBridge::install_frame_stub() const {

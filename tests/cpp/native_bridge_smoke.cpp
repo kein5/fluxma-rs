@@ -103,6 +103,10 @@ int main() {
     }
     const auto install = bridge.install_stub();
     const auto placeholder_gate = bridge.assess_install_gate(fluxma::KwinNativeInstallContext {});
+    const auto frame_preflight = bridge.preflight_frame_install(fluxma::KwinNativeInstallContext {});
+    const auto present_preflight = bridge.preflight_present_install(
+        fluxma::KwinNativeInstallContext {}
+    );
     const auto version_gate = bridge.assess_install_gate(
         fluxma::KwinNativeInstallContext {
             .kwin_version_supported = false,
@@ -146,6 +150,8 @@ int main() {
     const auto frame_install_summary = frame_install.summary();
     const auto present_install_summary = present_install.summary();
     const auto install_summary = install.summary();
+    const auto frame_preflight_summary = frame_preflight.summary();
+    const auto present_preflight_summary = present_preflight.summary();
     const auto placeholder_gate_summary = placeholder_gate.summary();
     const auto version_gate_assessment_summary = version_gate.summary();
     const auto backend_gate_assessment_summary = backend_gate.summary();
@@ -184,6 +190,29 @@ int main() {
         ) == std::string::npos ||
         install_summary.find("frame{result=deferred") == std::string::npos ||
         install_summary.find("present{result=deferred") == std::string::npos ||
+        frame_preflight.gate.deferred_reason != fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        frame_preflight.target != "compositor-output-frame-ready" ||
+        frame_preflight.installer_entry != "KfiKwinNativeBridge::install_frame_stub" ||
+        frame_preflight.source_file != "src/compositor_wayland.cpp" ||
+        frame_preflight.symbol != "WaylandCompositor::composite(RenderLoop *)" ||
+        frame_preflight.checklist_hint != "confirm final composed frame-id provenance" ||
+        frame_preflight.checklist_hint_secondary !=
+            "confirm compositor timestamp maps to final output frame" ||
+        frame_preflight_summary.find("deferred_reason=placeholder-only") == std::string::npos ||
+        frame_preflight_summary.find("target=compositor-output-frame-ready") ==
+            std::string::npos ||
+        present_preflight.gate.deferred_reason !=
+            fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        present_preflight.target != "output-frame-presented" ||
+        present_preflight.installer_entry != "KfiKwinNativeBridge::install_present_stub" ||
+        present_preflight.source_file != "src/core/renderbackend.cpp" ||
+        present_preflight.symbol != "OutputFrame::presented(...)" ||
+        present_preflight.checklist_hint !=
+            "confirm presented frame-id still correlates with submitted frame" ||
+        present_preflight.checklist_hint_secondary !=
+            "confirm backend completion timestamp semantics across backends" ||
+        present_preflight_summary.find("target=output-frame-presented") ==
+            std::string::npos ||
         placeholder_gate.deferred_reason != fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
         placeholder_gate.version_blocked || placeholder_gate.backend_blocked ||
         placeholder_gate_summary.find("deferred_reason=placeholder-only") == std::string::npos ||

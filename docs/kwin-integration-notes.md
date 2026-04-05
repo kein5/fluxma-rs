@@ -136,6 +136,7 @@ KWin source 上の観察:
 - version gate と backend gate が同時に掛かる場合は、KWin ABI 前提の確認を優先して version gate を先に返す
 - install stub report には `context_summary` も含め、どの KWin version / backend 前提で gate 判定したかを summary 1 本で追える
 - `assess_install_gate(KwinNativeInstallContext)` も追加し、gate 判定そのものを real installer 導入前から共通 helper として使い回せる
+- `preflight_frame_install()` / `preflight_present_install()` も追加し、install 前の candidate/gate/checklist を stub 実行なしで確認できる
 - `KfiOutputPolicy` は provenance context も見るようにし、MVP で未対応な frame hook 境界は `HookUnavailable` bypass、unknown present hook 境界は ignore に倒す
 - present feedback では `frame_id/presented_timestamp_ns/refresh_interval_ns` が欠けた入力も ignore に倒し、欠損 metadata を Rust metrics に流さない
 - adapter 層では width/height/gpu handle の最低限 validation を行い、未対応入力は `unsupported-output` bypass に倒す
