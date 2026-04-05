@@ -77,6 +77,13 @@ struct KwinNativeInstallPreflightReport {
     [[nodiscard]] std::string summary() const;
 };
 
+struct KwinNativeCombinedPreflightReport {
+    KwinNativeInstallPreflightReport frame {};
+    KwinNativeInstallPreflightReport present {};
+
+    [[nodiscard]] std::string summary() const;
+};
+
 struct KwinNativeCombinedInstallReport {
     KwinNativeInstallReport frame {};
     KwinNativeInstallReport present {};
@@ -103,6 +110,9 @@ class KfiKwinNativeBridge {
         const KwinNativeInstallContext& context
     ) const;
     [[nodiscard]] KwinNativeInstallPreflightReport preflight_present_install(
+        const KwinNativeInstallContext& context
+    ) const;
+    [[nodiscard]] KwinNativeCombinedPreflightReport preflight_install(
         const KwinNativeInstallContext& context
     ) const;
     [[nodiscard]] KwinNativeInstallReport install_frame_stub() const;

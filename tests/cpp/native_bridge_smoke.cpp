@@ -103,6 +103,7 @@ int main() {
     }
     const auto install = bridge.install_stub();
     const auto placeholder_gate = bridge.assess_install_gate(fluxma::KwinNativeInstallContext {});
+    const auto combined_preflight = bridge.preflight_install(fluxma::KwinNativeInstallContext {});
     const auto frame_preflight = bridge.preflight_frame_install(fluxma::KwinNativeInstallContext {});
     const auto present_preflight = bridge.preflight_present_install(
         fluxma::KwinNativeInstallContext {}
@@ -152,6 +153,7 @@ int main() {
     const auto install_summary = install.summary();
     const auto frame_preflight_summary = frame_preflight.summary();
     const auto present_preflight_summary = present_preflight.summary();
+    const auto combined_preflight_summary = combined_preflight.summary();
     const auto placeholder_gate_summary = placeholder_gate.summary();
     const auto version_gate_assessment_summary = version_gate.summary();
     const auto backend_gate_assessment_summary = backend_gate.summary();
@@ -200,6 +202,12 @@ int main() {
             "confirm compositor timestamp maps to final output frame" ||
         frame_preflight_summary.find("deferred_reason=placeholder-only") == std::string::npos ||
         frame_preflight_summary.find("target=compositor-output-frame-ready") ==
+            std::string::npos ||
+        combined_preflight.frame.target != "compositor-output-frame-ready" ||
+        combined_preflight.present.target != "output-frame-presented" ||
+        combined_preflight_summary.find("frame{deferred_reason=placeholder-only") ==
+            std::string::npos ||
+        combined_preflight_summary.find("present{deferred_reason=placeholder-only") ==
             std::string::npos ||
         present_preflight.gate.deferred_reason !=
             fluxma::KwinNativeDeferredReason::PlaceholderOnly ||

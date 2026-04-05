@@ -162,6 +162,16 @@ std::string KwinNativeInstallPreflightReport::summary() const {
     return output;
 }
 
+std::string KwinNativeCombinedPreflightReport::summary() const {
+    std::string output;
+    output += "frame{";
+    output += frame.summary();
+    output += "} present{";
+    output += present.summary();
+    output += "}";
+    return output;
+}
+
 std::string KwinNativeCombinedInstallReport::summary() const {
     std::string output;
     output += "frame{";
@@ -264,6 +274,15 @@ KwinNativeInstallPreflightReport KfiKwinNativeBridge::preflight_present_install(
         .symbol = std::string(candidate.symbol),
         .checklist_hint = std::string(checklist[0]),
         .checklist_hint_secondary = std::string(checklist[1]),
+    };
+}
+
+KwinNativeCombinedPreflightReport KfiKwinNativeBridge::preflight_install(
+    const KwinNativeInstallContext& context
+) const {
+    return KwinNativeCombinedPreflightReport {
+        .frame = preflight_frame_install(context),
+        .present = preflight_present_install(context),
     };
 }
 

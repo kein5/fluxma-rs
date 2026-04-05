@@ -204,6 +204,8 @@ support 状態を install summary 1 本で確認できるようにしている�
 将来の real installer が report 生成と同じ条件分岐を共有できるようにしている。
 さらに `preflight_frame_install()` / `preflight_present_install()` を用意し、
 install 実行前でも `gate + target + source/symbol + checklist` を 1 本の report として確認できる。
+`preflight_install()` はその frame/present 両方を束ね、combined summary と同じ粒度で
+native bridge の install 前診断を扱えるようにする。
 
 ## 7.2 GpuFrameHandle
 
