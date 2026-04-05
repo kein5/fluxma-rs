@@ -25,6 +25,86 @@ std::string join_checklist(const std::array<std::string_view, N>& items) {
     return output;
 }
 
+KwinNativeInstallReport make_install_report(
+    const KwinNativeDeferredReason deferred_reason,
+    const std::string& reason,
+    const std::string_view target,
+    const std::string_view installer_entry,
+    const std::string_view source_file,
+    const std::string_view symbol,
+    const std::string_view checklist_hint,
+    const std::string_view checklist_hint_secondary,
+    const std::string& checklist_all
+) {
+    return KwinNativeInstallReport {
+        .result = KwinNativeInstallResult::Deferred,
+        .deferred_reason = deferred_reason,
+        .reason = reason,
+        .target = std::string(target),
+        .installer_entry = std::string(installer_entry),
+        .source_file = std::string(source_file),
+        .symbol = std::string(symbol),
+        .checklist_hint = std::string(checklist_hint),
+        .checklist_hint_secondary = std::string(checklist_hint_secondary),
+        .checklist_all = checklist_all,
+    };
+}
+
+KwinNativeInstallReport make_deferred_install_report(
+    const KwinNativeInstallContext& context,
+    const std::string_view target,
+    const std::string_view installer_entry,
+    const std::string_view source_file,
+    const std::string_view symbol,
+    const std::string_view checklist_hint,
+    const std::string_view checklist_hint_secondary,
+    const std::string& checklist_all
+) {
+    if (!context.kwin_version_supported) {
+        std::string reason = "kwin version gate blocked install for ";
+        reason += context.kwin_version;
+        return make_install_report(
+            KwinNativeDeferredReason::KwinVersionGate,
+            reason,
+            target,
+            installer_entry,
+            source_file,
+            symbol,
+            checklist_hint,
+            checklist_hint_secondary,
+            checklist_all
+        );
+    }
+
+    if (!context.backend_supported) {
+        std::string reason = "backend gate blocked install for ";
+        reason += context.backend_name;
+        return make_install_report(
+            KwinNativeDeferredReason::BackendGate,
+            reason,
+            target,
+            installer_entry,
+            source_file,
+            symbol,
+            checklist_hint,
+            checklist_hint_secondary,
+            checklist_all
+        );
+    }
+
+    return make_install_report(
+        KwinNativeDeferredReason::PlaceholderOnly,
+        "native bridge is still placeholder-only",
+        target,
+        installer_entry,
+        source_file,
+        symbol,
+        checklist_hint,
+        checklist_hint_secondary,
+        checklist_all
+    );
+}
+
 }  // namespace
 
 std::string KwinNativeBringupReport::combined_summary() const {
@@ -110,43 +190,57 @@ std::array<std::string_view, 3> KfiKwinNativeBridge::present_checklist() const n
 }
 
 KwinNativeInstallReport KfiKwinNativeBridge::install_frame_stub() const {
+    return install_frame_stub(KwinNativeInstallContext {});
+}
+
+KwinNativeInstallReport KfiKwinNativeBridge::install_frame_stub(
+    const KwinNativeInstallContext& context
+) const {
     const auto candidate = frame_candidate();
     const auto checklist = frame_checklist();
-    return KwinNativeInstallReport {
-        .result = KwinNativeInstallResult::Deferred,
-        .deferred_reason = KwinNativeDeferredReason::PlaceholderOnly,
-        .reason = "native bridge is still placeholder-only",
-        .target = std::string(to_string(candidate.hook_point)),
-        .installer_entry = std::string(frame_installer_entry()),
-        .source_file = std::string(candidate.source_file),
-        .symbol = std::string(candidate.symbol),
-        .checklist_hint = std::string(checklist[0]),
-        .checklist_hint_secondary = std::string(checklist[1]),
-        .checklist_all = join_checklist(checklist),
-    };
+    return make_deferred_install_report(
+        context,
+        to_string(candidate.hook_point),
+        frame_installer_entry(),
+        candidate.source_file,
+        candidate.symbol,
+        checklist[0],
+        checklist[1],
+        join_checklist(checklist)
+    );
 }
 
 KwinNativeInstallReport KfiKwinNativeBridge::install_present_stub() const {
+    return install_present_stub(KwinNativeInstallContext {});
+}
+
+KwinNativeInstallReport KfiKwinNativeBridge::install_present_stub(
+    const KwinNativeInstallContext& context
+) const {
     const auto candidate = present_candidate();
     const auto checklist = present_checklist();
-    return KwinNativeInstallReport {
-        .result = KwinNativeInstallResult::Deferred,
-        .deferred_reason = KwinNativeDeferredReason::PlaceholderOnly,
-        .reason = "native bridge is still placeholder-only",
-        .target = std::string(to_string(candidate.hook_point)),
-        .installer_entry = std::string(present_installer_entry()),
-        .source_file = std::string(candidate.source_file),
-        .symbol = std::string(candidate.symbol),
-        .checklist_hint = std::string(checklist[0]),
-        .checklist_hint_secondary = std::string(checklist[1]),
-        .checklist_all = join_checklist(checklist),
-    };
+    return make_deferred_install_report(
+        context,
+        to_string(candidate.hook_point),
+        present_installer_entry(),
+        candidate.source_file,
+        candidate.symbol,
+        checklist[0],
+        checklist[1],
+        join_checklist(checklist)
+    );
 }
 
 KwinNativeCombinedInstallReport KfiKwinNativeBridge::install_stub() const {
+    return install_stub(KwinNativeInstallContext {});
+}
+
+KwinNativeCombinedInstallReport KfiKwinNativeBridge::install_stub(
+    const KwinNativeInstallContext& context
+) const {
     return KwinNativeCombinedInstallReport {
-        .frame = install_frame_stub(),
-        .present = install_present_stub(),
+        .frame = install_frame_stub(context),
+        .present = install_present_stub(context),
     };
 }
 

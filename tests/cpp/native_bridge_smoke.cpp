@@ -100,9 +100,36 @@ int main() {
         return EXIT_FAILURE;
     }
     const auto install = bridge.install_stub();
+    const auto version_gate_install = bridge.install_stub(
+        fluxma::KwinNativeInstallContext {
+            .kwin_version_supported = false,
+            .backend_supported = true,
+            .kwin_version = "6.3.80",
+            .backend_name = "drm",
+        }
+    );
+    const auto backend_gate_install = bridge.install_stub(
+        fluxma::KwinNativeInstallContext {
+            .kwin_version_supported = true,
+            .backend_supported = false,
+            .kwin_version = "6.3.80",
+            .backend_name = "wayland",
+        }
+    );
+    const auto precedence_install = bridge.install_stub(
+        fluxma::KwinNativeInstallContext {
+            .kwin_version_supported = false,
+            .backend_supported = false,
+            .kwin_version = "6.3.81",
+            .backend_name = "drm",
+        }
+    );
     const auto frame_install_summary = frame_install.summary();
     const auto present_install_summary = present_install.summary();
     const auto install_summary = install.summary();
+    const auto version_gate_summary = version_gate_install.summary();
+    const auto backend_gate_summary = backend_gate_install.summary();
+    const auto precedence_summary = precedence_install.summary();
     if (frame_install_summary.find("target=compositor-output-frame-ready") == std::string::npos ||
         frame_install_summary.find("deferred_reason=placeholder-only") == std::string::npos ||
         frame_install_summary.find(
@@ -134,7 +161,24 @@ int main() {
             "checklist_all=confirm presented frame-id still correlates with submitted frame"
         ) == std::string::npos ||
         install_summary.find("frame{result=deferred") == std::string::npos ||
-        install_summary.find("present{result=deferred") == std::string::npos) {
+        install_summary.find("present{result=deferred") == std::string::npos ||
+        version_gate_install.frame.deferred_reason != fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        version_gate_install.present.deferred_reason != fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        version_gate_install.frame.reason != "kwin version gate blocked install for 6.3.80" ||
+        version_gate_summary.find("deferred_reason=kwin-version-gate") == std::string::npos ||
+        version_gate_summary.find("reason=kwin version gate blocked install for 6.3.80") ==
+            std::string::npos ||
+        backend_gate_install.frame.deferred_reason != fluxma::KwinNativeDeferredReason::BackendGate ||
+        backend_gate_install.present.deferred_reason != fluxma::KwinNativeDeferredReason::BackendGate ||
+        backend_gate_install.present.reason != "backend gate blocked install for wayland" ||
+        backend_gate_summary.find("deferred_reason=backend-gate") == std::string::npos ||
+        backend_gate_summary.find("reason=backend gate blocked install for wayland") ==
+            std::string::npos ||
+        precedence_install.frame.deferred_reason != fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        precedence_install.present.deferred_reason != fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        precedence_summary.find("deferred_reason=kwin-version-gate") == std::string::npos ||
+        precedence_summary.find("reason=kwin version gate blocked install for 6.3.81") ==
+            std::string::npos) {
         std::cerr << "native bridge install summaries must stay stable\n";
         return EXIT_FAILURE;
     }

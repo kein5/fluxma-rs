@@ -9,6 +9,7 @@ Epic 1〜2 skeleton の次に着手する順序を固定する。
 - `KfiGpuServices` の passthrough submission を実際の present path へ結線する
 - final per-output composed frame の取得点を KWin 6 実コード上で確認する
 - `Compositor::composite(RenderLoop *)` と `OutputFrame` 生成点を最初の候補として検証する
+- native bridge install 時は `KwinNativeInstallContext` で KWin version/backend gate を先に明示し、placeholder-only と混同しない
 - `KfiKwinFrameBuilder` を使って `Compositor` 側 hook から metadata/payload/context を埋める
 - `KfiKwinHookAdapter::preferred_frame_candidate()` を起点に frame hook 候補を固定する
 - `KfiKwinFrameBuilder::is_complete()` を満たす field が KWin 実 hook から埋まることを確認する
@@ -19,6 +20,7 @@ Epic 1〜2 skeleton の次に着手する順序を固定する。
 - `unresolved_fields` を 0 にできる候補だけを実差し替え対象に進める
 - bring-up 時は `summarize(KfiKwinHookAdapter::assess_frame_candidate(...))` を 1 回記録して候補状態を残す
 - frame hook は candidate checklist を上から潰し、`final composed frame-id provenance` と `gpu handle ownership` を先に確定する
+- `KfiKwinNativeBridge::install_frame_stub(KwinNativeInstallContext)` で version gate / backend gate を明示しながら bring-up を進める
 - provenance context が `HookUnavailable` にならない形で final composed frame 境界を確認する
 - private/internal hook 利用箇所へ明示コメントを入れる
 
@@ -39,6 +41,7 @@ Epic 1〜2 skeleton の次に着手する順序を固定する。
 - `unresolved_fields` を backend ごとに削って、実際に採用する present callback を絞り込む
 - bring-up 時は `summarize(KfiKwinHookAdapter::assess_present_candidate(...))` を 1 回記録して候補状態を残す
 - present hook は candidate checklist を上から潰し、`frame-id correlation` と `refresh interval semantics` を先に確定する
+- `KfiKwinNativeBridge::install_present_stub(KwinNativeInstallContext)` で version/backend 条件を切り分けた report を残す
 - unknown ではない present hook context を backend ごとに選び、ignore path を実 hook で踏まないようにする
 
 ## 3. bypass-only path をクラッシュしない最小経路にする

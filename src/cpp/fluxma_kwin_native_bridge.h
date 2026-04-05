@@ -2,6 +2,7 @@
 
 #include <array>
 #include <string>
+#include <string_view>
 
 #include "fluxma_kwin_hook_adapter.h"
 
@@ -21,6 +22,13 @@ enum class KwinNativeDeferredReason : std::uint8_t {
     PlaceholderOnly = 0,
     KwinVersionGate = 1,
     BackendGate = 2,
+};
+
+struct KwinNativeInstallContext {
+    bool kwin_version_supported = true;
+    bool backend_supported = true;
+    std::string_view kwin_version = "unspecified";
+    std::string_view backend_name = "unspecified";
 };
 
 struct KwinNativeBringupReport {
@@ -66,8 +74,17 @@ class KfiKwinNativeBridge {
     [[nodiscard]] std::array<std::string_view, 5> frame_checklist() const noexcept;
     [[nodiscard]] std::array<std::string_view, 3> present_checklist() const noexcept;
     [[nodiscard]] KwinNativeInstallReport install_frame_stub() const;
+    [[nodiscard]] KwinNativeInstallReport install_frame_stub(
+        const KwinNativeInstallContext& context
+    ) const;
     [[nodiscard]] KwinNativeInstallReport install_present_stub() const;
+    [[nodiscard]] KwinNativeInstallReport install_present_stub(
+        const KwinNativeInstallContext& context
+    ) const;
     [[nodiscard]] KwinNativeCombinedInstallReport install_stub() const;
+    [[nodiscard]] KwinNativeCombinedInstallReport install_stub(
+        const KwinNativeInstallContext& context
+    ) const;
     [[nodiscard]] KwinNativeBringupReport build_report(
         const KwinCompositorFrameInputs& frame_inputs,
         const KwinPresentFeedbackInputs& present_inputs
