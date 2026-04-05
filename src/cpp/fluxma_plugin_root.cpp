@@ -5,14 +5,16 @@ namespace fluxma {
 KfiPluginRoot::KfiPluginRoot(ModuleConfig config)
     : config_(config),
       primary_output_(0, config_),
-      primary_output_hook_adapter_(0, primary_output_) {
+      primary_output_hook_adapter_(0, primary_output_),
+      native_bridge_(primary_output_hook_adapter_) {
     // TODO: This is a native-module skeleton only. Do not add QML effect entry points here.
 }
 
 KfiPluginRoot::KfiPluginRoot(ModuleConfig config, bool force_rust_core_unavailable_for_tests)
     : config_(config),
       primary_output_(0, config_, force_rust_core_unavailable_for_tests),
-      primary_output_hook_adapter_(0, primary_output_) {
+      primary_output_hook_adapter_(0, primary_output_),
+      native_bridge_(primary_output_hook_adapter_) {
     // TODO: This constructor is a local test seam for bypass fallback only.
 }
 
@@ -30,6 +32,14 @@ KfiKwinHookAdapter& KfiPluginRoot::primary_output_hook_adapter() noexcept {
 
 const KfiKwinHookAdapter& KfiPluginRoot::primary_output_hook_adapter() const noexcept {
     return primary_output_hook_adapter_;
+}
+
+KfiKwinNativeBridge& KfiPluginRoot::native_bridge() noexcept {
+    return native_bridge_;
+}
+
+const KfiKwinNativeBridge& KfiPluginRoot::native_bridge() const noexcept {
+    return native_bridge_;
 }
 
 }  // namespace fluxma

@@ -177,6 +177,8 @@ sentinel event しか生成しないことで、欠損 metadata をそのまま 
 実 hook 差し替え時の入口を adapter 境界に寄せている。
 checklist と readiness summary も adapter から直接引けるため、
 bring-up 時の診断は candidate helper を直接辿らず adapter API で閉じる。
+さらに `KfiKwinNativeBridge` を placeholder-only で追加し、
+native/internal hook の将来差し替え先を plugin root 配下に固定した。
 
 ## 7.2 GpuFrameHandle
 
