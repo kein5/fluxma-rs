@@ -259,6 +259,22 @@ target_link_libraries(fluxma_hook_candidate_plan_smoke
         fluxma_native_skeleton
 )
 
+add_executable(fluxma_incomplete_bundle_path_smoke
+    tests/cpp/incomplete_bundle_path_smoke.cpp
+)
+add_dependencies(fluxma_incomplete_bundle_path_smoke fluxma_rust_core)
+
+target_include_directories(fluxma_incomplete_bundle_path_smoke
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/rust/include
+)
+
+target_link_libraries(fluxma_incomplete_bundle_path_smoke
+    PRIVATE
+        fluxma_native_skeleton
+)
+
 add_executable(fluxma_invalid_present_feedback_smoke
     tests/cpp/invalid_present_feedback_smoke.cpp
 )
@@ -307,6 +323,10 @@ if(BUILD_TESTING)
     add_test(NAME fluxma_hook_input_builder_smoke COMMAND fluxma_hook_input_builder_smoke)
     add_test(NAME fluxma_hook_field_source_smoke COMMAND fluxma_hook_field_source_smoke)
     add_test(NAME fluxma_hook_candidate_plan_smoke COMMAND fluxma_hook_candidate_plan_smoke)
+    add_test(
+        NAME fluxma_incomplete_bundle_path_smoke
+        COMMAND fluxma_incomplete_bundle_path_smoke
+    )
     add_test(
         NAME fluxma_invalid_present_feedback_smoke
         COMMAND fluxma_invalid_present_feedback_smoke
