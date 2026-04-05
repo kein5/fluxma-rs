@@ -18,6 +18,7 @@ Epic 1〜2 skeleton の次に着手する順序を固定する。
 - `KfiKwinHookAdapter::assess_frame_candidate()` で incomplete field を開発時に即確認できるようにする
 - `unresolved_fields` を 0 にできる候補だけを実差し替え対象に進める
 - bring-up 時は `summarize(KfiKwinHookAdapter::assess_frame_candidate(...))` を 1 回記録して候補状態を残す
+- frame hook は candidate checklist を上から潰し、`final composed frame-id provenance` と `gpu handle ownership` を先に確定する
 - provenance context が `HookUnavailable` にならない形で final composed frame 境界を確認する
 - private/internal hook 利用箇所へ明示コメントを入れる
 
@@ -37,6 +38,7 @@ Epic 1〜2 skeleton の次に着手する順序を固定する。
 - `KfiKwinHookAdapter::assess_present_candidate()` で incomplete feedback field を開発時に即確認できるようにする
 - `unresolved_fields` を backend ごとに削って、実際に採用する present callback を絞り込む
 - bring-up 時は `summarize(KfiKwinHookAdapter::assess_present_candidate(...))` を 1 回記録して候補状態を残す
+- present hook は candidate checklist を上から潰し、`frame-id correlation` と `refresh interval semantics` を先に確定する
 - unknown ではない present hook context を backend ごとに選び、ignore path を実 hook で踏まないようにする
 
 ## 3. bypass-only path をクラッシュしない最小経路にする
