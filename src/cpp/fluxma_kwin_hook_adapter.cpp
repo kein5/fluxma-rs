@@ -32,6 +32,26 @@ KwinPresentHookReadiness KfiKwinHookAdapter::assess_present_candidate(
     return KfiKwinHookCandidates::assess(preferred_present_candidate(), inputs);
 }
 
+std::array<std::string_view, 5> KfiKwinHookAdapter::preferred_frame_checklist() noexcept {
+    return describe_checklist(preferred_frame_candidate());
+}
+
+std::array<std::string_view, 3> KfiKwinHookAdapter::preferred_present_checklist() noexcept {
+    return describe_checklist(preferred_present_candidate());
+}
+
+std::string KfiKwinHookAdapter::summarize_frame_candidate(
+    const KwinCompositorFrameInputs& inputs
+) {
+    return summarize(assess_frame_candidate(inputs));
+}
+
+std::string KfiKwinHookAdapter::summarize_present_candidate(
+    const KwinPresentFeedbackInputs& inputs
+) {
+    return summarize(assess_present_candidate(inputs));
+}
+
 OutputDecision KfiKwinHookAdapter::on_final_composed_frame(
     const FinalComposedFrameEvent& event
 ) noexcept {
@@ -52,7 +72,7 @@ OutputDecision KfiKwinHookAdapter::on_compositor_output_frame_ready(
     // 1. WaylandCompositor::composite(RenderLoop *) in src/compositor_wayland.cpp
     // 2. BackendOutput::present(..., frame) and backend-specific present() handoff
     // 3. OutputFrame::presented(...) -> RenderLoopPrivate::notifyFrameCompleted(...) feedback path
-    // TODO: When wiring the real hook, log summarize(assess_frame_candidate(inputs)) once per
+    // TODO: When wiring the real hook, log summarize_frame_candidate(inputs) once per
     // candidate revision so missing vs unresolved fields are visible during bring-up.
     (void)preferred_frame_candidate();
     const auto policy_decision = output_policy_.classify_frame_event(event);
@@ -119,7 +139,7 @@ void KfiKwinHookAdapter::on_render_loop_frame_presented(
     // TODO: Wire this to the actual KWin present feedback callback once the hook is confirmed.
     // Prefer KfiKwinHookCandidates::output_frame_presented(), then fall back to
     // KfiKwinHookCandidates::render_loop_frame_presented() if backend-specific metadata requires it.
-    // TODO: When wiring the real hook, log summarize(assess_present_candidate(inputs)) once per
+    // TODO: When wiring the real hook, log summarize_present_candidate(inputs) once per
     // candidate revision so missing vs unresolved feedback fields are visible during bring-up.
     (void)preferred_present_candidate();
     if (!output_policy_.accepts_output(event.output_id)) {

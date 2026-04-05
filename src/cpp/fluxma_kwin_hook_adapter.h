@@ -101,6 +101,14 @@ class KfiKwinHookAdapter {
     [[nodiscard]] static KwinPresentHookReadiness assess_present_candidate(
         const KwinPresentFeedbackInputs& inputs
     ) noexcept;
+    [[nodiscard]] static std::array<std::string_view, 5> preferred_frame_checklist() noexcept;
+    [[nodiscard]] static std::array<std::string_view, 3> preferred_present_checklist() noexcept;
+    [[nodiscard]] static std::string summarize_frame_candidate(
+        const KwinCompositorFrameInputs& inputs
+    );
+    [[nodiscard]] static std::string summarize_present_candidate(
+        const KwinPresentFeedbackInputs& inputs
+    );
 
     [[nodiscard]] OutputDecision on_compositor_output_frame_ready(
         const FinalComposedFrameEvent& event

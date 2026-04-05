@@ -175,6 +175,8 @@ sentinel event しか生成しないことで、欠損 metadata をそのまま 
 埋める想定かを型として保持している。
 `KfiKwinHookAdapter` 自体も preferred candidate/readiness helper を公開し、
 実 hook 差し替え時の入口を adapter 境界に寄せている。
+checklist と readiness summary も adapter から直接引けるため、
+bring-up 時の診断は candidate helper を直接辿らず adapter API で閉じる。
 
 ## 7.2 GpuFrameHandle
 
