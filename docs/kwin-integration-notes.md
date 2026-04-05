@@ -116,6 +116,7 @@ KWin source 上の観察:
 - builder には field source plan helper も追加し、`Compositor` / `OutputFrame` / `RenderLoop` / backend present path のどこから各 field を埋める想定かを enum で保持するようにした
 - `KfiKwinHookCandidates` を追加し、現時点の一次情報ベースの候補を `source_file + symbol + note + required_fields` としてコードで固定した
 - candidate plan は `assess(...)` で実入力に対する readiness 判定もできるようにし、実 hook 実装時の field 欠損を候補単位で見られるようにした
+- hook point と required field 名は string helper でも固定し、将来の debug log や TODO を enum 値に依存させないようにした
 - `KfiOutputPolicy` は provenance context も見るようにし、MVP で未対応な frame hook 境界は `HookUnavailable` bypass、unknown present hook 境界は ignore に倒す
 - present feedback では `frame_id/presented_timestamp_ns/refresh_interval_ns` が欠けた入力も ignore に倒し、欠損 metadata を Rust metrics に流さない
 - adapter 層では width/height/gpu handle の最低限 validation を行い、未対応入力は `unsupported-output` bypass に倒す

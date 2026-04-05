@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <string_view>
 
 #include "fluxma_kwin_hook_builders.h"
@@ -51,5 +52,14 @@ class KfiKwinHookCandidates {
         const KwinPresentFeedbackInputs& inputs
     ) noexcept;
 };
+
+[[nodiscard]] std::string_view to_string(KwinFrameHookPoint hook_point) noexcept;
+[[nodiscard]] std::string_view to_string(KwinPresentHookPoint hook_point) noexcept;
+[[nodiscard]] std::array<std::string_view, 5> describe_required(
+    KwinFrameHookCandidatePlan plan
+) noexcept;
+[[nodiscard]] std::array<std::string_view, 3> describe_required(
+    KwinPresentHookCandidatePlan plan
+) noexcept;
 
 }  // namespace fluxma

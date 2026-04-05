@@ -101,6 +101,16 @@ int main() {
         std::cerr << "incomplete frame inputs must collapse to sentinel event\n";
         return EXIT_FAILURE;
     }
+    auto multi_missing_frame_inputs = frame_inputs;
+    multi_missing_frame_inputs.frame_id = 0;
+    multi_missing_frame_inputs.width = 0;
+    const auto multi_missing_frame_names = fluxma::describe(
+        fluxma::KfiKwinFrameBuilder::missing_required_fields(multi_missing_frame_inputs)
+    );
+    if (multi_missing_frame_names[0] != "frame-id" || multi_missing_frame_names[2] != "width") {
+        std::cerr << "multi-field frame diagnostics must stay stable\n";
+        return EXIT_FAILURE;
+    }
 
     const auto present_inputs = make_present_inputs();
     if (!fluxma::KfiKwinPresentBuilder::is_complete(present_inputs)) {
@@ -145,6 +155,17 @@ int main() {
     if (incomplete_present_hook.event.output_id != 0 || incomplete_present_hook.event.frame_id != 0 ||
         incomplete_present_hook.event.refresh_interval_ns != 0) {
         std::cerr << "incomplete present inputs must collapse to sentinel event\n";
+        return EXIT_FAILURE;
+    }
+    auto multi_missing_present_inputs = present_inputs;
+    multi_missing_present_inputs.frame_id = 0;
+    multi_missing_present_inputs.presented_timestamp_ns = 0;
+    const auto multi_missing_present_names = fluxma::describe(
+        fluxma::KfiKwinPresentBuilder::missing_required_fields(multi_missing_present_inputs)
+    );
+    if (multi_missing_present_names[0] != "frame-id" ||
+        multi_missing_present_names[1] != "presented-timestamp-ns") {
+        std::cerr << "multi-field present diagnostics must stay stable\n";
         return EXIT_FAILURE;
     }
 

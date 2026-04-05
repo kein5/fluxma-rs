@@ -32,6 +32,20 @@ constexpr KwinPresentInputField combine(
     return static_cast<KwinPresentInputField>(raw(first) | raw(second) | raw(third));
 }
 
+constexpr KwinFrameInputField required_missing(
+    KwinFrameInputField required_fields,
+    KwinFrameInputField missing_fields
+) noexcept {
+    return static_cast<KwinFrameInputField>(raw(required_fields) & raw(missing_fields));
+}
+
+constexpr KwinPresentInputField required_missing(
+    KwinPresentInputField required_fields,
+    KwinPresentInputField missing_fields
+) noexcept {
+    return static_cast<KwinPresentInputField>(raw(required_fields) & raw(missing_fields));
+}
+
 }  // namespace
 
 KwinFrameHookCandidatePlan KfiKwinHookCandidates::compositor_output_frame_ready() noexcept {
@@ -110,13 +124,12 @@ KwinFrameHookReadiness KfiKwinHookCandidates::assess(
     const KwinFrameHookCandidatePlan& plan,
     const KwinCompositorFrameInputs& inputs
 ) noexcept {
-    const auto missing = KfiKwinFrameBuilder::missing_required_fields(inputs);
+    const auto input_missing = KfiKwinFrameBuilder::missing_required_fields(inputs);
+    const auto plan_missing = required_missing(plan.required_fields, input_missing);
     return KwinFrameHookReadiness {
         .plan = plan,
-        .missing_fields = static_cast<KwinFrameInputField>(
-            raw(missing) & raw(plan.required_fields)
-        ),
-        .ready = (raw(missing) & raw(plan.required_fields)) == 0,
+        .missing_fields = plan_missing,
+        .ready = plan_missing == KwinFrameInputField::None,
     };
 }
 
@@ -124,14 +137,47 @@ KwinPresentHookReadiness KfiKwinHookCandidates::assess(
     const KwinPresentHookCandidatePlan& plan,
     const KwinPresentFeedbackInputs& inputs
 ) noexcept {
-    const auto missing = KfiKwinPresentBuilder::missing_required_fields(inputs);
+    const auto input_missing = KfiKwinPresentBuilder::missing_required_fields(inputs);
+    const auto plan_missing = required_missing(plan.required_fields, input_missing);
     return KwinPresentHookReadiness {
         .plan = plan,
-        .missing_fields = static_cast<KwinPresentInputField>(
-            raw(missing) & raw(plan.required_fields)
-        ),
-        .ready = (raw(missing) & raw(plan.required_fields)) == 0,
+        .missing_fields = plan_missing,
+        .ready = plan_missing == KwinPresentInputField::None,
     };
+}
+
+std::string_view to_string(KwinFrameHookPoint hook_point) noexcept {
+    switch (hook_point) {
+    case KwinFrameHookPoint::Unknown:
+        return "unknown";
+    case KwinFrameHookPoint::CompositorOutputFrameReady:
+        return "compositor-output-frame-ready";
+    case KwinFrameHookPoint::BackendPresentHandoff:
+        return "backend-present-handoff";
+    }
+
+    return "unknown";
+}
+
+std::string_view to_string(KwinPresentHookPoint hook_point) noexcept {
+    switch (hook_point) {
+    case KwinPresentHookPoint::Unknown:
+        return "unknown";
+    case KwinPresentHookPoint::OutputFramePresented:
+        return "output-frame-presented";
+    case KwinPresentHookPoint::RenderLoopFramePresented:
+        return "render-loop-frame-presented";
+    }
+
+    return "unknown";
+}
+
+std::array<std::string_view, 5> describe_required(KwinFrameHookCandidatePlan plan) noexcept {
+    return describe(plan.required_fields);
+}
+
+std::array<std::string_view, 3> describe_required(KwinPresentHookCandidatePlan plan) noexcept {
+    return describe(plan.required_fields);
 }
 
 }  // namespace fluxma
