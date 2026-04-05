@@ -25,6 +25,11 @@ int main() {
         std::cerr << "native bridge must reuse adapter preferred candidates\n";
         return EXIT_FAILURE;
     }
+    if (bridge.frame_installer_entry() != "KfiKwinNativeBridge::install_frame_stub" ||
+        bridge.present_installer_entry() != "KfiKwinNativeBridge::install_present_stub") {
+        std::cerr << "native bridge must expose installer entry names\n";
+        return EXIT_FAILURE;
+    }
     const auto frame_checklist = bridge.frame_checklist();
     const auto present_checklist = bridge.present_checklist();
     if (frame_checklist[0] != "confirm final composed frame-id provenance" ||
@@ -68,6 +73,7 @@ int main() {
     if (frame_install.result != fluxma::KwinNativeInstallResult::Deferred ||
         frame_install.reason != "native bridge is still placeholder-only" ||
         frame_install.target != "compositor-output-frame-ready" ||
+        frame_install.installer_entry != "KfiKwinNativeBridge::install_frame_stub" ||
         frame_install.source_file != "src/compositor_wayland.cpp" ||
         frame_install.symbol != "WaylandCompositor::composite(RenderLoop *)" ||
         frame_install.checklist_hint != "confirm final composed frame-id provenance" ||
@@ -78,6 +84,7 @@ int main() {
         ) == std::string::npos ||
         present_install.result != fluxma::KwinNativeInstallResult::Deferred ||
         present_install.target != "output-frame-presented" ||
+        present_install.installer_entry != "KfiKwinNativeBridge::install_present_stub" ||
         present_install.source_file != "src/core/renderbackend.cpp" ||
         present_install.symbol != "OutputFrame::presented(...)" ||
         present_install.checklist_hint !=
@@ -95,6 +102,9 @@ int main() {
     const auto present_install_summary = present_install.summary();
     const auto install_summary = install.summary();
     if (frame_install_summary.find("target=compositor-output-frame-ready") == std::string::npos ||
+        frame_install_summary.find(
+            "installer_entry=KfiKwinNativeBridge::install_frame_stub"
+        ) == std::string::npos ||
         frame_install_summary.find("source=src/compositor_wayland.cpp") == std::string::npos ||
         frame_install_summary.find(
             "checklist_hint=confirm final composed frame-id provenance"
@@ -106,6 +116,9 @@ int main() {
             "checklist_all=confirm final composed frame-id provenance"
         ) == std::string::npos ||
         present_install_summary.find("target=output-frame-presented") == std::string::npos ||
+        present_install_summary.find(
+            "installer_entry=KfiKwinNativeBridge::install_present_stub"
+        ) == std::string::npos ||
         present_install_summary.find("source=src/core/renderbackend.cpp") == std::string::npos ||
         present_install_summary.find(
             "checklist_hint=confirm presented frame-id still correlates with submitted frame"

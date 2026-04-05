@@ -47,6 +47,8 @@ std::string KwinNativeInstallReport::summary() const {
     output += reason;
     output += " target=";
     output += target;
+    output += " installer_entry=";
+    output += installer_entry;
     output += " source=";
     output += source_file;
     output += " symbol=";
@@ -89,6 +91,14 @@ KwinPresentHookCandidatePlan KfiKwinNativeBridge::present_candidate() const noex
     return hook_adapter_.preferred_present_candidate();
 }
 
+std::string_view KfiKwinNativeBridge::frame_installer_entry() const noexcept {
+    return "KfiKwinNativeBridge::install_frame_stub";
+}
+
+std::string_view KfiKwinNativeBridge::present_installer_entry() const noexcept {
+    return "KfiKwinNativeBridge::install_present_stub";
+}
+
 std::array<std::string_view, 5> KfiKwinNativeBridge::frame_checklist() const noexcept {
     return hook_adapter_.preferred_frame_checklist();
 }
@@ -104,6 +114,7 @@ KwinNativeInstallReport KfiKwinNativeBridge::install_frame_stub() const {
         .result = KwinNativeInstallResult::Deferred,
         .reason = "native bridge is still placeholder-only",
         .target = std::string(to_string(candidate.hook_point)),
+        .installer_entry = std::string(frame_installer_entry()),
         .source_file = std::string(candidate.source_file),
         .symbol = std::string(candidate.symbol),
         .checklist_hint = std::string(checklist[0]),
@@ -119,6 +130,7 @@ KwinNativeInstallReport KfiKwinNativeBridge::install_present_stub() const {
         .result = KwinNativeInstallResult::Deferred,
         .reason = "native bridge is still placeholder-only",
         .target = std::string(to_string(candidate.hook_point)),
+        .installer_entry = std::string(present_installer_entry()),
         .source_file = std::string(candidate.source_file),
         .symbol = std::string(candidate.symbol),
         .checklist_hint = std::string(checklist[0]),

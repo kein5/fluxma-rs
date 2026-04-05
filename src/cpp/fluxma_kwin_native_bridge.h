@@ -29,6 +29,7 @@ struct KwinNativeInstallReport {
     KwinNativeInstallResult result = KwinNativeInstallResult::Deferred;
     std::string reason {};
     std::string target {};
+    std::string installer_entry {};
     std::string source_file {};
     std::string symbol {};
     std::string checklist_hint {};
@@ -53,6 +54,8 @@ class KfiKwinNativeBridge {
     [[nodiscard]] bool is_installed() const noexcept;
     [[nodiscard]] KwinFrameHookCandidatePlan frame_candidate() const noexcept;
     [[nodiscard]] KwinPresentHookCandidatePlan present_candidate() const noexcept;
+    [[nodiscard]] std::string_view frame_installer_entry() const noexcept;
+    [[nodiscard]] std::string_view present_installer_entry() const noexcept;
     [[nodiscard]] std::array<std::string_view, 5> frame_checklist() const noexcept;
     [[nodiscard]] std::array<std::string_view, 3> present_checklist() const noexcept;
     [[nodiscard]] KwinNativeInstallReport install_frame_stub() const;
