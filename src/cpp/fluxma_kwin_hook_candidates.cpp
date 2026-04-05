@@ -216,4 +216,62 @@ std::array<std::string_view, 3> describe_unresolved(KwinPresentHookCandidatePlan
     return describe(plan.unresolved_fields);
 }
 
+namespace {
+
+template <std::size_t N>
+std::string join_names(const std::array<std::string_view, N>& names) {
+    std::string result;
+    bool first = true;
+    for (const auto name : names) {
+        if (name.empty()) {
+            continue;
+        }
+        if (!first) {
+            result += ",";
+        }
+        result += name;
+        first = false;
+    }
+    if (result.empty()) {
+        return "none";
+    }
+    return result;
+}
+
+}  // namespace
+
+std::string summarize(KwinFrameHookReadiness readiness) {
+    std::string summary;
+    summary += "hook=";
+    summary += std::string(to_string(readiness.plan.hook_point));
+    summary += " source=";
+    summary += std::string(readiness.plan.source_file);
+    summary += " symbol=";
+    summary += std::string(readiness.plan.symbol);
+    summary += " ready=";
+    summary += readiness.ready ? "yes" : "no";
+    summary += " missing=";
+    summary += join_names(describe(readiness.missing_fields));
+    summary += " unresolved=";
+    summary += join_names(describe(readiness.unresolved_fields));
+    return summary;
+}
+
+std::string summarize(KwinPresentHookReadiness readiness) {
+    std::string summary;
+    summary += "hook=";
+    summary += std::string(to_string(readiness.plan.hook_point));
+    summary += " source=";
+    summary += std::string(readiness.plan.source_file);
+    summary += " symbol=";
+    summary += std::string(readiness.plan.symbol);
+    summary += " ready=";
+    summary += readiness.ready ? "yes" : "no";
+    summary += " missing=";
+    summary += join_names(describe(readiness.missing_fields));
+    summary += " unresolved=";
+    summary += join_names(describe(readiness.unresolved_fields));
+    return summary;
+}
+
 }  // namespace fluxma

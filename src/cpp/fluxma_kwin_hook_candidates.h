@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <string>
 #include <string_view>
 
 #include "fluxma_kwin_hook_builders.h"
@@ -71,5 +72,7 @@ class KfiKwinHookCandidates {
 [[nodiscard]] std::array<std::string_view, 3> describe_unresolved(
     KwinPresentHookCandidatePlan plan
 ) noexcept;
+[[nodiscard]] std::string summarize(KwinFrameHookReadiness readiness);
+[[nodiscard]] std::string summarize(KwinPresentHookReadiness readiness);
 
 }  // namespace fluxma

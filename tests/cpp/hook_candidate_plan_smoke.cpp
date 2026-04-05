@@ -143,5 +143,25 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    const auto compositor_summary = fluxma::summarize(ready_frame);
+    if (compositor_summary.find("hook=compositor-output-frame-ready") == std::string::npos ||
+        compositor_summary.find("ready=no") == std::string::npos ||
+        compositor_summary.find("missing=none") == std::string::npos ||
+        compositor_summary.find("unresolved=frame-id,timestamp-ns,width,height,gpu-handle") ==
+            std::string::npos) {
+        std::cerr << "frame readiness summary must stay stable\n";
+        return EXIT_FAILURE;
+    }
+
+    const auto present_summary = fluxma::summarize(missing_present);
+    if (present_summary.find("hook=output-frame-presented") == std::string::npos ||
+        present_summary.find("missing=refresh-interval-ns") == std::string::npos ||
+        present_summary.find(
+            "unresolved=frame-id,presented-timestamp-ns,refresh-interval-ns"
+        ) == std::string::npos) {
+        std::cerr << "present readiness summary must stay stable\n";
+        return EXIT_FAILURE;
+    }
+
     return EXIT_SUCCESS;
 }
