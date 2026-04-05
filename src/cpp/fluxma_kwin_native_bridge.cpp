@@ -43,6 +43,8 @@ std::string KwinNativeInstallReport::summary() const {
     std::string output;
     output += "result=";
     output += std::string(to_string(result));
+    output += " deferred_reason=";
+    output += std::string(to_string(deferred_reason));
     output += " reason=";
     output += reason;
     output += " target=";
@@ -112,6 +114,7 @@ KwinNativeInstallReport KfiKwinNativeBridge::install_frame_stub() const {
     const auto checklist = frame_checklist();
     return KwinNativeInstallReport {
         .result = KwinNativeInstallResult::Deferred,
+        .deferred_reason = KwinNativeDeferredReason::PlaceholderOnly,
         .reason = "native bridge is still placeholder-only",
         .target = std::string(to_string(candidate.hook_point)),
         .installer_entry = std::string(frame_installer_entry()),
@@ -128,6 +131,7 @@ KwinNativeInstallReport KfiKwinNativeBridge::install_present_stub() const {
     const auto checklist = present_checklist();
     return KwinNativeInstallReport {
         .result = KwinNativeInstallResult::Deferred,
+        .deferred_reason = KwinNativeDeferredReason::PlaceholderOnly,
         .reason = "native bridge is still placeholder-only",
         .target = std::string(to_string(candidate.hook_point)),
         .installer_entry = std::string(present_installer_entry()),
@@ -174,6 +178,19 @@ std::string_view to_string(KwinNativeInstallResult result) noexcept {
         return "deferred";
     case KwinNativeInstallResult::Installed:
         return "installed";
+    }
+
+    return "unknown";
+}
+
+std::string_view to_string(KwinNativeDeferredReason reason) noexcept {
+    switch (reason) {
+    case KwinNativeDeferredReason::PlaceholderOnly:
+        return "placeholder-only";
+    case KwinNativeDeferredReason::KwinVersionGate:
+        return "kwin-version-gate";
+    case KwinNativeDeferredReason::BackendGate:
+        return "backend-gate";
     }
 
     return "unknown";

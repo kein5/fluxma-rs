@@ -191,6 +191,7 @@ frame hook と present hook の install stub は分離してあり、将来の b
 `checklist_hint_secondary` も持たせてあり、最初の 2 手まで install report から追える。
 加えて `checklist_all` も返すので、候補ごとの bring-up 手順全体を bridge 側から直接確認できる。
 `installer_entry` も返すため、このリポジトリ内でどの空シグネチャを差し替え先にするかまで固定できる。
+さらに `deferred_reason` enum を持たせ、placeholder-only / version gate / backend gate を区別できるようにした。
 
 ## 7.2 GpuFrameHandle
 

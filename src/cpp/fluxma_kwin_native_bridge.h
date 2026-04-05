@@ -17,6 +17,12 @@ enum class KwinNativeInstallResult : std::uint8_t {
     Installed = 1,
 };
 
+enum class KwinNativeDeferredReason : std::uint8_t {
+    PlaceholderOnly = 0,
+    KwinVersionGate = 1,
+    BackendGate = 2,
+};
+
 struct KwinNativeBringupReport {
     KwinNativeBridgeState state = KwinNativeBridgeState::PlaceholderOnly;
     std::string frame_summary {};
@@ -27,6 +33,7 @@ struct KwinNativeBringupReport {
 
 struct KwinNativeInstallReport {
     KwinNativeInstallResult result = KwinNativeInstallResult::Deferred;
+    KwinNativeDeferredReason deferred_reason = KwinNativeDeferredReason::PlaceholderOnly;
     std::string reason {};
     std::string target {};
     std::string installer_entry {};
@@ -72,5 +79,6 @@ class KfiKwinNativeBridge {
 
 [[nodiscard]] std::string_view to_string(KwinNativeBridgeState state) noexcept;
 [[nodiscard]] std::string_view to_string(KwinNativeInstallResult result) noexcept;
+[[nodiscard]] std::string_view to_string(KwinNativeDeferredReason reason) noexcept;
 
 }  // namespace fluxma

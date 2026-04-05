@@ -71,6 +71,7 @@ int main() {
     const auto frame_install = bridge.install_frame_stub();
     const auto present_install = bridge.install_present_stub();
     if (frame_install.result != fluxma::KwinNativeInstallResult::Deferred ||
+        frame_install.deferred_reason != fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
         frame_install.reason != "native bridge is still placeholder-only" ||
         frame_install.target != "compositor-output-frame-ready" ||
         frame_install.installer_entry != "KfiKwinNativeBridge::install_frame_stub" ||
@@ -83,6 +84,7 @@ int main() {
             "confirm stable gpu handle ownership at present handoff"
         ) == std::string::npos ||
         present_install.result != fluxma::KwinNativeInstallResult::Deferred ||
+        present_install.deferred_reason != fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
         present_install.target != "output-frame-presented" ||
         present_install.installer_entry != "KfiKwinNativeBridge::install_present_stub" ||
         present_install.source_file != "src/core/renderbackend.cpp" ||
@@ -102,6 +104,7 @@ int main() {
     const auto present_install_summary = present_install.summary();
     const auto install_summary = install.summary();
     if (frame_install_summary.find("target=compositor-output-frame-ready") == std::string::npos ||
+        frame_install_summary.find("deferred_reason=placeholder-only") == std::string::npos ||
         frame_install_summary.find(
             "installer_entry=KfiKwinNativeBridge::install_frame_stub"
         ) == std::string::npos ||
@@ -116,6 +119,7 @@ int main() {
             "checklist_all=confirm final composed frame-id provenance"
         ) == std::string::npos ||
         present_install_summary.find("target=output-frame-presented") == std::string::npos ||
+        present_install_summary.find("deferred_reason=placeholder-only") == std::string::npos ||
         present_install_summary.find(
             "installer_entry=KfiKwinNativeBridge::install_present_stub"
         ) == std::string::npos ||
