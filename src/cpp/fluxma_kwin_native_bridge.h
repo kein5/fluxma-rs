@@ -33,6 +33,7 @@ struct KwinNativeInstallReport {
     std::string symbol {};
     std::string checklist_hint {};
     std::string checklist_hint_secondary {};
+    std::string checklist_all {};
 
     [[nodiscard]] std::string summary() const;
 };

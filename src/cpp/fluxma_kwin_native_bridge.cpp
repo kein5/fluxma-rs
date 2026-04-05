@@ -3,6 +3,30 @@
 
 namespace fluxma {
 
+namespace {
+
+template <std::size_t N>
+std::string join_checklist(const std::array<std::string_view, N>& items) {
+    std::string output;
+    bool first = true;
+    for (const auto item : items) {
+        if (item.empty()) {
+            continue;
+        }
+        if (!first) {
+            output += ",";
+        }
+        output += item;
+        first = false;
+    }
+    if (output.empty()) {
+        return "none";
+    }
+    return output;
+}
+
+}  // namespace
+
 std::string KwinNativeBringupReport::combined_summary() const {
     std::string summary;
     summary += "state=";
@@ -31,6 +55,8 @@ std::string KwinNativeInstallReport::summary() const {
     output += checklist_hint;
     output += " checklist_hint_secondary=";
     output += checklist_hint_secondary;
+    output += " checklist_all=";
+    output += checklist_all;
     return output;
 }
 
@@ -82,6 +108,7 @@ KwinNativeInstallReport KfiKwinNativeBridge::install_frame_stub() const {
         .symbol = std::string(candidate.symbol),
         .checklist_hint = std::string(checklist[0]),
         .checklist_hint_secondary = std::string(checklist[1]),
+        .checklist_all = join_checklist(checklist),
     };
 }
 
@@ -96,6 +123,7 @@ KwinNativeInstallReport KfiKwinNativeBridge::install_present_stub() const {
         .symbol = std::string(candidate.symbol),
         .checklist_hint = std::string(checklist[0]),
         .checklist_hint_secondary = std::string(checklist[1]),
+        .checklist_all = join_checklist(checklist),
     };
 }
 
