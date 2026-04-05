@@ -173,6 +173,8 @@ sentinel event しか生成しないことで、欠損 metadata をそのまま 
 さらに field source plan helper を持たせ、frame/present の各必須値を
 `Compositor` / `OutputFrame` / `RenderLoop` / backend present path のどこから
 埋める想定かを型として保持している。
+`KfiKwinHookAdapter` 自体も preferred candidate/readiness helper を公開し、
+実 hook 差し替え時の入口を adapter 境界に寄せている。
 
 ## 7.2 GpuFrameHandle
 
