@@ -12,6 +12,26 @@ KfiKwinHookAdapter::KfiKwinHookAdapter(
       output_policy_(output_id),
       output_controller_(output_controller) {}
 
+KwinFrameHookCandidatePlan KfiKwinHookAdapter::preferred_frame_candidate() noexcept {
+    return KfiKwinHookCandidates::compositor_output_frame_ready();
+}
+
+KwinPresentHookCandidatePlan KfiKwinHookAdapter::preferred_present_candidate() noexcept {
+    return KfiKwinHookCandidates::output_frame_presented();
+}
+
+KwinFrameHookReadiness KfiKwinHookAdapter::assess_frame_candidate(
+    const KwinCompositorFrameInputs& inputs
+) noexcept {
+    return KfiKwinHookCandidates::assess(preferred_frame_candidate(), inputs);
+}
+
+KwinPresentHookReadiness KfiKwinHookAdapter::assess_present_candidate(
+    const KwinPresentFeedbackInputs& inputs
+) noexcept {
+    return KfiKwinHookCandidates::assess(preferred_present_candidate(), inputs);
+}
+
 OutputDecision KfiKwinHookAdapter::on_final_composed_frame(
     const FinalComposedFrameEvent& event
 ) noexcept {
@@ -32,7 +52,7 @@ OutputDecision KfiKwinHookAdapter::on_compositor_output_frame_ready(
     // 1. WaylandCompositor::composite(RenderLoop *) in src/compositor_wayland.cpp
     // 2. BackendOutput::present(..., frame) and backend-specific present() handoff
     // 3. OutputFrame::presented(...) -> RenderLoopPrivate::notifyFrameCompleted(...) feedback path
-    (void)KfiKwinHookCandidates::compositor_output_frame_ready();
+    (void)preferred_frame_candidate();
     const auto policy_decision = output_policy_.classify_frame_event(event);
     if (policy_decision.bypass_reason == BypassReason::UnsupportedOutput ||
         policy_decision.bypass_reason == BypassReason::ProtectedContent) {
@@ -97,7 +117,7 @@ void KfiKwinHookAdapter::on_render_loop_frame_presented(
     // TODO: Wire this to the actual KWin present feedback callback once the hook is confirmed.
     // Prefer KfiKwinHookCandidates::output_frame_presented(), then fall back to
     // KfiKwinHookCandidates::render_loop_frame_presented() if backend-specific metadata requires it.
-    (void)KfiKwinHookCandidates::output_frame_presented();
+    (void)preferred_present_candidate();
     if (!output_policy_.accepts_output(event.output_id)) {
         return;
     }

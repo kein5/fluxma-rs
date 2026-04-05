@@ -211,6 +211,22 @@ target_link_libraries(fluxma_hook_context_smoke
         fluxma_native_skeleton
 )
 
+add_executable(fluxma_adapter_candidate_smoke
+    tests/cpp/adapter_candidate_smoke.cpp
+)
+add_dependencies(fluxma_adapter_candidate_smoke fluxma_rust_core)
+
+target_include_directories(fluxma_adapter_candidate_smoke
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/rust/include
+)
+
+target_link_libraries(fluxma_adapter_candidate_smoke
+    PRIVATE
+        fluxma_native_skeleton
+)
+
 add_executable(fluxma_hook_input_builder_smoke
     tests/cpp/hook_input_builder_smoke.cpp
 )
@@ -320,6 +336,7 @@ if(BUILD_TESTING)
     add_test(NAME fluxma_non_primary_output_smoke COMMAND fluxma_non_primary_output_smoke)
     add_test(NAME fluxma_hud_opt_out_smoke COMMAND fluxma_hud_opt_out_smoke)
     add_test(NAME fluxma_hook_context_smoke COMMAND fluxma_hook_context_smoke)
+    add_test(NAME fluxma_adapter_candidate_smoke COMMAND fluxma_adapter_candidate_smoke)
     add_test(NAME fluxma_hook_input_builder_smoke COMMAND fluxma_hook_input_builder_smoke)
     add_test(NAME fluxma_hook_field_source_smoke COMMAND fluxma_hook_field_source_smoke)
     add_test(NAME fluxma_hook_candidate_plan_smoke COMMAND fluxma_hook_candidate_plan_smoke)

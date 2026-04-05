@@ -31,6 +31,12 @@ struct KwinPresentHookContext {
 
 struct KwinResolvedFrameHook;
 struct KwinResolvedPresentHook;
+struct KwinCompositorFrameInputs;
+struct KwinPresentFeedbackInputs;
+struct KwinFrameHookCandidatePlan;
+struct KwinPresentHookCandidatePlan;
+struct KwinFrameHookReadiness;
+struct KwinPresentHookReadiness;
 
 struct FinalComposedFrameMetadata {
     std::uint64_t frame_id = 0;
@@ -86,6 +92,15 @@ struct PresentCompletedStatus {
 class KfiKwinHookAdapter {
   public:
     KfiKwinHookAdapter(std::uint32_t output_id, KfiOutputController& output_controller);
+
+    [[nodiscard]] static KwinFrameHookCandidatePlan preferred_frame_candidate() noexcept;
+    [[nodiscard]] static KwinPresentHookCandidatePlan preferred_present_candidate() noexcept;
+    [[nodiscard]] static KwinFrameHookReadiness assess_frame_candidate(
+        const KwinCompositorFrameInputs& inputs
+    ) noexcept;
+    [[nodiscard]] static KwinPresentHookReadiness assess_present_candidate(
+        const KwinPresentFeedbackInputs& inputs
+    ) noexcept;
 
     [[nodiscard]] OutputDecision on_compositor_output_frame_ready(
         const FinalComposedFrameEvent& event
