@@ -29,6 +29,8 @@ struct KwinNativeInstallReport {
     KwinNativeInstallResult result = KwinNativeInstallResult::Deferred;
     std::string reason {};
     std::string target {};
+    std::string source_file {};
+    std::string symbol {};
 
     [[nodiscard]] std::string summary() const;
 };

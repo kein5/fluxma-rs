@@ -68,8 +68,12 @@ int main() {
     if (frame_install.result != fluxma::KwinNativeInstallResult::Deferred ||
         frame_install.reason != "native bridge is still placeholder-only" ||
         frame_install.target != "compositor-output-frame-ready" ||
+        frame_install.source_file != "src/compositor_wayland.cpp" ||
+        frame_install.symbol != "WaylandCompositor::composite(RenderLoop *)" ||
         present_install.result != fluxma::KwinNativeInstallResult::Deferred ||
-        present_install.target != "output-frame-presented") {
+        present_install.target != "output-frame-presented" ||
+        present_install.source_file != "src/core/renderbackend.cpp" ||
+        present_install.symbol != "OutputFrame::presented(...)") {
         std::cerr << "native bridge install stubs must surface deferred state\n";
         return EXIT_FAILURE;
     }
@@ -78,7 +82,9 @@ int main() {
     const auto present_install_summary = present_install.summary();
     const auto install_summary = install.summary();
     if (frame_install_summary.find("target=compositor-output-frame-ready") == std::string::npos ||
+        frame_install_summary.find("source=src/compositor_wayland.cpp") == std::string::npos ||
         present_install_summary.find("target=output-frame-presented") == std::string::npos ||
+        present_install_summary.find("source=src/core/renderbackend.cpp") == std::string::npos ||
         install_summary.find("frame{result=deferred") == std::string::npos ||
         install_summary.find("present{result=deferred") == std::string::npos) {
         std::cerr << "native bridge install summaries must stay stable\n";

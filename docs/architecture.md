@@ -185,6 +185,8 @@ install 経路も stub 化してあり、placeholder-only の間は deferred rea
 明示的に返して実差し替え前の責務境界を固定している。
 frame hook と present hook の install stub は分離してあり、将来の bring-up を
 別々に進められるようにしている。
+各 install stub は target 名だけでなく `source_file` と `symbol` も返すため、
+実際にどの KWin entry point を触る前提なのかを bridge 側で固定できる。
 
 ## 7.2 GpuFrameHandle
 
