@@ -183,6 +183,8 @@ bridge は preferred candidate, checklist, readiness summary を集約して返�
 plugin root から native bring-up 状態を一段で観測できる。
 install 経路も stub 化してあり、placeholder-only の間は deferred reason を
 明示的に返して実差し替え前の責務境界を固定している。
+frame hook と present hook の install stub は分離してあり、将来の bring-up を
+別々に進められるようにしている。
 
 ## 7.2 GpuFrameHandle
 

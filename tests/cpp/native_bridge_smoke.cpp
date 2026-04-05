@@ -63,19 +63,25 @@ int main() {
         return EXIT_FAILURE;
     }
 
-    const auto install = bridge.install_stub();
-    if (install.result != fluxma::KwinNativeInstallResult::Deferred ||
-        install.reason != "native bridge is still placeholder-only" ||
-        install.frame_candidate != "compositor-output-frame-ready" ||
-        install.present_candidate != "output-frame-presented") {
-        std::cerr << "native bridge install stub must surface deferred state\n";
+    const auto frame_install = bridge.install_frame_stub();
+    const auto present_install = bridge.install_present_stub();
+    if (frame_install.result != fluxma::KwinNativeInstallResult::Deferred ||
+        frame_install.reason != "native bridge is still placeholder-only" ||
+        frame_install.target != "compositor-output-frame-ready" ||
+        present_install.result != fluxma::KwinNativeInstallResult::Deferred ||
+        present_install.target != "output-frame-presented") {
+        std::cerr << "native bridge install stubs must surface deferred state\n";
         return EXIT_FAILURE;
     }
+    const auto install = bridge.install_stub();
+    const auto frame_install_summary = frame_install.summary();
+    const auto present_install_summary = present_install.summary();
     const auto install_summary = install.summary();
-    if (install_summary.find("result=deferred") == std::string::npos ||
-        install_summary.find("frame=compositor-output-frame-ready") == std::string::npos ||
-        install_summary.find("present=output-frame-presented") == std::string::npos) {
-        std::cerr << "native bridge install summary must stay stable\n";
+    if (frame_install_summary.find("target=compositor-output-frame-ready") == std::string::npos ||
+        present_install_summary.find("target=output-frame-presented") == std::string::npos ||
+        install_summary.find("frame{result=deferred") == std::string::npos ||
+        install_summary.find("present{result=deferred") == std::string::npos) {
+        std::cerr << "native bridge install summaries must stay stable\n";
         return EXIT_FAILURE;
     }
 

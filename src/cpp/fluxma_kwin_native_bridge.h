@@ -28,8 +28,14 @@ struct KwinNativeBringupReport {
 struct KwinNativeInstallReport {
     KwinNativeInstallResult result = KwinNativeInstallResult::Deferred;
     std::string reason {};
-    std::string frame_candidate {};
-    std::string present_candidate {};
+    std::string target {};
+
+    [[nodiscard]] std::string summary() const;
+};
+
+struct KwinNativeCombinedInstallReport {
+    KwinNativeInstallReport frame {};
+    KwinNativeInstallReport present {};
 
     [[nodiscard]] std::string summary() const;
 };
@@ -44,7 +50,9 @@ class KfiKwinNativeBridge {
     [[nodiscard]] KwinPresentHookCandidatePlan present_candidate() const noexcept;
     [[nodiscard]] std::array<std::string_view, 5> frame_checklist() const noexcept;
     [[nodiscard]] std::array<std::string_view, 3> present_checklist() const noexcept;
-    [[nodiscard]] KwinNativeInstallReport install_stub() const;
+    [[nodiscard]] KwinNativeInstallReport install_frame_stub() const;
+    [[nodiscard]] KwinNativeInstallReport install_present_stub() const;
+    [[nodiscard]] KwinNativeCombinedInstallReport install_stub() const;
     [[nodiscard]] KwinNativeBringupReport build_report(
         const KwinCompositorFrameInputs& frame_inputs,
         const KwinPresentFeedbackInputs& present_inputs
