@@ -28,8 +28,9 @@ int main() {
             .gpu_handle = fluxma::GpuFrameHandle {.backend_kind = 0, .handle_id = 7},
         }
     );
-    if (!frame_readiness.ready) {
-        std::cerr << "adapter frame candidate readiness must pass on complete inputs\n";
+    if (frame_readiness.ready || frame_readiness.missing_fields != fluxma::KwinFrameInputField::None ||
+        frame_readiness.unresolved_fields == fluxma::KwinFrameInputField::None) {
+        std::cerr << "adapter frame candidate must stay unresolved before real hook landing\n";
         return EXIT_FAILURE;
     }
 
@@ -41,8 +42,10 @@ int main() {
             .refresh_interval_ns = 16'666'667,
         }
     );
-    if (!present_readiness.ready) {
-        std::cerr << "adapter present candidate readiness must pass on complete inputs\n";
+    if (present_readiness.ready ||
+        present_readiness.missing_fields != fluxma::KwinPresentInputField::None ||
+        present_readiness.unresolved_fields == fluxma::KwinPresentInputField::None) {
+        std::cerr << "adapter present candidate must stay unresolved before real hook landing\n";
         return EXIT_FAILURE;
     }
 

@@ -64,6 +64,13 @@ KwinFrameHookCandidatePlan KfiKwinHookCandidates::compositor_output_frame_ready(
             KwinFrameInputField::Height,
             KwinFrameInputField::GpuHandle
         ),
+        .unresolved_fields = combine(
+            KwinFrameInputField::FrameId,
+            KwinFrameInputField::Timestamp,
+            KwinFrameInputField::Width,
+            KwinFrameInputField::Height,
+            KwinFrameInputField::GpuHandle
+        ),
     };
 }
 
@@ -77,6 +84,13 @@ KwinFrameHookCandidatePlan KfiKwinHookCandidates::backend_present_handoff() noex
             "still treats this boundary as HookUnavailable until final composed semantics are confirmed.",
         .field_sources = KfiKwinFrameBuilder::backend_present_handoff_field_sources(),
         .required_fields = combine(
+            KwinFrameInputField::FrameId,
+            KwinFrameInputField::Timestamp,
+            KwinFrameInputField::Width,
+            KwinFrameInputField::Height,
+            KwinFrameInputField::GpuHandle
+        ),
+        .unresolved_fields = combine(
             KwinFrameInputField::FrameId,
             KwinFrameInputField::Timestamp,
             KwinFrameInputField::Width,
@@ -100,6 +114,11 @@ KwinPresentHookCandidatePlan KfiKwinHookCandidates::output_frame_presented() noe
             KwinPresentInputField::PresentedTimestamp,
             KwinPresentInputField::RefreshInterval
         ),
+        .unresolved_fields = combine(
+            KwinPresentInputField::FrameId,
+            KwinPresentInputField::PresentedTimestamp,
+            KwinPresentInputField::RefreshInterval
+        ),
     };
 }
 
@@ -117,6 +136,11 @@ KwinPresentHookCandidatePlan KfiKwinHookCandidates::render_loop_frame_presented(
             KwinPresentInputField::PresentedTimestamp,
             KwinPresentInputField::RefreshInterval
         ),
+        .unresolved_fields = combine(
+            KwinPresentInputField::FrameId,
+            KwinPresentInputField::PresentedTimestamp,
+            KwinPresentInputField::RefreshInterval
+        ),
     };
 }
 
@@ -129,7 +153,9 @@ KwinFrameHookReadiness KfiKwinHookCandidates::assess(
     return KwinFrameHookReadiness {
         .plan = plan,
         .missing_fields = plan_missing,
-        .ready = plan_missing == KwinFrameInputField::None,
+        .unresolved_fields = plan.unresolved_fields,
+        .ready = plan_missing == KwinFrameInputField::None &&
+            plan.unresolved_fields == KwinFrameInputField::None,
     };
 }
 
@@ -142,7 +168,9 @@ KwinPresentHookReadiness KfiKwinHookCandidates::assess(
     return KwinPresentHookReadiness {
         .plan = plan,
         .missing_fields = plan_missing,
-        .ready = plan_missing == KwinPresentInputField::None,
+        .unresolved_fields = plan.unresolved_fields,
+        .ready = plan_missing == KwinPresentInputField::None &&
+            plan.unresolved_fields == KwinPresentInputField::None,
     };
 }
 
@@ -178,6 +206,14 @@ std::array<std::string_view, 5> describe_required(KwinFrameHookCandidatePlan pla
 
 std::array<std::string_view, 3> describe_required(KwinPresentHookCandidatePlan plan) noexcept {
     return describe(plan.required_fields);
+}
+
+std::array<std::string_view, 5> describe_unresolved(KwinFrameHookCandidatePlan plan) noexcept {
+    return describe(plan.unresolved_fields);
+}
+
+std::array<std::string_view, 3> describe_unresolved(KwinPresentHookCandidatePlan plan) noexcept {
+    return describe(plan.unresolved_fields);
 }
 
 }  // namespace fluxma

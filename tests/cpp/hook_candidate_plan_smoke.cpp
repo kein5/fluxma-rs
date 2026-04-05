@@ -17,6 +17,12 @@ int main() {
         std::cerr << "compositor required fields must stay named\n";
         return EXIT_FAILURE;
     }
+    const auto compositor_unresolved_names = fluxma::describe_unresolved(compositor);
+    if (compositor_unresolved_names[0] != "frame-id" ||
+        compositor_unresolved_names[4] != "gpu-handle") {
+        std::cerr << "compositor unresolved fields must stay named\n";
+        return EXIT_FAILURE;
+    }
 
     const auto backend = fluxma::KfiKwinHookCandidates::backend_present_handoff();
     if (backend.hook_point != fluxma::KwinFrameHookPoint::BackendPresentHandoff ||
@@ -60,8 +66,9 @@ int main() {
             .gpu_handle = fluxma::GpuFrameHandle {.backend_kind = 0, .handle_id = 9},
         }
     );
-    if (!ready_frame.ready || ready_frame.missing_fields != fluxma::KwinFrameInputField::None) {
-        std::cerr << "complete compositor inputs must satisfy candidate readiness\n";
+    if (ready_frame.ready || ready_frame.missing_fields != fluxma::KwinFrameInputField::None ||
+        ready_frame.unresolved_fields != compositor.unresolved_fields) {
+        std::cerr << "compositor candidate must remain unresolved even with complete inputs\n";
         return EXIT_FAILURE;
     }
 
@@ -94,7 +101,8 @@ int main() {
         !fluxma::has_flag(
             missing_present.missing_fields,
             fluxma::KwinPresentInputField::RefreshInterval
-        )) {
+        ) ||
+        missing_present.unresolved_fields != output_frame.unresolved_fields) {
         std::cerr << "present candidate readiness must surface missing refresh interval\n";
         return EXIT_FAILURE;
     }
@@ -110,7 +118,8 @@ int main() {
         }
     );
     if (backend_missing.ready ||
-        !fluxma::has_flag(backend_missing.missing_fields, fluxma::KwinFrameInputField::GpuHandle)) {
+        !fluxma::has_flag(backend_missing.missing_fields, fluxma::KwinFrameInputField::GpuHandle) ||
+        backend_missing.unresolved_fields != backend.unresolved_fields) {
         std::cerr << "backend candidate readiness must surface missing gpu handle\n";
         return EXIT_FAILURE;
     }
@@ -128,7 +137,8 @@ int main() {
         !fluxma::has_flag(
             render_loop_missing.missing_fields,
             fluxma::KwinPresentInputField::PresentedTimestamp
-        )) {
+        ) ||
+        render_loop_missing.unresolved_fields != render_loop.unresolved_fields) {
         std::cerr << "render loop candidate readiness must surface missing timestamp\n";
         return EXIT_FAILURE;
     }

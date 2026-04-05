@@ -14,6 +14,7 @@ struct KwinFrameHookCandidatePlan {
     std::string_view note {};
     KwinFrameFieldSources field_sources {};
     KwinFrameInputField required_fields = KwinFrameInputField::None;
+    KwinFrameInputField unresolved_fields = KwinFrameInputField::None;
 };
 
 struct KwinPresentHookCandidatePlan {
@@ -23,17 +24,20 @@ struct KwinPresentHookCandidatePlan {
     std::string_view note {};
     KwinPresentFieldSources field_sources {};
     KwinPresentInputField required_fields = KwinPresentInputField::None;
+    KwinPresentInputField unresolved_fields = KwinPresentInputField::None;
 };
 
 struct KwinFrameHookReadiness {
     KwinFrameHookCandidatePlan plan {};
     KwinFrameInputField missing_fields = KwinFrameInputField::None;
+    KwinFrameInputField unresolved_fields = KwinFrameInputField::None;
     bool ready = false;
 };
 
 struct KwinPresentHookReadiness {
     KwinPresentHookCandidatePlan plan {};
     KwinPresentInputField missing_fields = KwinPresentInputField::None;
+    KwinPresentInputField unresolved_fields = KwinPresentInputField::None;
     bool ready = false;
 };
 
@@ -59,6 +63,12 @@ class KfiKwinHookCandidates {
     KwinFrameHookCandidatePlan plan
 ) noexcept;
 [[nodiscard]] std::array<std::string_view, 3> describe_required(
+    KwinPresentHookCandidatePlan plan
+) noexcept;
+[[nodiscard]] std::array<std::string_view, 5> describe_unresolved(
+    KwinFrameHookCandidatePlan plan
+) noexcept;
+[[nodiscard]] std::array<std::string_view, 3> describe_unresolved(
     KwinPresentHookCandidatePlan plan
 ) noexcept;
 
