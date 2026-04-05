@@ -43,6 +43,7 @@ struct KwinNativeInstallReport {
     KwinNativeInstallResult result = KwinNativeInstallResult::Deferred;
     KwinNativeDeferredReason deferred_reason = KwinNativeDeferredReason::PlaceholderOnly;
     std::string reason {};
+    std::string context_summary {};
     std::string target {};
     std::string installer_entry {};
     std::string source_file {};

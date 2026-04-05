@@ -28,6 +28,7 @@ std::string join_checklist(const std::array<std::string_view, N>& items) {
 KwinNativeInstallReport make_install_report(
     const KwinNativeDeferredReason deferred_reason,
     const std::string& reason,
+    const std::string& context_summary,
     const std::string_view target,
     const std::string_view installer_entry,
     const std::string_view source_file,
@@ -40,6 +41,7 @@ KwinNativeInstallReport make_install_report(
         .result = KwinNativeInstallResult::Deferred,
         .deferred_reason = deferred_reason,
         .reason = reason,
+        .context_summary = context_summary,
         .target = std::string(target),
         .installer_entry = std::string(installer_entry),
         .source_file = std::string(source_file),
@@ -48,6 +50,18 @@ KwinNativeInstallReport make_install_report(
         .checklist_hint_secondary = std::string(checklist_hint_secondary),
         .checklist_all = checklist_all,
     };
+}
+
+std::string build_install_context_summary(const KwinNativeInstallContext& context) {
+    std::string summary = "kwin=";
+    summary += context.kwin_version;
+    summary += " backend=";
+    summary += context.backend_name;
+    summary += " version_supported=";
+    summary += context.kwin_version_supported ? "true" : "false";
+    summary += " backend_supported=";
+    summary += context.backend_supported ? "true" : "false";
+    return summary;
 }
 
 KwinNativeInstallReport make_deferred_install_report(
@@ -60,12 +74,15 @@ KwinNativeInstallReport make_deferred_install_report(
     const std::string_view checklist_hint_secondary,
     const std::string& checklist_all
 ) {
+    const auto context_summary = build_install_context_summary(context);
+
     if (!context.kwin_version_supported) {
         std::string reason = "kwin version gate blocked install for ";
         reason += context.kwin_version;
         return make_install_report(
             KwinNativeDeferredReason::KwinVersionGate,
             reason,
+            context_summary,
             target,
             installer_entry,
             source_file,
@@ -82,6 +99,7 @@ KwinNativeInstallReport make_deferred_install_report(
         return make_install_report(
             KwinNativeDeferredReason::BackendGate,
             reason,
+            context_summary,
             target,
             installer_entry,
             source_file,
@@ -95,6 +113,7 @@ KwinNativeInstallReport make_deferred_install_report(
     return make_install_report(
         KwinNativeDeferredReason::PlaceholderOnly,
         "native bridge is still placeholder-only",
+        context_summary,
         target,
         installer_entry,
         source_file,
@@ -127,6 +146,8 @@ std::string KwinNativeInstallReport::summary() const {
     output += std::string(to_string(deferred_reason));
     output += " reason=";
     output += reason;
+    output += " context=";
+    output += context_summary;
     output += " target=";
     output += target;
     output += " installer_entry=";

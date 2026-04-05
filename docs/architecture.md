@@ -198,6 +198,8 @@ KWin version と backend の gate を placeholder 分岐とは別に注入でき
 「version/backend 条件が満たせず保留」を report 上で分離できる。
 `KwinNativeInstallContext` を与えれば、実 hook 差し替え前でも KWin version gate と backend gate のどちらで
 止めているのかを install report 上で切り替えて観測できる。
+加えて `context_summary` も report に保持し、gate 判定時の KWin version / backend 名と
+support 状態を install summary 1 本で確認できるようにしている。
 
 ## 7.2 GpuFrameHandle
 

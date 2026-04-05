@@ -134,6 +134,7 @@ KWin source 上の観察:
 - install stub report には `deferred_reason` enum も含め、未接続理由を placeholder / version gate / backend gate に分類できる
 - install stub は `KwinNativeInstallContext` も受けられ、現時点でも version/backend gate を placeholder-only と分けて report できる
 - version gate と backend gate が同時に掛かる場合は、KWin ABI 前提の確認を優先して version gate を先に返す
+- install stub report には `context_summary` も含め、どの KWin version / backend 前提で gate 判定したかを summary 1 本で追える
 - `KfiOutputPolicy` は provenance context も見るようにし、MVP で未対応な frame hook 境界は `HookUnavailable` bypass、unknown present hook 境界は ignore に倒す
 - present feedback では `frame_id/presented_timestamp_ns/refresh_interval_ns` が欠けた入力も ignore に倒し、欠損 metadata を Rust metrics に流さない
 - adapter 層では width/height/gpu handle の最低限 validation を行い、未対応入力は `unsupported-output` bypass に倒す
