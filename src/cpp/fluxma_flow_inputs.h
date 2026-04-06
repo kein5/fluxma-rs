@@ -13,6 +13,10 @@ struct FlowFrameResources {
     bool valid = false;
     bool truncated = false;
     bool placeholder_only = true;
+
+    [[nodiscard]] bool has_live_resources() const noexcept {
+        return valid;
+    }
 };
 
 struct FlowInputBundle {
@@ -21,6 +25,14 @@ struct FlowInputBundle {
     bool valid = false;
     bool truncated = false;
     bool placeholder_only = true;
+
+    [[nodiscard]] bool is_usable() const noexcept {
+        return valid && !truncated;
+    }
+
+    [[nodiscard]] bool has_live_resources() const noexcept {
+        return previous.has_live_resources() || current.has_live_resources();
+    }
 };
 
 class KfiFlowInputsBuilder {

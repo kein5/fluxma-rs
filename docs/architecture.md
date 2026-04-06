@@ -448,6 +448,8 @@ overflow や invalid descriptor では fail-safe に acquire を拒否する。
 real motion field の前段で必要になる GPU input bundle を placeholder として固定する。
 現段階では real luma extraction や real compute dispatch は行わず、
 pool 枯渇時や invalid descriptor では fail-safe に build を止め、lease を解放して空 bundle を返す。
+この bundle は `is_usable()` が真のときだけ次段へ渡す想定であり、
+placeholder slice の範囲では real flow dispatch の成立を意味しない。
 この skeleton の目的は、Epic 7 で必要になる GPU lifetime と pyramid 形状を
 C++ 側に固定することであり、Rust に GPU resource ownership を渡さない点は維持する。
 

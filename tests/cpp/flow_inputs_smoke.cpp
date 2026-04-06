@@ -12,7 +12,8 @@ int main() {
         fluxma::GpuTextureDescriptor {.width = 1920, .height = 1080, .pixel_format = 1}
     );
 
-    if (!bundle.valid || !bundle.placeholder_only || !bundle.previous.valid ||
+    if (!bundle.valid || !bundle.is_usable() || !bundle.has_live_resources() ||
+        !bundle.placeholder_only || !bundle.previous.valid ||
         !bundle.current.valid || bundle.truncated || bundle.previous.frame_id != 100 ||
         bundle.current.frame_id != 101 || !bundle.previous.source_texture.acquired ||
         !bundle.current.source_texture.acquired || bundle.previous.luma_pyramid.built_levels == 0 ||
@@ -34,7 +35,8 @@ int main() {
         101,
         fluxma::GpuTextureDescriptor {.width = 1920, .height = 1080, .pixel_format = 1}
     );
-    if (invalid.valid || invalid.truncated || invalid_builder.pooled_texture_count() != 0) {
+    if (invalid.valid || invalid.truncated || invalid.has_live_resources() ||
+        invalid_builder.pooled_texture_count() != 0) {
         std::cerr << "flow input invalid descriptor mismatch\n";
         return EXIT_FAILURE;
     }
@@ -46,7 +48,8 @@ int main() {
         201,
         fluxma::GpuTextureDescriptor {.width = 1920, .height = 1080, .pixel_format = 1}
     );
-    if (truncated.valid || !truncated.truncated || truncated_builder.pooled_texture_count() != 0) {
+    if (truncated.valid || truncated.is_usable() || !truncated.truncated ||
+        truncated.has_live_resources() || truncated_builder.pooled_texture_count() != 0) {
         std::cerr << "flow input truncation cleanup mismatch\n";
         return EXIT_FAILURE;
     }
