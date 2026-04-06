@@ -173,6 +173,55 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    const auto install_only_version_gate = plugin_root.observe_native_bridge_install(
+        fluxma::KwinNativeInstallContext {
+            .kwin_version_supported = false,
+            .backend_supported = true,
+            .kwin_version = "6.3.84",
+            .backend_name = "drm",
+        }
+    );
+    if (install_only_version_gate.preflight.frame.gate.deferred_reason !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        install_only_version_gate.preflight.present.gate.deferred_reason !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        install_only_version_gate.install.frame.deferred_reason !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        install_only_version_gate.install.present.deferred_reason !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        install_only_version_gate.preflight.present.symbol != "OutputFrame::presented(...)" ||
+        install_only_version_gate.install.present.checklist_hint_secondary !=
+            "confirm backend completion timestamp semantics across backends" ||
+        install_only_version_gate.summary().find(
+            "reason=kwin version gate blocked install for 6.3.84"
+        ) == std::string::npos) {
+        std::cerr << "plugin root install observation must preserve version gate diagnostics\n";
+        return EXIT_FAILURE;
+    }
+
+    const auto install_only_precedence = plugin_root.observe_native_bridge_install(
+        fluxma::KwinNativeInstallContext {
+            .kwin_version_supported = false,
+            .backend_supported = false,
+            .kwin_version = "6.3.85",
+            .backend_name = "wayland",
+        }
+    );
+    if (install_only_precedence.preflight.frame.gate.deferred_reason !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        install_only_precedence.preflight.present.gate.deferred_reason !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        install_only_precedence.install.frame.deferred_reason !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        install_only_precedence.install.present.deferred_reason !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        install_only_precedence.summary().find(
+            "reason=kwin version gate blocked install for 6.3.85"
+        ) == std::string::npos) {
+        std::cerr << "plugin root install observation must keep version gate precedence\n";
+        return EXIT_FAILURE;
+    }
+
     auto incomplete_frame = complete_frame_inputs();
     incomplete_frame.frame_id = 0;
     incomplete_frame.width = 0;
