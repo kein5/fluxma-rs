@@ -21,6 +21,9 @@ struct KwinNativeBridgeObservationReport {
     [[nodiscard]] bool present_gate_matches() const noexcept;
     // This checks preflight/install consistency for both frame and present independently.
     [[nodiscard]] bool all_gates_match() const noexcept;
+    [[nodiscard]] bool frame_install_deferred() const noexcept;
+    [[nodiscard]] bool present_install_deferred() const noexcept;
+    [[nodiscard]] bool all_installs_deferred() const noexcept;
     [[nodiscard]] std::string summary() const;
 };
 
@@ -35,6 +38,9 @@ struct KwinNativeBridgeInstallObservationReport {
     [[nodiscard]] bool present_gate_matches() const noexcept;
     // This checks preflight/install consistency for both frame and present independently.
     [[nodiscard]] bool all_gates_match() const noexcept;
+    [[nodiscard]] bool frame_install_deferred() const noexcept;
+    [[nodiscard]] bool present_install_deferred() const noexcept;
+    [[nodiscard]] bool all_installs_deferred() const noexcept;
     [[nodiscard]] std::string summary() const;
 };
 

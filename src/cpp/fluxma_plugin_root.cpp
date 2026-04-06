@@ -22,6 +22,18 @@ bool KwinNativeBridgeObservationReport::all_gates_match() const noexcept {
     return frame_gate_matches() && present_gate_matches();
 }
 
+bool KwinNativeBridgeObservationReport::frame_install_deferred() const noexcept {
+    return install.frame.result == KwinNativeInstallResult::Deferred;
+}
+
+bool KwinNativeBridgeObservationReport::present_install_deferred() const noexcept {
+    return install.present.result == KwinNativeInstallResult::Deferred;
+}
+
+bool KwinNativeBridgeObservationReport::all_installs_deferred() const noexcept {
+    return frame_install_deferred() && present_install_deferred();
+}
+
 std::string KwinNativeBridgeObservationReport::summary() const {
     std::string output;
     output += "state=";
@@ -50,6 +62,18 @@ bool KwinNativeBridgeInstallObservationReport::present_gate_matches() const noex
 
 bool KwinNativeBridgeInstallObservationReport::all_gates_match() const noexcept {
     return frame_gate_matches() && present_gate_matches();
+}
+
+bool KwinNativeBridgeInstallObservationReport::frame_install_deferred() const noexcept {
+    return install.frame.result == KwinNativeInstallResult::Deferred;
+}
+
+bool KwinNativeBridgeInstallObservationReport::present_install_deferred() const noexcept {
+    return install.present.result == KwinNativeInstallResult::Deferred;
+}
+
+bool KwinNativeBridgeInstallObservationReport::all_installs_deferred() const noexcept {
+    return frame_install_deferred() && present_install_deferred();
 }
 
 std::string KwinNativeBridgeInstallObservationReport::summary() const {
