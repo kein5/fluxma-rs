@@ -57,7 +57,7 @@ int main() {
             .deferred_reason = fluxma::KwinNativeDeferredReason::PlaceholderOnly,
         },
         .present = fluxma::KwinNativeInstallReport {
-            .result = fluxma::KwinNativeInstallResult::Deferred,
+            .result = fluxma::KwinNativeInstallResult::Installed,
             .deferred_reason = fluxma::KwinNativeDeferredReason::BackendGate,
         },
     };
@@ -71,7 +71,7 @@ int main() {
             fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
         asymmetric_install.present_deferred_reason() !=
             fluxma::KwinNativeDeferredReason::BackendGate ||
-        !asymmetric_install.frame_is_deferred() || !asymmetric_install.present_is_deferred()) {
+        !asymmetric_install.frame_is_deferred() || asymmetric_install.present_is_deferred()) {
         std::cerr << "native bridge combined helpers must preserve frame/present split\n";
         return EXIT_FAILURE;
     }
