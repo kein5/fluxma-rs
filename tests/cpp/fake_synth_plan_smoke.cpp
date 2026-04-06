@@ -66,6 +66,7 @@ int main() {
         !ready_artifact.generated || ready_artifact.dropped ||
         ready_artifact.synthetic_frame_id != 11 ||
         !ready_submission.queued || ready_submission.dropped ||
+        !ready_submission.placeholder_only ||
         ready_submission.synthetic_frame_id != 11 ||
         hud.find("synthetic_armed=yes") == std::string::npos ||
         hud.find("synthetic_drop=no") == std::string::npos ||
@@ -91,7 +92,8 @@ int main() {
     const auto dropped_submission = output.submit_fake_synthetic_frame(181'333'332);
     if (!dropped_plan.armed || !dropped_plan.should_drop ||
         dropped_artifact.generated || !dropped_artifact.dropped ||
-        dropped_submission.queued || !dropped_submission.dropped) {
+        dropped_submission.queued || !dropped_submission.dropped ||
+        !dropped_submission.placeholder_only) {
         std::cerr << "fake synth plan must drop once deadline is missed\n";
         return EXIT_FAILURE;
     }
@@ -103,7 +105,8 @@ int main() {
     if (protected_decision.state != fluxma::OutputState::ProtectedBypass ||
         protected_plan.armed || protected_plan.should_drop ||
         protected_artifact.generated || protected_artifact.dropped ||
-        protected_submission.queued || protected_submission.dropped) {
+        protected_submission.queued || protected_submission.dropped ||
+        !protected_submission.placeholder_only) {
         std::cerr << "protected bypass must not arm fake synth plan\n";
         return EXIT_FAILURE;
     }

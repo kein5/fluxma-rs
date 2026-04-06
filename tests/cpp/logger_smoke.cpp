@@ -96,8 +96,32 @@ int main() {
     const auto submission_logs = synth_logger.snapshot_messages();
     if (submission_logs.size() != 3 ||
         submission_logs.back().find("synthetic-queued=yes") == std::string::npos ||
+        submission_logs.back().find("synthetic-drop=no") == std::string::npos ||
+        submission_logs.back().find("synthetic-placeholder=yes") == std::string::npos ||
         submission_logs.back().find("synthetic-frame-id=11") == std::string::npos) {
         std::cerr << "synthetic submission logger mismatch\n";
+        return EXIT_FAILURE;
+    }
+    synth_logger.note_synthetic_submission(
+        0,
+        5,
+        fluxma::SyntheticPresentSubmission {
+            .output_id = 0,
+            .source_frame_id = 5,
+            .synthetic_frame_id = 12,
+            .target_present_timestamp_ns = 199999999,
+            .queued = false,
+            .dropped = true,
+            .placeholder_only = true,
+        }
+    );
+    const auto dropped_submission_logs = synth_logger.snapshot_messages();
+    if (dropped_submission_logs.size() != 4 ||
+        dropped_submission_logs.back().find("synthetic-queued=no") == std::string::npos ||
+        dropped_submission_logs.back().find("synthetic-drop=yes") == std::string::npos ||
+        dropped_submission_logs.back().find("synthetic-placeholder=yes") == std::string::npos ||
+        dropped_submission_logs.back().find("synthetic-frame-id=12") == std::string::npos) {
+        std::cerr << "dropped synthetic submission logger mismatch\n";
         return EXIT_FAILURE;
     }
 

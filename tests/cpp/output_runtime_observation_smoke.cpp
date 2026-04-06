@@ -70,6 +70,7 @@ int main() {
     if (!late_report.synthetic_should_drop() ||
         late_report.synthetic_generated() || late_report.synthetic_queued() ||
         !late_report.synthetic_submission_dropped() || !late_report.synthetic_placeholder_only() ||
+        late_report.synthetic_submission.synthetic_frame_id != 11 ||
         late_report.summary().find("synthetic-drop=yes") == std::string::npos ||
         late_report.summary().find("synthetic-placeholder=yes") == std::string::npos ||
         late_report.summary().find("synthetic-submission-drop=yes") == std::string::npos) {
