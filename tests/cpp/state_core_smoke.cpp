@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cstdlib>
 #include <iostream>
 #include <string>
@@ -73,11 +74,14 @@ int main() {
     }
 
     const auto logs = output.log_messages();
-    if (logs.empty() ||
-        logs.back().find("cadence=stable") == std::string::npos ||
-        logs.back().find("governor=quality-high") == std::string::npos ||
-        logs.back().find("scheduler=synthetic-2x") == std::string::npos ||
-        logs.back().find("classifier=yes") == std::string::npos) {
+    const auto has_state_core_log =
+        std::any_of(logs.begin(), logs.end(), [](const std::string& log) {
+            return log.find("cadence=stable") != std::string::npos &&
+                log.find("governor=quality-high") != std::string::npos &&
+                log.find("scheduler=synthetic-2x") != std::string::npos &&
+                log.find("classifier=yes") != std::string::npos;
+        });
+    if (!has_state_core_log) {
         std::cerr << "state core log mismatch\n";
         return EXIT_FAILURE;
     }

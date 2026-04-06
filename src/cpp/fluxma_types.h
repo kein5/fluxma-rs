@@ -239,6 +239,16 @@ struct SyntheticFramePlan {
     bool should_drop = false;
 };
 
+struct SyntheticFrameArtifact {
+    std::uint32_t output_id = 0;
+    std::uint64_t source_frame_id = 0;
+    std::uint64_t synthetic_frame_id = 0;
+    std::uint64_t target_present_timestamp_ns = 0;
+    bool generated = false;
+    bool dropped = false;
+    bool placeholder_only = true;
+};
+
 [[nodiscard]] inline std::string_view to_string(OutputState state) noexcept {
     switch (state) {
     case OutputState::Disabled:

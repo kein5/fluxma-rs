@@ -55,12 +55,15 @@ int main() {
     );
 
     const auto ready_plan = output.plan_synthetic_frame(47'999'999);
+    const auto ready_artifact = output.generate_fake_synthetic_frame(47'999'999);
     const auto hud = output.render_hud_text();
     const auto logs = output.log_messages();
     if (!ready_plan.armed || ready_plan.should_drop ||
         ready_plan.source_frame_id != 5 || ready_plan.synthetic_frame_id != 11 ||
         ready_plan.target_present_timestamp_ns != 183'333'332 ||
         ready_plan.deadline_timestamp_ns != 181'333'332 ||
+        !ready_artifact.generated || ready_artifact.dropped ||
+        ready_artifact.synthetic_frame_id != 11 ||
         hud.find("synthetic_armed=yes") == std::string::npos ||
         hud.find("synthetic_drop=no") == std::string::npos ||
         hud.find("synthetic_target_ns=183333332") == std::string::npos) {
@@ -78,15 +81,19 @@ int main() {
     }
 
     const auto dropped_plan = output.plan_synthetic_frame(181'333'332);
-    if (!dropped_plan.armed || !dropped_plan.should_drop) {
+    const auto dropped_artifact = output.generate_fake_synthetic_frame(181'333'332);
+    if (!dropped_plan.armed || !dropped_plan.should_drop ||
+        dropped_artifact.generated || !dropped_artifact.dropped) {
         std::cerr << "fake synth plan must drop once deadline is missed\n";
         return EXIT_FAILURE;
     }
 
     const auto protected_decision = output.on_frame_tapped(frame(6, true));
     const auto protected_plan = output.plan_synthetic_frame(200'000'000);
+    const auto protected_artifact = output.generate_fake_synthetic_frame(200'000'000);
     if (protected_decision.state != fluxma::OutputState::ProtectedBypass ||
-        protected_plan.armed || protected_plan.should_drop) {
+        protected_plan.armed || protected_plan.should_drop ||
+        protected_artifact.generated || protected_artifact.dropped) {
         std::cerr << "protected bypass must not arm fake synth plan\n";
         return EXIT_FAILURE;
     }

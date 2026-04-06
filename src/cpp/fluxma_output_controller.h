@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "fluxma_fake_synth_generator.h"
 #include "fluxma_bypass_pipeline.h"
 #include "fluxma_config.h"
 #include "fluxma_hud_renderer.h"
@@ -44,6 +45,9 @@ class KfiOutputController {
     [[nodiscard]] OutputDecision on_frame_tapped(const FrameDescriptor& frame) noexcept;
     [[nodiscard]] PassthroughSubmission last_submission() const noexcept;
     [[nodiscard]] SyntheticFramePlan plan_synthetic_frame(std::uint64_t now_ns) const noexcept;
+    [[nodiscard]] SyntheticFrameArtifact generate_fake_synthetic_frame(
+        std::uint64_t now_ns
+    ) const noexcept;
     void on_present_feedback(const PresentFeedback& feedback) noexcept;
     [[nodiscard]] MetricsSnapshot snapshot_metrics() const noexcept;
     [[nodiscard]] std::string render_hud_text() const;
@@ -75,6 +79,7 @@ class KfiOutputController {
     ModuleConfig config_ {};
     KfiBypassPipeline bypass_pipeline_ {};
     KfiHudRenderer hud_renderer_ {};
+    KfiFakeSynthGenerator fake_synth_generator_ {};
     KfiSyntheticScheduler synthetic_scheduler_ {};
     RustOutputCore rust_core_;
     bool rust_core_ready_ = false;

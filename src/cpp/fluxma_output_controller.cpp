@@ -126,11 +126,18 @@ SyntheticFramePlan KfiOutputController::plan_synthetic_frame(std::uint64_t now_n
     );
 }
 
+SyntheticFrameArtifact KfiOutputController::generate_fake_synthetic_frame(
+    std::uint64_t now_ns
+) const noexcept {
+    return fake_synth_generator_.generate(plan_synthetic_frame(now_ns));
+}
+
 void KfiOutputController::on_present_feedback(const PresentFeedback& feedback) noexcept {
     rust_core_.note_present_feedback(feedback);
     const auto snapshot = rust_core_.snapshot_metrics();
     maybe_log_present_feedback_mismatch(feedback, snapshot);
     maybe_log_present_feedback(feedback, snapshot);
+    maybe_log_synthetic_plan(snapshot);
     update_runtime(snapshot);
 }
 

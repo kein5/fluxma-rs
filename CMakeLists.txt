@@ -46,6 +46,7 @@ add_library(fluxma_native_skeleton STATIC
     src/cpp/fluxma_bypass_pipeline.cpp
     src/cpp/fluxma_config.cpp
     src/cpp/fluxma_frame_tap.cpp
+    src/cpp/fluxma_fake_synth_generator.cpp
     src/cpp/fluxma_gpu_services.cpp
     src/cpp/fluxma_hud_renderer.cpp
     src/cpp/fluxma_kwin_hook_builders.cpp

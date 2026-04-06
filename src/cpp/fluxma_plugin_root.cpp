@@ -218,6 +218,8 @@ std::string OutputRuntimeObservationReport::summary() const {
     output += std::string(to_bool_string(synthetic_plan.armed));
     output += " synthetic-drop=";
     output += std::string(to_bool_string(synthetic_plan.should_drop));
+    output += " synthetic-generated=";
+    output += std::string(to_bool_string(synthetic_artifact.generated));
     return output;
 }
 
@@ -300,6 +302,7 @@ OutputRuntimeObservationReport KfiPluginRoot::observe_output_runtime(std::uint64
     return OutputRuntimeObservationReport {
         .snapshot = primary_output_.snapshot_metrics(),
         .synthetic_plan = primary_output_.plan_synthetic_frame(now_ns),
+        .synthetic_artifact = primary_output_.generate_fake_synthetic_frame(now_ns),
         .hud_text = primary_output_.render_hud_text(),
     };
 }

@@ -83,6 +83,7 @@ struct KwinNativeBridgeInstallObservationReport {
 struct OutputRuntimeObservationReport {
     MetricsSnapshot snapshot {};
     SyntheticFramePlan synthetic_plan {};
+    SyntheticFrameArtifact synthetic_artifact {};
     std::string hud_text {};
 
     [[nodiscard]] bool synthetic_armed() const noexcept {
@@ -91,6 +92,10 @@ struct OutputRuntimeObservationReport {
 
     [[nodiscard]] bool synthetic_should_drop() const noexcept {
         return synthetic_plan.should_drop;
+    }
+
+    [[nodiscard]] bool synthetic_generated() const noexcept {
+        return synthetic_artifact.generated;
     }
 
     [[nodiscard]] std::string summary() const;
