@@ -213,6 +213,8 @@ native bridge の install 前診断を扱えるようにする。
 `observe_native_bridge(...)` は両者をまとめて残す用途として使い分ける。
 `observe_native_bridge_bringup(...)` は hook 入力の completeness/readiness だけを見たい場合に使い、
 `observe_native_bridge_install(...)` は install 前後の gate 一致だけを見たい場合に使う。
+observation report には deferred reason と version/backend blocker flag の helper もあり、
+plugin root 利用側は nested report を直接 unpack せずに frame/present ごとの gate 状態を確認できる。
 
 ## 7.2 GpuFrameHandle
 
