@@ -56,6 +56,7 @@ add_library(fluxma_native_skeleton STATIC
     src/cpp/fluxma_logger.cpp
     src/cpp/fluxma_present_feedback_tap.cpp
     src/cpp/fluxma_synthetic_scheduler.cpp
+    src/cpp/fluxma_synthetic_present_queue.cpp
 )
 add_dependencies(fluxma_native_skeleton fluxma_rust_core)
 

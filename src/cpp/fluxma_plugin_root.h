@@ -84,6 +84,7 @@ struct OutputRuntimeObservationReport {
     MetricsSnapshot snapshot {};
     SyntheticFramePlan synthetic_plan {};
     SyntheticFrameArtifact synthetic_artifact {};
+    SyntheticPresentSubmission synthetic_submission {};
     std::string hud_text {};
 
     [[nodiscard]] bool synthetic_armed() const noexcept {
@@ -96,6 +97,10 @@ struct OutputRuntimeObservationReport {
 
     [[nodiscard]] bool synthetic_generated() const noexcept {
         return synthetic_artifact.generated;
+    }
+
+    [[nodiscard]] bool synthetic_queued() const noexcept {
+        return synthetic_submission.queued;
     }
 
     [[nodiscard]] std::string summary() const;

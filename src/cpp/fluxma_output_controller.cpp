@@ -133,6 +133,14 @@ SyntheticFrameArtifact KfiOutputController::generate_fake_synthetic_frame(
     return fake_synth_generator_.generate(plan_synthetic_frame(now_ns));
 }
 
+SyntheticPresentSubmission KfiOutputController::submit_fake_synthetic_frame(
+    std::uint64_t now_ns
+) const noexcept {
+    return synthetic_present_queue_.enqueue_placeholder(
+        generate_fake_synthetic_frame(now_ns)
+    );
+}
+
 void KfiOutputController::on_present_feedback(const PresentFeedback& feedback) noexcept {
     rust_core_.note_present_feedback(feedback);
     const auto snapshot = rust_core_.snapshot_metrics();

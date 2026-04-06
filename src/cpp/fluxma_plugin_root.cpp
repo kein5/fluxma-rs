@@ -222,6 +222,8 @@ std::string OutputRuntimeObservationReport::summary() const {
     output += std::string(to_bool_string(synthetic_artifact.generated));
     output += " synthetic-placeholder=";
     output += std::string(to_bool_string(synthetic_artifact.placeholder_only));
+    output += " synthetic-queued=";
+    output += std::string(to_bool_string(synthetic_submission.queued));
     return output;
 }
 
@@ -301,10 +303,13 @@ KwinNativeBridgeInstallObservationReport KfiPluginRoot::observe_native_bridge_in
 }
 
 OutputRuntimeObservationReport KfiPluginRoot::observe_output_runtime(std::uint64_t now_ns) const {
+    const auto synthetic_plan = primary_output_.plan_synthetic_frame(now_ns);
+    const auto synthetic_artifact = primary_output_.generate_fake_synthetic_frame(now_ns);
     return OutputRuntimeObservationReport {
         .snapshot = primary_output_.snapshot_metrics(),
-        .synthetic_plan = primary_output_.plan_synthetic_frame(now_ns),
-        .synthetic_artifact = primary_output_.generate_fake_synthetic_frame(now_ns),
+        .synthetic_plan = synthetic_plan,
+        .synthetic_artifact = synthetic_artifact,
+        .synthetic_submission = primary_output_.submit_fake_synthetic_frame(now_ns),
         .hud_text = primary_output_.render_hud_text(),
     };
 }

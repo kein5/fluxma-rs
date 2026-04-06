@@ -10,6 +10,7 @@
 #include "fluxma_config.h"
 #include "fluxma_hud_renderer.h"
 #include "fluxma_logger.h"
+#include "fluxma_synthetic_present_queue.h"
 #include "fluxma_synthetic_scheduler.h"
 #include "fluxma_types.h"
 
@@ -48,6 +49,9 @@ class KfiOutputController {
     [[nodiscard]] SyntheticFrameArtifact generate_fake_synthetic_frame(
         std::uint64_t now_ns
     ) const noexcept;
+    [[nodiscard]] SyntheticPresentSubmission submit_fake_synthetic_frame(
+        std::uint64_t now_ns
+    ) const noexcept;
     void on_present_feedback(const PresentFeedback& feedback) noexcept;
     [[nodiscard]] MetricsSnapshot snapshot_metrics() const noexcept;
     [[nodiscard]] std::string render_hud_text() const;
@@ -81,6 +85,7 @@ class KfiOutputController {
     KfiBypassPipeline bypass_pipeline_ {};
     KfiHudRenderer hud_renderer_ {};
     KfiFakeSynthGenerator fake_synth_generator_ {};
+    KfiSyntheticPresentQueue synthetic_present_queue_ {};
     KfiSyntheticScheduler synthetic_scheduler_ {};
     RustOutputCore rust_core_;
     bool rust_core_ready_ = false;
