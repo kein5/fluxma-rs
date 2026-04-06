@@ -224,6 +224,8 @@ std::string OutputRuntimeObservationReport::summary() const {
     output += std::string(to_bool_string(synthetic_artifact.placeholder_only));
     output += " synthetic-queued=";
     output += std::string(to_bool_string(synthetic_submission.queued));
+    output += " synthetic-submission-drop=";
+    output += std::string(to_bool_string(synthetic_submission.dropped));
     return output;
 }
 

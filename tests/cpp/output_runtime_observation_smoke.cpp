@@ -51,6 +51,7 @@ int main() {
     if (report.snapshot.state != fluxma::OutputState::Active2x ||
         !report.synthetic_armed() || report.synthetic_should_drop() ||
         !report.synthetic_generated() || !report.synthetic_queued() ||
+        report.synthetic_submission_dropped() || !report.synthetic_placeholder_only() ||
         report.synthetic_plan.synthetic_frame_id != 11 ||
         report.synthetic_artifact.synthetic_frame_id != 11 ||
         report.synthetic_submission.synthetic_frame_id != 11 ||
@@ -59,7 +60,8 @@ int main() {
         report.hud_text.find("synthetic_queued=yes") == std::string::npos ||
         report.summary().find("synthetic-armed=yes") == std::string::npos ||
         report.summary().find("synthetic-generated=yes") == std::string::npos ||
-        report.summary().find("synthetic-queued=yes") == std::string::npos) {
+        report.summary().find("synthetic-queued=yes") == std::string::npos ||
+        report.summary().find("synthetic-submission-drop=no") == std::string::npos) {
         std::cerr << "output runtime observation mismatch\n";
         return EXIT_FAILURE;
     }
@@ -67,8 +69,10 @@ int main() {
     const auto late_report = plugin_root.observe_output_runtime(181'333'332);
     if (!late_report.synthetic_should_drop() ||
         late_report.synthetic_generated() || late_report.synthetic_queued() ||
+        !late_report.synthetic_submission_dropped() || !late_report.synthetic_placeholder_only() ||
         late_report.summary().find("synthetic-drop=yes") == std::string::npos ||
-        late_report.summary().find("synthetic-placeholder=yes") == std::string::npos) {
+        late_report.summary().find("synthetic-placeholder=yes") == std::string::npos ||
+        late_report.summary().find("synthetic-submission-drop=yes") == std::string::npos) {
         std::cerr << "output runtime observation must surface synthetic deadline miss\n";
         return EXIT_FAILURE;
     }

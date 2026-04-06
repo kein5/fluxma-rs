@@ -103,6 +103,14 @@ struct OutputRuntimeObservationReport {
         return synthetic_submission.queued;
     }
 
+    [[nodiscard]] bool synthetic_submission_dropped() const noexcept {
+        return synthetic_submission.dropped;
+    }
+
+    [[nodiscard]] bool synthetic_placeholder_only() const noexcept {
+        return synthetic_submission.placeholder_only;
+    }
+
     [[nodiscard]] std::string summary() const;
 };
 
