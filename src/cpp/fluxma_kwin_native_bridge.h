@@ -37,9 +37,9 @@ struct KwinNativeBringupReport {
     KwinFrameHookReadiness frame {};
     KwinPresentHookReadiness present {};
 
-    [[nodiscard]] bool frame_ready() const noexcept;
-    [[nodiscard]] bool present_ready() const noexcept;
-    [[nodiscard]] bool fully_ready() const noexcept;
+    [[nodiscard]] bool frame_complete() const noexcept;
+    [[nodiscard]] bool present_complete() const noexcept;
+    [[nodiscard]] bool fully_populated() const noexcept;
     [[nodiscard]] std::string frame_summary() const;
     [[nodiscard]] std::string present_summary() const;
     [[nodiscard]] std::string combined_summary() const;

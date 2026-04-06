@@ -53,9 +53,9 @@ int main() {
     const auto version_gate_frame_summary = version_gate_observation.bringup.frame_summary();
     if (version_gate_observation.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
         version_gate_observation.bringup.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
-        !version_gate_observation.bringup.frame_ready() ||
-        !version_gate_observation.bringup.present_ready() ||
-        !version_gate_observation.bringup.fully_ready() ||
+        !version_gate_observation.bringup.frame_complete() ||
+        !version_gate_observation.bringup.present_complete() ||
+        !version_gate_observation.bringup.fully_populated() ||
         version_gate_observation.bringup.frame.plan.hook_point !=
             fluxma::KwinFrameHookPoint::CompositorOutputFrameReady ||
         version_gate_frame_summary.find(
@@ -153,12 +153,18 @@ int main() {
     );
     const auto install_only_summary = install_only_observation.summary();
     if (install_only_observation.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
-        install_only_observation.preflight_summary.find(
-            "frame{deferred_reason=backend-gate"
-        ) == std::string::npos ||
-        install_only_observation.install_summary.find(
-            "frame{result=deferred deferred_reason=backend-gate"
-        ) == std::string::npos ||
+        install_only_observation.preflight.frame.gate.deferred_reason !=
+            fluxma::KwinNativeDeferredReason::BackendGate ||
+        install_only_observation.preflight.present.gate.deferred_reason !=
+            fluxma::KwinNativeDeferredReason::BackendGate ||
+        install_only_observation.preflight.present.source_file !=
+            "src/core/renderbackend.cpp" ||
+        install_only_observation.install.frame.deferred_reason !=
+            fluxma::KwinNativeDeferredReason::BackendGate ||
+        install_only_observation.install.present.deferred_reason !=
+            fluxma::KwinNativeDeferredReason::BackendGate ||
+        install_only_observation.install.present.source_file !=
+            "src/core/renderbackend.cpp" ||
         install_only_summary.find("state=placeholder-only") == std::string::npos ||
         install_only_summary.find("preflight{frame{deferred_reason=backend-gate") ==
             std::string::npos ||
@@ -181,9 +187,9 @@ int main() {
     const auto incomplete_summary = incomplete_observation.summary();
     const auto incomplete_frame_summary = incomplete_observation.bringup.frame_summary();
     const auto incomplete_present_summary = incomplete_observation.bringup.present_summary();
-    if (incomplete_observation.bringup.frame_ready() ||
-        incomplete_observation.bringup.present_ready() ||
-        incomplete_observation.bringup.fully_ready() ||
+    if (incomplete_observation.bringup.frame_complete() ||
+        incomplete_observation.bringup.present_complete() ||
+        incomplete_observation.bringup.fully_populated() ||
         incomplete_frame_summary.find("ready=no") == std::string::npos ||
         incomplete_frame_summary.find("missing=frame-id,width") ==
             std::string::npos ||

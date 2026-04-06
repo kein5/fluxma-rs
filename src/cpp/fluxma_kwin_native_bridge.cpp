@@ -90,16 +90,16 @@ KwinNativeInstallReport make_deferred_install_report(
 
 }  // namespace
 
-bool KwinNativeBringupReport::frame_ready() const noexcept {
-    return frame.ready;
+bool KwinNativeBringupReport::frame_complete() const noexcept {
+    return frame.missing_fields == KwinFrameInputField::None;
 }
 
-bool KwinNativeBringupReport::present_ready() const noexcept {
-    return present.ready;
+bool KwinNativeBringupReport::present_complete() const noexcept {
+    return present.missing_fields == KwinPresentInputField::None;
 }
 
-bool KwinNativeBringupReport::fully_ready() const noexcept {
-    return frame_ready() && present_ready();
+bool KwinNativeBringupReport::fully_populated() const noexcept {
+    return frame_complete() && present_complete();
 }
 
 std::string KwinNativeBringupReport::frame_summary() const {

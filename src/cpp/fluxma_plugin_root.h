@@ -18,8 +18,8 @@ struct KwinNativeBridgeObservationReport {
 
 struct KwinNativeBridgeInstallObservationReport {
     KwinNativeBridgeState state = KwinNativeBridgeState::PlaceholderOnly;
-    std::string preflight_summary {};
-    std::string install_summary {};
+    KwinNativeCombinedPreflightReport preflight {};
+    KwinNativeCombinedInstallReport install {};
 
     [[nodiscard]] std::string summary() const;
 };

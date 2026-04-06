@@ -21,9 +21,9 @@ std::string KwinNativeBridgeInstallObservationReport::summary() const {
     output += "state=";
     output += std::string(to_string(state));
     output += " preflight{";
-    output += preflight_summary;
+    output += preflight.summary();
     output += "} install{";
-    output += install_summary;
+    output += install.summary();
     output += "}";
     return output;
 }
@@ -91,8 +91,8 @@ KwinNativeBridgeInstallObservationReport KfiPluginRoot::observe_native_bridge_in
     const auto install = native_bridge_.install_stub(install_context);
     return KwinNativeBridgeInstallObservationReport {
         .state = native_bridge_.state(),
-        .preflight_summary = preflight.summary(),
-        .install_summary = install.summary(),
+        .preflight = preflight,
+        .install = install,
     };
 }
 
