@@ -2,7 +2,7 @@
 
 Fluxma は Plasma 6 / KWin 6 / Wayland 向けの KWin 内蔵型 post-display フレーム補間モジュールである。
 
-このリポジトリの現段階は、Epic 1〜2 相当の skeleton に限定している。
+このリポジトリの現段階は、Epic 1〜6 の skeleton / placeholder 実装まで進めている。
 
 - QML effect は使わない
 - KWin internal/native module 前提で進める
@@ -15,14 +15,17 @@ Fluxma は Plasma 6 / KWin 6 / Wayland 向けの KWin 内蔵型 post-display フ
 - mixed build skeleton (`CMake` + `Cargo`)
 - C++/Rust 最小ブリッジ
 - `KfiPluginRoot` / `KfiOutputController` の骨格
-- bypass-only path 用の基本型
-- output ごとの state / present feedback / HUD text skeleton
-- KWin integration notes
+- bypass-only path と protected passthrough-only
+- output ごとの state / cadence / governor / scheduler skeleton
+- present feedback / HUD / metrics / rate-limited logging
+- fake synthetic plan / artifact / placeholder present queue
+- KWin integration notes / native bridge placeholder
 
 ## 現在まだ入っていないもの
 
 - optical flow
 - synthesis shader
+- real synthetic present path
 - subtitle heuristic の詳細実装
 - KCM の本実装
 

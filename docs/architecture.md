@@ -386,12 +386,22 @@ MVP は 2x のみなので、基本形は次の通り。
 - 連続 miss で degrade または bypass
 - 不安定なら real frame のみ出す
 
-現状の skeleton では、scheduler はまだ present queue を持たず、
-`PassthroughOnly / WarmupHold / Synthetic2x` の mode 判定だけを返す。
-state machine はこの mode を見て `Bypass / Warmup / Active2x / Degraded` を更新するが、
-実際の synthetic present slot 接続は Epic 6 以降で行う。
+現状の skeleton では、Rust scheduler は
+`PassthroughOnly / WarmupHold / Synthetic2x` の mode 判定を返し、
+state machine はこの mode を見て `Bypass / Warmup / Active2x / Degraded` を更新する。
+C++ 側ではこれに対応して、次の placeholder synthetic chain を持つ。
+
+- `KfiSyntheticScheduler`
+- `KfiFakeSynthGenerator`
+- `KfiSyntheticPresentQueue`
+
+この chain は `SyntheticFramePlan -> SyntheticFrameArtifact -> SyntheticPresentSubmission`
+を順に生成し、real GPU synth や real present queue をまだ使わずに
+synthetic path の timing と drop contract だけを先に固定する。
+`SyntheticPresentSubmission` は queue 成否、drop、placeholder-only を持ち、
+HUD / logging / output runtime observation で可視化される。
 この段階でも decision には `interpolation_armed` を保持し、
-C++ 側へ「まだ passthrough-only だが、次段で synthetic path を要求している」ことを伝える。
+C++ 側へ「まだ placeholder path だが、synthetic slot を要求している」ことを伝える。
 
 ---
 
@@ -407,11 +417,14 @@ MVP の最初から本物の optical flow を作らない。
 4. midframe synthesis
 
 現状の skeleton では、本物の synth frame の前段として
-`KfiSyntheticScheduler` が placeholder synthetic slot を計画する。
-これは GPU frame をまだ生成せず、`interpolation_armed` と
+`KfiSyntheticScheduler` が placeholder synthetic slot を計画し、
+`KfiFakeSynthGenerator` が placeholder artifact を生成し、
+`KfiSyntheticPresentQueue` が placeholder submission へ変換する。
+この段階では GPU frame をまだ生成せず、`interpolation_armed` と
 `refresh_interval_ns` / `predicted_render_time_ns` から
 `target_present_timestamp_ns` と `deadline_timestamp_ns` を決め、
-間に合わない場合は即 drop する。
+deadline miss 時は artifact/submission の両方で即 drop する。
+protected content や bypass state では synthetic plan 自体を arm しない。
 
 ### 13.2 初期実装
 初期版では、軽量な low-resolution flow または block matching を想定する。  
