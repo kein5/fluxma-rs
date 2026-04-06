@@ -27,14 +27,14 @@ int main() {
         return EXIT_FAILURE;
     }
 
-    fluxma::KfiFlowInputsBuilder constrained_builder(4);
-    const auto invalid = constrained_builder.build(
+    fluxma::KfiFlowInputsBuilder invalid_builder(16);
+    const auto invalid = invalid_builder.build(
         100,
         fluxma::GpuTextureDescriptor {.width = 0, .height = 1080, .pixel_format = 1},
         101,
         fluxma::GpuTextureDescriptor {.width = 1920, .height = 1080, .pixel_format = 1}
     );
-    if (invalid.valid || invalid.truncated || constrained_builder.pooled_texture_count() != 0) {
+    if (invalid.valid || invalid.truncated || invalid_builder.pooled_texture_count() != 0) {
         std::cerr << "flow input invalid descriptor mismatch\n";
         return EXIT_FAILURE;
     }
