@@ -35,6 +35,18 @@ fluxma::KwinPresentFeedbackInputs complete_present_inputs() {
 }  // namespace
 
 int main() {
+    const fluxma::KwinNativeBridgeObservationReport non_placeholder_observation {
+        .state = fluxma::KwinNativeBridgeState::Hooked,
+    };
+    const fluxma::KwinNativeBridgeInstallObservationReport non_placeholder_install_observation {
+        .state = fluxma::KwinNativeBridgeState::Hooked,
+    };
+    if (non_placeholder_observation.is_placeholder_state() ||
+        non_placeholder_install_observation.is_placeholder_state()) {
+        std::cerr << "plugin root observation placeholder helper must reflect state exactly\n";
+        return EXIT_FAILURE;
+    }
+
     const fluxma::KwinNativeBridgeObservationReport frame_gate_only_match {
         .preflight = fluxma::KwinNativeCombinedPreflightReport {
             .frame = fluxma::KwinNativeInstallPreflightReport {
