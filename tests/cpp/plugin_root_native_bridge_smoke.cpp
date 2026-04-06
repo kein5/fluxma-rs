@@ -265,6 +265,9 @@ int main() {
     const auto install_only_placeholder = plugin_root.observe_native_bridge_install(
         fluxma::KwinNativeInstallContext {}
     );
+    const auto install_only_placeholder_preflight_summary =
+        install_only_placeholder.preflight_summary();
+    const auto install_only_placeholder_install_summary = install_only_placeholder.install_summary();
     if (!install_only_placeholder.is_placeholder_state() ||
         install_only_placeholder.preflight.frame.gate.deferred_reason !=
             fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
@@ -275,6 +278,11 @@ int main() {
         install_only_placeholder.install.present.deferred_reason !=
             fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
         !install_only_placeholder.all_gates_match() ||
+        install_only_placeholder_preflight_summary.find(
+            "frame{deferred_reason=placeholder-only"
+        ) == std::string::npos ||
+        install_only_placeholder_install_summary.find("present{result=deferred") ==
+            std::string::npos ||
         install_only_placeholder.summary().find("state=") ==
             std::string::npos) {
         std::cerr << "plugin root install observation must preserve placeholder diagnostics\n";
@@ -289,6 +297,9 @@ int main() {
             .backend_name = "drm",
         }
     );
+    const auto install_only_version_preflight_summary =
+        install_only_version_gate.preflight_summary();
+    const auto install_only_version_install_summary = install_only_version_gate.install_summary();
     if (install_only_version_gate.preflight.frame.gate.deferred_reason !=
             fluxma::KwinNativeDeferredReason::KwinVersionGate ||
         install_only_version_gate.preflight.present.gate.deferred_reason !=
@@ -299,6 +310,11 @@ int main() {
             fluxma::KwinNativeDeferredReason::KwinVersionGate ||
         !install_only_version_gate.all_gates_match() ||
         !install_only_version_gate.all_installs_deferred() ||
+        install_only_version_preflight_summary.find(
+            "frame{deferred_reason=kwin-version-gate"
+        ) == std::string::npos ||
+        install_only_version_install_summary.find("present{result=deferred") ==
+            std::string::npos ||
         install_only_version_gate.preflight.present.symbol != "OutputFrame::presented(...)" ||
         install_only_version_gate.install.present.checklist_hint_secondary !=
             "confirm backend completion timestamp semantics across backends" ||
@@ -317,6 +333,10 @@ int main() {
             .backend_name = "wayland",
         }
     );
+    const auto install_only_precedence_preflight_summary =
+        install_only_precedence.preflight_summary();
+    const auto install_only_precedence_install_summary =
+        install_only_precedence.install_summary();
     if (install_only_precedence.preflight.frame.gate.deferred_reason !=
             fluxma::KwinNativeDeferredReason::KwinVersionGate ||
         install_only_precedence.preflight.present.gate.deferred_reason !=
@@ -327,6 +347,11 @@ int main() {
             fluxma::KwinNativeDeferredReason::KwinVersionGate ||
         !install_only_precedence.all_gates_match() ||
         !install_only_precedence.all_installs_deferred() ||
+        install_only_precedence_preflight_summary.find(
+            "frame{deferred_reason=kwin-version-gate"
+        ) == std::string::npos ||
+        install_only_precedence_install_summary.find("present{result=deferred") ==
+            std::string::npos ||
         install_only_precedence.summary().find(
             "reason=kwin version gate blocked install for 6.3.85"
         ) == std::string::npos) {
