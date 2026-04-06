@@ -16,6 +16,18 @@ std::string KwinNativeBridgeObservationReport::summary() const {
     return output;
 }
 
+bool KwinNativeBridgeInstallObservationReport::frame_gate_matches() const noexcept {
+    return preflight.frame.gate.deferred_reason == install.frame.deferred_reason;
+}
+
+bool KwinNativeBridgeInstallObservationReport::present_gate_matches() const noexcept {
+    return preflight.present.gate.deferred_reason == install.present.deferred_reason;
+}
+
+bool KwinNativeBridgeInstallObservationReport::all_gates_match() const noexcept {
+    return frame_gate_matches() && present_gate_matches();
+}
+
 std::string KwinNativeBridgeInstallObservationReport::summary() const {
     std::string output;
     output += "state=";

@@ -21,6 +21,9 @@ struct KwinNativeBridgeInstallObservationReport {
     KwinNativeCombinedPreflightReport preflight {};
     KwinNativeCombinedInstallReport install {};
 
+    [[nodiscard]] bool frame_gate_matches() const noexcept;
+    [[nodiscard]] bool present_gate_matches() const noexcept;
+    [[nodiscard]] bool all_gates_match() const noexcept;
     [[nodiscard]] std::string summary() const;
 };
 

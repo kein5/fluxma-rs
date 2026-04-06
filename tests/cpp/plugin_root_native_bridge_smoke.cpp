@@ -165,11 +165,36 @@ int main() {
             fluxma::KwinNativeDeferredReason::BackendGate ||
         install_only_observation.install.present.source_file !=
             "src/core/renderbackend.cpp" ||
+        install_only_observation.install.present.checklist_hint_secondary !=
+            "confirm backend completion timestamp semantics across backends" ||
+        !install_only_observation.frame_gate_matches() ||
+        !install_only_observation.present_gate_matches() ||
+        !install_only_observation.all_gates_match() ||
         install_only_summary.find("state=placeholder-only") == std::string::npos ||
+        install_only_summary.find("preflight{") == std::string::npos ||
+        install_only_summary.find("install{") == std::string::npos ||
         install_only_summary.find("preflight{frame{deferred_reason=backend-gate") ==
             std::string::npos ||
         install_only_summary.find("install{frame{result=deferred") == std::string::npos) {
         std::cerr << "plugin root install observation must preserve backend gate diagnostics\n";
+        return EXIT_FAILURE;
+    }
+
+    const auto install_only_placeholder = plugin_root.observe_native_bridge_install(
+        fluxma::KwinNativeInstallContext {}
+    );
+    if (install_only_placeholder.preflight.frame.gate.deferred_reason !=
+            fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        install_only_placeholder.preflight.present.gate.deferred_reason !=
+            fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        install_only_placeholder.install.frame.deferred_reason !=
+            fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        install_only_placeholder.install.present.deferred_reason !=
+            fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        !install_only_placeholder.all_gates_match() ||
+        install_only_placeholder.summary().find("state=placeholder-only") ==
+            std::string::npos) {
+        std::cerr << "plugin root install observation must preserve placeholder diagnostics\n";
         return EXIT_FAILURE;
     }
 
@@ -189,6 +214,7 @@ int main() {
             fluxma::KwinNativeDeferredReason::KwinVersionGate ||
         install_only_version_gate.install.present.deferred_reason !=
             fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        !install_only_version_gate.all_gates_match() ||
         install_only_version_gate.preflight.present.symbol != "OutputFrame::presented(...)" ||
         install_only_version_gate.install.present.checklist_hint_secondary !=
             "confirm backend completion timestamp semantics across backends" ||
@@ -215,6 +241,7 @@ int main() {
             fluxma::KwinNativeDeferredReason::KwinVersionGate ||
         install_only_precedence.install.present.deferred_reason !=
             fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        !install_only_precedence.all_gates_match() ||
         install_only_precedence.summary().find(
             "reason=kwin version gate blocked install for 6.3.85"
         ) == std::string::npos) {
