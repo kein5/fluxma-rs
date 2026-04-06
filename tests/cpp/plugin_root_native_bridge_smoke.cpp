@@ -78,6 +78,12 @@ int main() {
         !version_gate_observation.frame_bringup_has_unresolved() ||
         !version_gate_observation.present_bringup_has_unresolved() ||
         !version_gate_observation.bringup_has_unresolved_candidates() ||
+        version_gate_observation.frame_bringup_has_unresolved() !=
+            version_gate_observation.bringup.frame_has_unresolved() ||
+        version_gate_observation.present_bringup_has_unresolved() !=
+            version_gate_observation.bringup.present_has_unresolved() ||
+        version_gate_observation.bringup_has_unresolved_candidates() !=
+            version_gate_observation.bringup.has_unresolved_candidates() ||
         !version_gate_observation.frame_gate_matches() ||
         !version_gate_observation.present_gate_matches() ||
         !version_gate_observation.all_gates_match() ||
@@ -300,6 +306,12 @@ int main() {
         !incomplete_observation.frame_bringup_has_unresolved() ||
         !incomplete_observation.present_bringup_has_unresolved() ||
         !incomplete_observation.bringup_has_unresolved_candidates() ||
+        incomplete_observation.frame_bringup_has_unresolved() !=
+            incomplete_observation.bringup.frame_has_unresolved() ||
+        incomplete_observation.present_bringup_has_unresolved() !=
+            incomplete_observation.bringup.present_has_unresolved() ||
+        incomplete_observation.bringup_has_unresolved_candidates() !=
+            incomplete_observation.bringup.has_unresolved_candidates() ||
         incomplete_frame_summary.find("ready=no") == std::string::npos ||
         incomplete_frame_summary.find("missing=frame-id,width") ==
             std::string::npos ||

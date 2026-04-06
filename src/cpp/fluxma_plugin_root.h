@@ -17,6 +17,8 @@ struct KwinNativeBridgeObservationReport {
     [[nodiscard]] bool is_placeholder_state() const noexcept;
     // Shorthand for "bring-up has all required fields populated for both frame and present".
     [[nodiscard]] bool bringup_complete() const noexcept;
+    // These are passthrough helpers over bringup.*_has_unresolved() so callers can stay on
+    // the observation report without unpacking nested bring-up state.
     [[nodiscard]] bool frame_bringup_has_unresolved() const noexcept;
     [[nodiscard]] bool present_bringup_has_unresolved() const noexcept;
     [[nodiscard]] bool bringup_has_unresolved_candidates() const noexcept;
