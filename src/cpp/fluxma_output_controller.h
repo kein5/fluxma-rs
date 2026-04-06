@@ -52,7 +52,6 @@ class KfiOutputController {
         OutputState state = OutputState::Bypass;
         BypassReason bypass_reason = BypassReason::None;
         bool protected_content = false;
-        std::uint64_t state_transition_count = 0;
         std::array<std::uint64_t, 8> recent_submitted_frame_ids {};
     };
 

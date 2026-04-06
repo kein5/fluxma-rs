@@ -107,7 +107,8 @@ typedef struct FluxmaRustDecision {
     FluxmaRustOutputState state;
     FluxmaRustBypassReason bypass_reason;
     uint8_t passthrough_only;
-    uint8_t reserved[7];
+    uint8_t interpolation_armed;
+    uint8_t reserved[6];
 } FluxmaRustDecision;
 
 typedef struct FluxmaRustMetricsSnapshot {

@@ -139,12 +139,14 @@ struct OutputDecision {
     OutputState state = OutputState::Bypass;
     BypassReason bypass_reason = BypassReason::None;
     bool passthrough_only = true;
+    bool interpolation_armed = false;
 
     [[nodiscard]] static OutputDecision from_ffi(FluxmaRustDecision decision) noexcept {
         return OutputDecision {
             .state = static_cast<OutputState>(decision.state),
             .bypass_reason = static_cast<BypassReason>(decision.bypass_reason),
             .passthrough_only = decision.passthrough_only != 0,
+            .interpolation_armed = decision.interpolation_armed != 0,
         };
     }
 };
@@ -171,6 +173,19 @@ struct MetricsSnapshot {
     SchedulerMode scheduler_mode = SchedulerMode::PassthroughOnly;
     std::uint32_t cadence_hz_millihz = 0;
     std::uint64_t state_transition_count = 0;
+
+    [[nodiscard]] bool cadence_stable() const noexcept {
+        return cadence_status == CadenceStatus::Stable;
+    }
+
+    [[nodiscard]] bool scheduler_can_synthesize() const noexcept {
+        return scheduler_mode == SchedulerMode::Synthetic2x;
+    }
+
+    [[nodiscard]] bool governor_is_degraded() const noexcept {
+        return governor_mode == GovernorMode::QualityLow ||
+            governor_mode == GovernorMode::QualityMedium;
+    }
 
     [[nodiscard]] static MetricsSnapshot from_ffi(
         FluxmaRustMetricsSnapshot snapshot
@@ -209,6 +224,7 @@ struct PassthroughSubmission {
     std::uint64_t frame_id = 0;
     GpuFrameHandle source_frame {};
     bool accepted = false;
+    bool interpolation_armed = false;
     bool protected_content = false;
     BypassReason bypass_reason = BypassReason::None;
 };

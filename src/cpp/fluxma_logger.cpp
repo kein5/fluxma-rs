@@ -17,6 +17,10 @@ void KfiRateLimitedLogger::note_state_transition(
     std::uint64_t sequence,
     OutputState state,
     BypassReason bypass_reason,
+    CadenceStatus cadence_status,
+    GovernorMode governor_mode,
+    SchedulerMode scheduler_mode,
+    bool classifier_allows_interpolation,
     bool protected_content
 ) noexcept {
     if (has_last_logged_state_transition_frame_tap_count_ &&
@@ -37,6 +41,10 @@ void KfiRateLimitedLogger::note_state_transition(
             .present_feedback_count = 0,
             .state = state,
             .bypass_reason = bypass_reason,
+            .cadence_status = cadence_status,
+            .governor_mode = governor_mode,
+            .scheduler_mode = scheduler_mode,
+            .classifier_allows_interpolation = classifier_allows_interpolation,
             .protected_content = protected_content,
             .present_success = true,
             .dropped_synthetic = false,
@@ -69,6 +77,10 @@ void KfiRateLimitedLogger::note_present_feedback_issue(
             .present_feedback_count = present_feedback_count,
             .state = OutputState::Bypass,
             .bypass_reason = BypassReason::None,
+            .cadence_status = CadenceStatus::Unknown,
+            .governor_mode = GovernorMode::Bypass,
+            .scheduler_mode = SchedulerMode::PassthroughOnly,
+            .classifier_allows_interpolation = false,
             .protected_content = false,
             .present_success = present_success,
             .dropped_synthetic = dropped_synthetic,
@@ -103,6 +115,10 @@ void KfiRateLimitedLogger::note_present_feedback_mismatch(
             .present_feedback_count = present_feedback_count,
             .state = OutputState::Bypass,
             .bypass_reason = BypassReason::None,
+            .cadence_status = CadenceStatus::Unknown,
+            .governor_mode = GovernorMode::Bypass,
+            .scheduler_mode = SchedulerMode::PassthroughOnly,
+            .classifier_allows_interpolation = false,
             .protected_content = false,
             .present_success = true,
             .dropped_synthetic = false,
@@ -140,6 +156,10 @@ std::string KfiRateLimitedLogger::render_event(const LogEvent& event) {
         stream << "output=" << event.output_id << " transition=" << event.sequence
                << " state=" << to_string(event.state)
                << " bypass=" << to_string(event.bypass_reason)
+               << " cadence=" << to_string(event.cadence_status)
+               << " governor=" << to_string(event.governor_mode)
+               << " scheduler=" << to_string(event.scheduler_mode)
+               << " classifier=" << to_bool_string(event.classifier_allows_interpolation)
                << " protected=" << to_bool_string(event.protected_content);
         break;
     case LogEventKind::PresentFeedbackIssue:

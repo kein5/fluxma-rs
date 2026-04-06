@@ -14,6 +14,7 @@ PassthroughSubmission KfiGpuServices::submit_passthrough(
         .frame_id = frame.frame_id,
         .source_frame = frame.gpu_handle,
         .accepted = decision.passthrough_only,
+        .interpolation_armed = decision.interpolation_armed,
         .protected_content = frame.protected_content,
         .bypass_reason = decision.bypass_reason,
     };

@@ -24,6 +24,10 @@ struct LogEvent {
     std::uint64_t present_feedback_count = 0;
     OutputState state = OutputState::Bypass;
     BypassReason bypass_reason = BypassReason::None;
+    CadenceStatus cadence_status = CadenceStatus::Unknown;
+    GovernorMode governor_mode = GovernorMode::Bypass;
+    SchedulerMode scheduler_mode = SchedulerMode::PassthroughOnly;
+    bool classifier_allows_interpolation = false;
     bool protected_content = false;
     bool present_success = true;
     bool dropped_synthetic = false;
@@ -41,6 +45,10 @@ class KfiRateLimitedLogger {
         std::uint64_t sequence,
         OutputState state,
         BypassReason bypass_reason,
+        CadenceStatus cadence_status,
+        GovernorMode governor_mode,
+        SchedulerMode scheduler_mode,
+        bool classifier_allows_interpolation,
         bool protected_content
     ) noexcept;
     void note_present_feedback_issue(

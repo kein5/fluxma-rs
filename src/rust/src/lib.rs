@@ -127,7 +127,8 @@ pub struct FluxmaRustDecision {
     state: FluxmaRustOutputState,
     bypass_reason: FluxmaRustBypassReason,
     passthrough_only: u8,
-    reserved: [u8; 7],
+    interpolation_armed: u8,
+    reserved: [u8; 6],
 }
 
 #[repr(C)]
@@ -164,7 +165,8 @@ impl FluxmaRustDecision {
             state,
             bypass_reason: reason,
             passthrough_only: 1,
-            reserved: [0; 7],
+            interpolation_armed: 0,
+            reserved: [0; 6],
         }
     }
 }
@@ -415,16 +417,19 @@ impl RustOutputCore {
         };
 
         let decision = if !self.enabled {
+            self.reset_runtime_controls_for_bypass();
             FluxmaRustDecision::bypass(
                 FluxmaRustOutputState::Disabled,
                 FluxmaRustBypassReason::Disabled,
             )
         } else if frame.protected_content != 0 {
+            self.reset_runtime_controls_for_bypass();
             FluxmaRustDecision::bypass(
                 FluxmaRustOutputState::ProtectedBypass,
                 FluxmaRustBypassReason::ProtectedContent,
             )
         } else if frame.width == 0 || frame.height == 0 || frame.gpu_handle.handle_id == 0 {
+            self.reset_runtime_controls_for_bypass();
             FluxmaRustDecision::bypass(
                 FluxmaRustOutputState::Bypass,
                 FluxmaRustBypassReason::UnsupportedOutput,
@@ -513,7 +518,35 @@ impl RustOutputCore {
             state,
             bypass_reason,
             passthrough_only: 1,
-            reserved: [0; 7],
+            interpolation_armed: u8::from(
+                scheduler_mode == FluxmaRustSchedulerMode::Synthetic2x &&
+                    state != FluxmaRustOutputState::Bypass
+            ),
+            reserved: [0; 6],
+        }
+    }
+
+    fn reset_runtime_controls_for_bypass(&self) {
+        {
+            let mut classifier = match self.classifier.lock() {
+                Ok(classifier) => classifier,
+                Err(poisoned) => poisoned.into_inner(),
+            };
+            classifier.allows_interpolation = false;
+        }
+        {
+            let mut governor = match self.governor.lock() {
+                Ok(governor) => governor,
+                Err(poisoned) => poisoned.into_inner(),
+            };
+            governor.mode = FluxmaRustGovernorMode::Bypass;
+        }
+        {
+            let mut scheduler = match self.scheduler.lock() {
+                Ok(scheduler) => scheduler,
+                Err(poisoned) => poisoned.into_inner(),
+            };
+            scheduler.mode = FluxmaRustSchedulerMode::PassthroughOnly;
         }
     }
 
@@ -731,6 +764,8 @@ pub extern "C" fn fluxma_rust_core_snapshot_metrics(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::mem::{align_of, size_of, MaybeUninit};
+    use std::ptr::addr_of;
 
     fn frame(protected_content: u8) -> FluxmaRustFrameDescriptor {
         FluxmaRustFrameDescriptor {
@@ -772,6 +807,7 @@ mod tests {
             FluxmaRustBypassReason::ProtectedContent
         );
         assert_eq!(decision.passthrough_only, 1);
+        assert_eq!(decision.interpolation_armed, 0);
     }
 
     #[test]
@@ -786,6 +822,7 @@ mod tests {
             decision.bypass_reason,
             FluxmaRustBypassReason::GpuPathNotReady
         );
+        assert_eq!(decision.interpolation_armed, 0);
     }
 
     #[test]
@@ -804,6 +841,7 @@ mod tests {
             FluxmaRustBypassReason::UnsupportedOutput
         );
         assert_eq!(decision.passthrough_only, 1);
+        assert_eq!(decision.interpolation_armed, 0);
     }
 
     #[test]
@@ -816,6 +854,7 @@ mod tests {
         assert_eq!(decision.state, FluxmaRustOutputState::Disabled);
         assert_eq!(decision.bypass_reason, FluxmaRustBypassReason::Disabled);
         assert_eq!(decision.passthrough_only, 1);
+        assert_eq!(decision.interpolation_armed, 0);
     }
 
     #[test]
@@ -871,6 +910,7 @@ mod tests {
             } else {
                 assert_eq!(decision.state, FluxmaRustOutputState::Active2x);
                 assert_eq!(decision.bypass_reason, FluxmaRustBypassReason::None);
+                assert_eq!(decision.interpolation_armed, 1);
             }
         }
 
@@ -920,6 +960,7 @@ mod tests {
         let snapshot = core.snapshot_metrics();
         assert_eq!(decision.state, FluxmaRustOutputState::Degraded);
         assert_eq!(decision.bypass_reason, FluxmaRustBypassReason::None);
+        assert_eq!(decision.interpolation_armed, 1);
         assert_eq!(snapshot.governor_mode, FluxmaRustGovernorMode::QualityLow);
         assert_eq!(
             snapshot.scheduler_mode,
@@ -934,6 +975,7 @@ mod tests {
         assert_eq!(decision.state, FluxmaRustOutputState::Faulted);
         assert_eq!(decision.bypass_reason, FluxmaRustBypassReason::Fault);
         assert_eq!(decision.passthrough_only, 1);
+        assert_eq!(decision.interpolation_armed, 0);
 
         let snapshot = fluxma_rust_core_snapshot_metrics(std::ptr::null_mut());
         assert_eq!(snapshot.state, FluxmaRustOutputState::Faulted);
@@ -953,6 +995,115 @@ mod tests {
                 dropped_synthetic: 0,
                 reserved: [0; 5],
             },
+        );
+    }
+
+    #[test]
+    fn cadence_estimator_snaps_24fps() {
+        let core = RustOutputCore::new(FluxmaRustConfig {
+            enabled: 1,
+            reserved: [0; 7],
+        });
+
+        for index in 0..5u64 {
+            let mut descriptor = frame(0);
+            descriptor.frame_id = index + 1;
+            descriptor.timestamp_ns = 41_666_667 * (index + 1);
+            let _ = core.evaluate_frame(descriptor);
+        }
+
+        let snapshot = core.snapshot_metrics();
+        assert_eq!(snapshot.cadence_status, FluxmaRustCadenceStatus::Stable);
+        assert_eq!(snapshot.cadence_hz_millihz, 24_000);
+    }
+
+    #[test]
+    fn out_of_order_timestamps_do_not_fake_stable_cadence() {
+        let core = RustOutputCore::new(FluxmaRustConfig {
+            enabled: 1,
+            reserved: [0; 7],
+        });
+
+        let timestamps = [33_333_333u64, 66_666_666, 50_000_000, 100_000_000, 133_333_333];
+        for (index, timestamp_ns) in timestamps.into_iter().enumerate() {
+            let mut descriptor = frame(0);
+            descriptor.frame_id = (index + 1) as u64;
+            descriptor.timestamp_ns = timestamp_ns;
+            let _ = core.evaluate_frame(descriptor);
+        }
+
+        let snapshot = core.snapshot_metrics();
+        assert_ne!(snapshot.state, FluxmaRustOutputState::Active2x);
+        assert_ne!(snapshot.cadence_status, FluxmaRustCadenceStatus::Stable);
+    }
+
+    #[test]
+    fn protected_frame_clears_active_control_diagnostics() {
+        let core = RustOutputCore::new(FluxmaRustConfig {
+            enabled: 1,
+            reserved: [0; 7],
+        });
+
+        for index in 0..5u64 {
+            let mut descriptor = frame(0);
+            descriptor.frame_id = index + 1;
+            descriptor.timestamp_ns = 33_333_333 * (index + 1);
+            let _ = core.evaluate_frame(descriptor);
+        }
+
+        let protected = core.evaluate_frame(frame(1));
+        let snapshot = core.snapshot_metrics();
+        assert_eq!(protected.state, FluxmaRustOutputState::ProtectedBypass);
+        assert_eq!(protected.interpolation_armed, 0);
+        assert_eq!(snapshot.cadence_status, FluxmaRustCadenceStatus::Stable);
+        assert_eq!(snapshot.classifier_allows_interpolation, 0);
+        assert_eq!(snapshot.governor_mode, FluxmaRustGovernorMode::Bypass);
+        assert_eq!(
+            snapshot.scheduler_mode,
+            FluxmaRustSchedulerMode::PassthroughOnly
+        );
+    }
+
+    #[test]
+    fn ffi_layout_stays_stable() {
+        assert_eq!(size_of::<FluxmaRustConfig>(), 8);
+        assert_eq!(align_of::<FluxmaRustConfig>(), 1);
+        assert_eq!(size_of::<FluxmaRustDecision>(), 16);
+        assert_eq!(align_of::<FluxmaRustDecision>(), 4);
+        assert_eq!(size_of::<FluxmaRustPresentFeedback>(), 40);
+        assert_eq!(align_of::<FluxmaRustPresentFeedback>(), 8);
+        assert_eq!(size_of::<FluxmaRustFrameDescriptor>(), 120);
+        assert_eq!(align_of::<FluxmaRustFrameDescriptor>(), 8);
+        assert_eq!(size_of::<FluxmaRustMetricsSnapshot>(), 128);
+        assert_eq!(align_of::<FluxmaRustMetricsSnapshot>(), 8);
+
+        let frame = MaybeUninit::<FluxmaRustFrameDescriptor>::uninit();
+        let frame_ptr = frame.as_ptr();
+        // Safety: addr_of does not dereference the MaybeUninit payload.
+        assert_eq!(unsafe { addr_of!((*frame_ptr).gpu_handle) as usize - frame_ptr as usize }, 104);
+
+        let feedback = MaybeUninit::<FluxmaRustPresentFeedback>::uninit();
+        let feedback_ptr = feedback.as_ptr();
+        // Safety: addr_of does not dereference the MaybeUninit payload.
+        assert_eq!(
+            unsafe { addr_of!((*feedback_ptr).present_success) as usize - feedback_ptr as usize },
+            28
+        );
+
+        let metrics = MaybeUninit::<FluxmaRustMetricsSnapshot>::uninit();
+        let metrics_ptr = metrics.as_ptr();
+        // Safety: addr_of does not dereference the MaybeUninit payload.
+        assert_eq!(
+            unsafe { addr_of!((*metrics_ptr).frame_tap_count) as usize - metrics_ptr as usize },
+            16
+        );
+        assert_eq!(
+            unsafe { addr_of!((*metrics_ptr).cadence_hz_millihz) as usize - metrics_ptr as usize },
+            116
+        );
+        assert_eq!(
+            unsafe { addr_of!((*metrics_ptr).state_transition_count) as usize - metrics_ptr as usize },
+            120
         );
     }
 }

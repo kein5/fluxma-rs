@@ -31,7 +31,9 @@ fluxma::FrameDescriptor frame(std::uint64_t frame_id, std::uint64_t timestamp_ns
 }  // namespace
 
 int main() {
-    fluxma::KfiOutputController output(7, fluxma::ModuleConfig {});
+    fluxma::ModuleConfig config;
+    config.log_interval_frames = 1;
+    fluxma::KfiOutputController output(7, config);
 
     for (std::uint64_t index = 0; index < 5; ++index) {
         const auto decision = output.on_frame_tapped(
@@ -44,6 +46,7 @@ int main() {
     }
 
     const auto snapshot = output.snapshot_metrics();
+    const auto submission = output.last_submission();
     if (snapshot.state != fluxma::OutputState::Active2x ||
         snapshot.bypass_reason != fluxma::BypassReason::None ||
         snapshot.cadence_status != fluxma::CadenceStatus::Stable ||
@@ -51,7 +54,8 @@ int main() {
         !snapshot.classifier_allows_interpolation ||
         snapshot.governor_mode != fluxma::GovernorMode::QualityHigh ||
         snapshot.scheduler_mode != fluxma::SchedulerMode::Synthetic2x ||
-        snapshot.state_transition_count < 2) {
+        snapshot.state_transition_count < 2 ||
+        !submission.accepted || !submission.interpolation_armed) {
         std::cerr << "state core snapshot mismatch\n";
         return EXIT_FAILURE;
     }
@@ -65,6 +69,16 @@ int main() {
         hud.find("governor=quality-high") == std::string::npos ||
         hud.find("scheduler=synthetic-2x") == std::string::npos) {
         std::cerr << "state core hud mismatch\n";
+        return EXIT_FAILURE;
+    }
+
+    const auto logs = output.log_messages();
+    if (logs.empty() ||
+        logs.back().find("cadence=stable") == std::string::npos ||
+        logs.back().find("governor=quality-high") == std::string::npos ||
+        logs.back().find("scheduler=synthetic-2x") == std::string::npos ||
+        logs.back().find("classifier=yes") == std::string::npos) {
+        std::cerr << "state core log mismatch\n";
         return EXIT_FAILURE;
     }
 

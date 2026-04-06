@@ -390,6 +390,8 @@ MVP は 2x のみなので、基本形は次の通り。
 `PassthroughOnly / WarmupHold / Synthetic2x` の mode 判定だけを返す。
 state machine はこの mode を見て `Bypass / Warmup / Active2x / Degraded` を更新するが、
 実際の synthetic present slot 接続は Epic 6 以降で行う。
+この段階でも decision には `interpolation_armed` を保持し、
+C++ 側へ「まだ passthrough-only だが、次段で synthetic path を要求している」ことを伝える。
 
 ---
 

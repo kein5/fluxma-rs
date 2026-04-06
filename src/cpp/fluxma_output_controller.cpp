@@ -85,6 +85,10 @@ KfiOutputController::KfiOutputController(
             0,
             runtime_.state,
             runtime_.bypass_reason,
+            CadenceStatus::Unknown,
+            GovernorMode::Bypass,
+            SchedulerMode::PassthroughOnly,
+            false,
             false
         );
     }
@@ -182,13 +186,16 @@ void KfiOutputController::maybe_log_state_change(const MetricsSnapshot& snapshot
         return;
     }
 
-    ++runtime_.state_transition_count;
     logger_.note_state_transition(
         output_id_,
         snapshot.frame_tap_count,
-        runtime_.state_transition_count,
+        snapshot.state_transition_count,
         snapshot.state,
         snapshot.bypass_reason,
+        snapshot.cadence_status,
+        snapshot.governor_mode,
+        snapshot.scheduler_mode,
+        snapshot.classifier_allows_interpolation,
         snapshot.protected_content
     );
 }
