@@ -53,6 +53,45 @@ fluxma::KwinPresentFeedbackInputs make_present_inputs(
 }  // namespace
 
 int main() {
+    const fluxma::KwinNativeBridgeObservationReport asymmetric_observation {
+        .preflight = fluxma::KwinNativeCombinedPreflightReport {
+            .frame = fluxma::KwinNativeInstallPreflightReport {
+                .gate = fluxma::KwinNativeInstallGateAssessment {
+                    .deferred_reason = fluxma::KwinNativeDeferredReason::PlaceholderOnly,
+                },
+            },
+            .present = fluxma::KwinNativeInstallPreflightReport {
+                .gate = fluxma::KwinNativeInstallGateAssessment {
+                    .deferred_reason = fluxma::KwinNativeDeferredReason::BackendGate,
+                    .backend_blocked = true,
+                },
+            },
+        },
+        .install = fluxma::KwinNativeCombinedInstallReport {
+            .frame = fluxma::KwinNativeInstallReport {
+                .result = fluxma::KwinNativeInstallResult::Deferred,
+                .deferred_reason = fluxma::KwinNativeDeferredReason::PlaceholderOnly,
+            },
+            .present = fluxma::KwinNativeInstallReport {
+                .result = fluxma::KwinNativeInstallResult::Deferred,
+                .deferred_reason = fluxma::KwinNativeDeferredReason::BackendGate,
+            },
+        },
+    };
+    if (asymmetric_observation.frame_preflight_deferred_reason() !=
+            fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        asymmetric_observation.present_preflight_deferred_reason() !=
+            fluxma::KwinNativeDeferredReason::BackendGate ||
+        asymmetric_observation.frame_install_deferred_reason() !=
+            fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        asymmetric_observation.present_install_deferred_reason() !=
+            fluxma::KwinNativeDeferredReason::BackendGate ||
+        asymmetric_observation.frame_preflight_has_any_blocker() ||
+        !asymmetric_observation.present_preflight_has_any_blocker()) {
+        std::cerr << "bridge smoke must preserve asymmetric observation helper wiring\n";
+        return EXIT_FAILURE;
+    }
+
     fluxma::KfiPluginRoot plugin_root(
         {.enabled = true, .show_hud = true, .log_interval_frames = 2, .max_log_messages = 4}
     );
