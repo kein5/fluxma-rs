@@ -51,7 +51,7 @@ int main() {
     );
     const auto version_gate_summary = version_gate_observation.summary();
     const auto version_gate_frame_summary = version_gate_observation.bringup.frame_summary();
-    if (version_gate_observation.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
+    if (!version_gate_observation.is_placeholder_state() ||
         version_gate_observation.bringup.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
         !version_gate_observation.bringup.frame_complete() ||
         !version_gate_observation.bringup.present_complete() ||
@@ -152,7 +152,7 @@ int main() {
         }
     );
     const auto install_only_summary = install_only_observation.summary();
-    if (install_only_observation.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
+    if (!install_only_observation.is_placeholder_state() ||
         install_only_observation.preflight.frame.gate.deferred_reason !=
             fluxma::KwinNativeDeferredReason::BackendGate ||
         install_only_observation.preflight.present.gate.deferred_reason !=
@@ -183,7 +183,8 @@ int main() {
     const auto install_only_placeholder = plugin_root.observe_native_bridge_install(
         fluxma::KwinNativeInstallContext {}
     );
-    if (install_only_placeholder.preflight.frame.gate.deferred_reason !=
+    if (!install_only_placeholder.is_placeholder_state() ||
+        install_only_placeholder.preflight.frame.gate.deferred_reason !=
             fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
         install_only_placeholder.preflight.present.gate.deferred_reason !=
             fluxma::KwinNativeDeferredReason::PlaceholderOnly ||

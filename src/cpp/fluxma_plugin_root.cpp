@@ -2,6 +2,10 @@
 
 namespace fluxma {
 
+bool KwinNativeBridgeObservationReport::is_placeholder_state() const noexcept {
+    return state == KwinNativeBridgeState::PlaceholderOnly;
+}
+
 std::string KwinNativeBridgeObservationReport::summary() const {
     std::string output;
     output += "state=";
@@ -14,6 +18,10 @@ std::string KwinNativeBridgeObservationReport::summary() const {
     output += install.summary();
     output += "}";
     return output;
+}
+
+bool KwinNativeBridgeInstallObservationReport::is_placeholder_state() const noexcept {
+    return state == KwinNativeBridgeState::PlaceholderOnly;
 }
 
 bool KwinNativeBridgeInstallObservationReport::frame_gate_matches() const noexcept {
