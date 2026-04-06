@@ -66,6 +66,14 @@ bool KwinNativeBridgeObservationReport::present_preflight_backend_blocked() cons
     return preflight.present.gate.backend_blocked;
 }
 
+bool KwinNativeBridgeObservationReport::frame_preflight_has_any_blocker() const noexcept {
+    return preflight.frame.gate.has_any_blocker();
+}
+
+bool KwinNativeBridgeObservationReport::present_preflight_has_any_blocker() const noexcept {
+    return preflight.present.gate.has_any_blocker();
+}
+
 bool KwinNativeBridgeObservationReport::all_gates_match() const noexcept {
     return frame_gate_matches() && present_gate_matches();
 }
@@ -154,6 +162,14 @@ bool KwinNativeBridgeInstallObservationReport::frame_preflight_backend_blocked()
 
 bool KwinNativeBridgeInstallObservationReport::present_preflight_backend_blocked() const noexcept {
     return preflight.present.gate.backend_blocked;
+}
+
+bool KwinNativeBridgeInstallObservationReport::frame_preflight_has_any_blocker() const noexcept {
+    return preflight.frame.gate.has_any_blocker();
+}
+
+bool KwinNativeBridgeInstallObservationReport::present_preflight_has_any_blocker() const noexcept {
+    return preflight.present.gate.has_any_blocker();
 }
 
 bool KwinNativeBridgeInstallObservationReport::all_gates_match() const noexcept {

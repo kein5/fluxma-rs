@@ -32,6 +32,8 @@ struct KwinNativeBridgeObservationReport {
     [[nodiscard]] bool present_preflight_version_blocked() const noexcept;
     [[nodiscard]] bool frame_preflight_backend_blocked() const noexcept;
     [[nodiscard]] bool present_preflight_backend_blocked() const noexcept;
+    [[nodiscard]] bool frame_preflight_has_any_blocker() const noexcept;
+    [[nodiscard]] bool present_preflight_has_any_blocker() const noexcept;
     // This checks preflight/install consistency for both frame and present independently.
     [[nodiscard]] bool all_gates_match() const noexcept;
     // These reflect the current skeleton contract where native bridge install remains deferred.
@@ -63,6 +65,8 @@ struct KwinNativeBridgeInstallObservationReport {
     [[nodiscard]] bool present_preflight_version_blocked() const noexcept;
     [[nodiscard]] bool frame_preflight_backend_blocked() const noexcept;
     [[nodiscard]] bool present_preflight_backend_blocked() const noexcept;
+    [[nodiscard]] bool frame_preflight_has_any_blocker() const noexcept;
+    [[nodiscard]] bool present_preflight_has_any_blocker() const noexcept;
     // This checks preflight/install consistency for both frame and present independently.
     [[nodiscard]] bool all_gates_match() const noexcept;
     // These reflect the current skeleton contract where native bridge install remains deferred.
