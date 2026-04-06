@@ -80,6 +80,14 @@ int main() {
             fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
         frame_gate_only_match.present_install_deferred_reason() !=
             fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        frame_gate_only_match.frame_preflight_deferred_reason() !=
+            frame_gate_only_match.preflight.frame.gate.deferred_reason ||
+        frame_gate_only_match.present_preflight_deferred_reason() !=
+            frame_gate_only_match.preflight.present.gate.deferred_reason ||
+        frame_gate_only_match.frame_install_deferred_reason() !=
+            frame_gate_only_match.install.frame.deferred_reason ||
+        frame_gate_only_match.present_install_deferred_reason() !=
+            frame_gate_only_match.install.present.deferred_reason ||
         frame_gate_only_match.all_gates_match() ||
         !frame_gate_only_match.frame_install_deferred() ||
         frame_gate_only_match.present_install_deferred() ||
@@ -122,6 +130,14 @@ int main() {
             fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
         present_gate_only_match.present_install_deferred_reason() !=
             fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        present_gate_only_match.frame_preflight_deferred_reason() !=
+            present_gate_only_match.preflight.frame.gate.deferred_reason ||
+        present_gate_only_match.present_preflight_deferred_reason() !=
+            present_gate_only_match.preflight.present.gate.deferred_reason ||
+        present_gate_only_match.frame_install_deferred_reason() !=
+            present_gate_only_match.install.frame.deferred_reason ||
+        present_gate_only_match.present_install_deferred_reason() !=
+            present_gate_only_match.install.present.deferred_reason ||
         present_gate_only_match.all_gates_match() ||
         present_gate_only_match.frame_install_deferred() ||
         !present_gate_only_match.present_install_deferred() ||

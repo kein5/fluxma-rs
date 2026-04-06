@@ -165,6 +165,22 @@ std::string KwinNativeInstallReport::summary() const {
     return output;
 }
 
+bool KwinNativeInstallGateAssessment::is_placeholder_only() const noexcept {
+    return deferred_reason == KwinNativeDeferredReason::PlaceholderOnly;
+}
+
+bool KwinNativeInstallGateAssessment::is_version_gate() const noexcept {
+    return deferred_reason == KwinNativeDeferredReason::KwinVersionGate;
+}
+
+bool KwinNativeInstallGateAssessment::is_backend_gate() const noexcept {
+    return deferred_reason == KwinNativeDeferredReason::BackendGate;
+}
+
+bool KwinNativeInstallGateAssessment::has_any_blocker() const noexcept {
+    return version_blocked || backend_blocked;
+}
+
 std::string KwinNativeInstallGateAssessment::summary() const {
     std::string output;
     output += "deferred_reason=";

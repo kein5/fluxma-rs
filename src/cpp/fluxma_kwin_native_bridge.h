@@ -74,6 +74,10 @@ struct KwinNativeInstallGateAssessment {
     bool version_blocked = false;
     bool backend_blocked = false;
 
+    [[nodiscard]] bool is_placeholder_only() const noexcept;
+    [[nodiscard]] bool is_version_gate() const noexcept;
+    [[nodiscard]] bool is_backend_gate() const noexcept;
+    [[nodiscard]] bool has_any_blocker() const noexcept;
     [[nodiscard]] std::string summary() const;
 };
 

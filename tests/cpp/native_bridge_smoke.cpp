@@ -229,13 +229,19 @@ int main() {
         present_preflight_summary.find("target=output-frame-presented") ==
             std::string::npos ||
         placeholder_gate.deferred_reason != fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        !placeholder_gate.is_placeholder_only() || placeholder_gate.is_version_gate() ||
+        placeholder_gate.is_backend_gate() || placeholder_gate.has_any_blocker() ||
         placeholder_gate.version_blocked || placeholder_gate.backend_blocked ||
         placeholder_gate_summary.find("deferred_reason=placeholder-only") == std::string::npos ||
         version_gate.deferred_reason != fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        version_gate.is_placeholder_only() || !version_gate.is_version_gate() ||
+        version_gate.is_backend_gate() || !version_gate.has_any_blocker() ||
         !version_gate.version_blocked || version_gate.backend_blocked ||
         version_gate_assessment_summary.find("version_blocked=true") == std::string::npos ||
         version_gate_assessment_summary.find("backend_blocked=false") == std::string::npos ||
         backend_gate.deferred_reason != fluxma::KwinNativeDeferredReason::BackendGate ||
+        backend_gate.is_placeholder_only() || backend_gate.is_version_gate() ||
+        !backend_gate.is_backend_gate() || !backend_gate.has_any_blocker() ||
         backend_gate.version_blocked || !backend_gate.backend_blocked ||
         backend_gate_assessment_summary.find("version_blocked=false") == std::string::npos ||
         backend_gate_assessment_summary.find("backend_blocked=true") == std::string::npos ||
