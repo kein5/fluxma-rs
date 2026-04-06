@@ -30,6 +30,8 @@ struct KwinNativeBridgeObservationReport {
     [[nodiscard]] bool frame_install_deferred() const noexcept;
     [[nodiscard]] bool present_install_deferred() const noexcept;
     [[nodiscard]] bool all_installs_deferred() const noexcept;
+    // These are passthrough helpers over the nested reports for test/log callers that do not
+    // want to unpack the structured subreports first.
     [[nodiscard]] std::string bringup_summary() const;
     [[nodiscard]] std::string preflight_summary() const;
     [[nodiscard]] std::string install_summary() const;
@@ -51,6 +53,8 @@ struct KwinNativeBridgeInstallObservationReport {
     [[nodiscard]] bool frame_install_deferred() const noexcept;
     [[nodiscard]] bool present_install_deferred() const noexcept;
     [[nodiscard]] bool all_installs_deferred() const noexcept;
+    // These are passthrough helpers over the nested reports for test/log callers that do not
+    // want to unpack the structured subreports first.
     [[nodiscard]] std::string preflight_summary() const;
     [[nodiscard]] std::string install_summary() const;
     [[nodiscard]] std::string summary() const;
