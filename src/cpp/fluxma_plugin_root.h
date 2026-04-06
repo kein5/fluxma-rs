@@ -9,7 +9,15 @@ namespace fluxma {
 
 struct KwinNativeBridgeObservationReport {
     KwinNativeBridgeState state = KwinNativeBridgeState::PlaceholderOnly;
-    std::string bringup_summary {};
+    KwinNativeBringupReport bringup {};
+    KwinNativeCombinedPreflightReport preflight {};
+    KwinNativeCombinedInstallReport install {};
+
+    [[nodiscard]] std::string summary() const;
+};
+
+struct KwinNativeBridgeInstallObservationReport {
+    KwinNativeBridgeState state = KwinNativeBridgeState::PlaceholderOnly;
     std::string preflight_summary {};
     std::string install_summary {};
 
@@ -30,6 +38,9 @@ class KfiPluginRoot {
     [[nodiscard]] KwinNativeBridgeObservationReport observe_native_bridge(
         const KwinCompositorFrameInputs& frame_inputs,
         const KwinPresentFeedbackInputs& present_inputs,
+        const KwinNativeInstallContext& install_context
+    ) const;
+    [[nodiscard]] KwinNativeBridgeInstallObservationReport observe_native_bridge_install(
         const KwinNativeInstallContext& install_context
     ) const;
 

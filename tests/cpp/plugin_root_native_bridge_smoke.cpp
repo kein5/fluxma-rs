@@ -1,0 +1,130 @@
+#include <cstdlib>
+#include <iostream>
+
+#include "fluxma_kwin_hook_builders.h"
+#include "fluxma_plugin_root.h"
+
+namespace {
+
+fluxma::KwinCompositorFrameInputs complete_frame_inputs() {
+    return fluxma::KwinCompositorFrameInputs {
+        .output_id = 0,
+        .frame_id = 11,
+        .timestamp_ns = 1'000'000,
+        .target_presentation_timestamp_ns = 16'666'667,
+        .predicted_render_time_ns = 2'000'000,
+        .content_type = fluxma::ContentType::Video,
+        .width = 1920,
+        .height = 1080,
+        .gpu_handle = fluxma::GpuFrameHandle {.backend_kind = 0, .handle_id = 41},
+    };
+}
+
+fluxma::KwinPresentFeedbackInputs complete_present_inputs() {
+    return fluxma::KwinPresentFeedbackInputs {
+        .output_id = 0,
+        .frame_id = 11,
+        .presented_timestamp_ns = 2'000'000,
+        .refresh_interval_ns = 16'666'667,
+        .presentation_mode = fluxma::PresentationMode::VSync,
+        .present_success = true,
+        .dropped_synthetic = false,
+    };
+}
+
+}  // namespace
+
+int main() {
+    fluxma::KfiPluginRoot plugin_root(
+        {.enabled = true, .show_hud = true, .log_interval_frames = 1, .max_log_messages = 4}
+    );
+
+    const auto version_gate_observation = plugin_root.observe_native_bridge(
+        complete_frame_inputs(),
+        complete_present_inputs(),
+        fluxma::KwinNativeInstallContext {
+            .kwin_version_supported = false,
+            .backend_supported = true,
+            .kwin_version = "6.3.81",
+            .backend_name = "drm",
+        }
+    );
+    const auto version_gate_summary = version_gate_observation.summary();
+    if (version_gate_observation.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
+        version_gate_observation.bringup.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
+        version_gate_observation.bringup.frame_summary.find(
+            "hook=compositor-output-frame-ready"
+        ) == std::string::npos ||
+        version_gate_observation.preflight.frame.gate.deferred_reason !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        version_gate_observation.preflight.present.gate.deferred_reason !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        version_gate_observation.install.frame.deferred_reason !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        version_gate_observation.install.present.deferred_reason !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        version_gate_summary.find("bringup{state=placeholder-only") == std::string::npos ||
+        version_gate_summary.find("preflight{frame{deferred_reason=kwin-version-gate") ==
+            std::string::npos ||
+        version_gate_summary.find("install{frame{result=deferred") == std::string::npos) {
+        std::cerr << "plugin root observation must surface version gate state\n";
+        return EXIT_FAILURE;
+    }
+
+    const auto precedence_observation = plugin_root.observe_native_bridge(
+        complete_frame_inputs(),
+        complete_present_inputs(),
+        fluxma::KwinNativeInstallContext {
+            .kwin_version_supported = false,
+            .backend_supported = false,
+            .kwin_version = "6.3.82",
+            .backend_name = "wayland",
+        }
+    );
+    if (precedence_observation.preflight.frame.gate.deferred_reason !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        precedence_observation.preflight.present.gate.deferred_reason !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        precedence_observation.install.frame.deferred_reason !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        precedence_observation.install.present.deferred_reason !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        precedence_observation.summary().find("reason=kwin version gate blocked install for 6.3.82")
+            == std::string::npos) {
+        std::cerr << "version gate must remain the first deferred reason\n";
+        return EXIT_FAILURE;
+    }
+
+    auto incomplete_frame = complete_frame_inputs();
+    incomplete_frame.frame_id = 0;
+    incomplete_frame.width = 0;
+    auto incomplete_present = complete_present_inputs();
+    incomplete_present.frame_id = 0;
+    incomplete_present.refresh_interval_ns = 0;
+    const auto incomplete_observation = plugin_root.observe_native_bridge(
+        incomplete_frame,
+        incomplete_present,
+        fluxma::KwinNativeInstallContext {}
+    );
+    const auto incomplete_summary = incomplete_observation.summary();
+    if (incomplete_observation.bringup.frame_summary.find("ready=no") == std::string::npos ||
+        incomplete_observation.bringup.frame_summary.find("missing=frame-id,width") ==
+            std::string::npos ||
+        incomplete_observation.bringup.present_summary.find(
+            "missing=frame-id,refresh-interval-ns"
+        ) ==
+            std::string::npos ||
+        incomplete_observation.preflight.frame.gate.deferred_reason !=
+            fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        incomplete_summary.find("preflight{frame{deferred_reason=placeholder-only") ==
+            std::string::npos ||
+        incomplete_summary.find("install{frame{result=deferred") == std::string::npos) {
+        std::cerr << "plugin root observation must preserve incomplete bringup diagnostics\n"
+                  << "frame_summary=" << incomplete_observation.bringup.frame_summary << '\n'
+                  << "present_summary=" << incomplete_observation.bringup.present_summary << '\n'
+                  << "summary=" << incomplete_summary << '\n';
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+}

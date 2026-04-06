@@ -7,8 +7,20 @@ std::string KwinNativeBridgeObservationReport::summary() const {
     output += "state=";
     output += std::string(to_string(state));
     output += " bringup{";
-    output += bringup_summary;
+    output += bringup.combined_summary();
     output += "} preflight{";
+    output += preflight.summary();
+    output += "} install{";
+    output += install.summary();
+    output += "}";
+    return output;
+}
+
+std::string KwinNativeBridgeInstallObservationReport::summary() const {
+    std::string output;
+    output += "state=";
+    output += std::string(to_string(state));
+    output += " preflight{";
     output += preflight_summary;
     output += "} install{";
     output += install_summary;
@@ -66,7 +78,19 @@ KwinNativeBridgeObservationReport KfiPluginRoot::observe_native_bridge(
     const auto install = native_bridge_.install_stub(install_context);
     return KwinNativeBridgeObservationReport {
         .state = native_bridge_.state(),
-        .bringup_summary = bringup.combined_summary(),
+        .bringup = bringup,
+        .preflight = preflight,
+        .install = install,
+    };
+}
+
+KwinNativeBridgeInstallObservationReport KfiPluginRoot::observe_native_bridge_install(
+    const KwinNativeInstallContext& install_context
+) const {
+    const auto preflight = native_bridge_.preflight_install(install_context);
+    const auto install = native_bridge_.install_stub(install_context);
+    return KwinNativeBridgeInstallObservationReport {
+        .state = native_bridge_.state(),
         .preflight_summary = preflight.summary(),
         .install_summary = install.summary(),
     };
