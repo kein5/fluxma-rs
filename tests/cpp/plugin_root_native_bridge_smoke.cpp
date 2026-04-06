@@ -63,11 +63,53 @@ int main() {
             fluxma::KwinNativeDeferredReason::KwinVersionGate ||
         version_gate_observation.install.present.deferred_reason !=
             fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        version_gate_observation.preflight.present.source_file != "src/core/renderbackend.cpp" ||
+        version_gate_observation.preflight.present.symbol != "OutputFrame::presented(...)" ||
+        version_gate_observation.preflight.present.checklist_hint_secondary !=
+            "confirm backend completion timestamp semantics across backends" ||
+        version_gate_observation.install.present.source_file != "src/core/renderbackend.cpp" ||
+        version_gate_observation.install.present.symbol != "OutputFrame::presented(...)" ||
+        version_gate_observation.install.present.checklist_hint_secondary !=
+            "confirm backend completion timestamp semantics across backends" ||
+        version_gate_summary.find("state=placeholder-only") == std::string::npos ||
         version_gate_summary.find("bringup{state=placeholder-only") == std::string::npos ||
         version_gate_summary.find("preflight{frame{deferred_reason=kwin-version-gate") ==
             std::string::npos ||
-        version_gate_summary.find("install{frame{result=deferred") == std::string::npos) {
+        version_gate_summary.find("install{frame{result=deferred") == std::string::npos ||
+        version_gate_summary.find("present{deferred_reason=kwin-version-gate") ==
+            std::string::npos) {
         std::cerr << "plugin root observation must surface version gate state\n";
+        return EXIT_FAILURE;
+    }
+
+    const auto backend_gate_observation = plugin_root.observe_native_bridge(
+        complete_frame_inputs(),
+        complete_present_inputs(),
+        fluxma::KwinNativeInstallContext {
+            .kwin_version_supported = true,
+            .backend_supported = false,
+            .kwin_version = "6.3.82",
+            .backend_name = "wayland",
+        }
+    );
+    if (backend_gate_observation.preflight.frame.gate.deferred_reason !=
+            fluxma::KwinNativeDeferredReason::BackendGate ||
+        backend_gate_observation.preflight.present.gate.deferred_reason !=
+            fluxma::KwinNativeDeferredReason::BackendGate ||
+        backend_gate_observation.install.frame.deferred_reason !=
+            fluxma::KwinNativeDeferredReason::BackendGate ||
+        backend_gate_observation.install.present.deferred_reason !=
+            fluxma::KwinNativeDeferredReason::BackendGate ||
+        backend_gate_observation.preflight.present.source_file != "src/core/renderbackend.cpp" ||
+        backend_gate_observation.preflight.present.symbol != "OutputFrame::presented(...)" ||
+        backend_gate_observation.install.present.source_file != "src/core/renderbackend.cpp" ||
+        backend_gate_observation.install.present.symbol != "OutputFrame::presented(...)" ||
+        backend_gate_observation.summary().find("preflight{frame{deferred_reason=backend-gate") ==
+            std::string::npos ||
+        backend_gate_observation.summary().find(
+            "reason=backend gate blocked install for wayland"
+        ) == std::string::npos) {
+        std::cerr << "plugin root observation must surface backend gate state\n";
         return EXIT_FAILURE;
     }
 
