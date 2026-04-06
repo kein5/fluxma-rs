@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <iostream>
+#include <string>
 
 #include "fluxma_output_controller.h"
 
@@ -53,10 +54,14 @@ int main() {
     );
 
     const auto ready_plan = output.plan_synthetic_frame(47'999'999);
+    const auto hud = output.render_hud_text();
     if (!ready_plan.armed || ready_plan.should_drop ||
         ready_plan.source_frame_id != 5 || ready_plan.synthetic_frame_id != 11 ||
         ready_plan.target_present_timestamp_ns != 183'333'332 ||
-        ready_plan.deadline_timestamp_ns != 181'333'332) {
+        ready_plan.deadline_timestamp_ns != 181'333'332 ||
+        hud.find("synthetic_armed=yes") == std::string::npos ||
+        hud.find("synthetic_drop=no") == std::string::npos ||
+        hud.find("synthetic_target_ns=183333332") == std::string::npos) {
         std::cerr << "fake synth plan mismatch\n";
         return EXIT_FAILURE;
     }

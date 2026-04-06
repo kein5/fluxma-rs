@@ -142,7 +142,12 @@ std::string KfiOutputController::render_hud_text() const {
         return {};
     }
 
-    return hud_renderer_.compose_text(output_id_, snapshot_metrics());
+    const auto snapshot = snapshot_metrics();
+    return hud_renderer_.compose_text(
+        output_id_,
+        snapshot,
+        plan_synthetic_frame(snapshot.last_presented_timestamp_ns)
+    );
 }
 
 std::vector<std::string> KfiOutputController::log_messages() const {
