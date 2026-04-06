@@ -37,6 +37,8 @@ struct KwinNativeBringupReport {
     KwinFrameHookReadiness frame {};
     KwinPresentHookReadiness present {};
 
+    // These report whether the required hook fields are populated; unresolved candidate semantics
+    // may still remain until real KWin private/internal hooks are validated.
     [[nodiscard]] bool frame_complete() const noexcept;
     [[nodiscard]] bool present_complete() const noexcept;
     [[nodiscard]] bool fully_populated() const noexcept;
