@@ -433,6 +433,21 @@ real queue/backpressure をまだ表現しない。`synthetic_queued` は placeh
 初期版では、軽量な low-resolution flow または block matching を想定する。  
 RIFE のような AI backend は後回しにする。
 
+### 13.3 現在の placeholder GPU skeleton
+real flow の前段として、C++ 側には次の placeholder GPU skeleton を追加している。
+
+- `KfiTexturePool`
+- `KfiLumaPyramidBuilder`
+
+`KfiTexturePool` は fixed-capacity の placeholder texture lease を管理し、
+overflow や invalid descriptor では fail-safe に acquire を拒否する。
+`KfiLumaPyramidBuilder` は source descriptor から downsample level の寸法列だけを先に固定し、
+各 level 用の placeholder lease を pool から取る。
+現段階では real luma extraction や real compute dispatch は行わず、
+pool 枯渇時は `truncated` を返して build を打ち切る。
+この skeleton の目的は、Epic 7 で必要になる GPU lifetime と pyramid 形状を
+C++ 側に固定することであり、Rust に GPU resource ownership を渡さない点は維持する。
+
 ---
 
 ## 14. cursor / subtitle / overlay 保護

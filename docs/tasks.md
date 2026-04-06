@@ -181,6 +181,12 @@ scheduler と synthetic present slot を接続する。
 
 ## Epic 7: low-resolution flow
 
+現状:
+- `KfiTexturePool` で placeholder texture lease を管理済み
+- `KfiLumaPyramidBuilder` で placeholder pyramid level を構築済み
+- overflow 時は fail-safe に acquire/build を止め、truncated として返す
+- まだ motion field / block matching / confidence map には進んでいない
+
 ### Task 7.1
 texture pool を実装する。
 
@@ -195,6 +201,9 @@ confidence map の初期版を実装する。
 
 ### 完了条件
 - prev/curr から motion field 相当を生成できる
+
+補足:
+- 現段階の texture/pyramid は C++ 側の GPU lifetime 骨格であり、Rust へ所有権は渡さない
 
 ---
 
