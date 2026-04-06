@@ -9,6 +9,7 @@
 #include "fluxma_config.h"
 #include "fluxma_hud_renderer.h"
 #include "fluxma_logger.h"
+#include "fluxma_synthetic_scheduler.h"
 #include "fluxma_types.h"
 
 namespace fluxma {
@@ -42,6 +43,7 @@ class KfiOutputController {
     [[nodiscard]] std::uint32_t output_id() const noexcept;
     [[nodiscard]] OutputDecision on_frame_tapped(const FrameDescriptor& frame) noexcept;
     [[nodiscard]] PassthroughSubmission last_submission() const noexcept;
+    [[nodiscard]] SyntheticFramePlan plan_synthetic_frame(std::uint64_t now_ns) const noexcept;
     void on_present_feedback(const PresentFeedback& feedback) noexcept;
     [[nodiscard]] MetricsSnapshot snapshot_metrics() const noexcept;
     [[nodiscard]] std::string render_hud_text() const;
@@ -72,6 +74,7 @@ class KfiOutputController {
     ModuleConfig config_ {};
     KfiBypassPipeline bypass_pipeline_ {};
     KfiHudRenderer hud_renderer_ {};
+    KfiSyntheticScheduler synthetic_scheduler_ {};
     RustOutputCore rust_core_;
     bool rust_core_ready_ = false;
     OutputDecision last_decision_ {};

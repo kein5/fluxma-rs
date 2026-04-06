@@ -406,6 +406,13 @@ MVP の最初から本物の optical flow を作らない。
 3. low-resolution optical flow
 4. midframe synthesis
 
+現状の skeleton では、本物の synth frame の前段として
+`KfiSyntheticScheduler` が placeholder synthetic slot を計画する。
+これは GPU frame をまだ生成せず、`interpolation_armed` と
+`refresh_interval_ns` / `predicted_render_time_ns` から
+`target_present_timestamp_ns` と `deadline_timestamp_ns` を決め、
+間に合わない場合は即 drop する。
+
 ### 13.2 初期実装
 初期版では、軽量な low-resolution flow または block matching を想定する。  
 RIFE のような AI backend は後回しにする。

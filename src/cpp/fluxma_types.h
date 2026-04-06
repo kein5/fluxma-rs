@@ -229,6 +229,16 @@ struct PassthroughSubmission {
     BypassReason bypass_reason = BypassReason::None;
 };
 
+struct SyntheticFramePlan {
+    std::uint32_t output_id = 0;
+    std::uint64_t source_frame_id = 0;
+    std::uint64_t synthetic_frame_id = 0;
+    std::uint64_t target_present_timestamp_ns = 0;
+    std::uint64_t deadline_timestamp_ns = 0;
+    bool armed = false;
+    bool should_drop = false;
+};
+
 [[nodiscard]] inline std::string_view to_string(OutputState state) noexcept {
     switch (state) {
     case OutputState::Disabled:

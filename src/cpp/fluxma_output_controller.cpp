@@ -115,6 +115,16 @@ PassthroughSubmission KfiOutputController::last_submission() const noexcept {
     return last_submission_;
 }
 
+SyntheticFramePlan KfiOutputController::plan_synthetic_frame(std::uint64_t now_ns) const noexcept {
+    return synthetic_scheduler_.plan_placeholder_synthetic(
+        output_id_,
+        last_submission_,
+        last_decision_,
+        snapshot_metrics(),
+        now_ns
+    );
+}
+
 void KfiOutputController::on_present_feedback(const PresentFeedback& feedback) noexcept {
     rust_core_.note_present_feedback(feedback);
     const auto snapshot = rust_core_.snapshot_metrics();

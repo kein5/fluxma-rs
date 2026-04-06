@@ -307,12 +307,16 @@ impl Default for ClassifierState {
 #[derive(Clone, Copy, Debug)]
 struct GovernorState {
     mode: FluxmaRustGovernorMode,
+    recent_deadline_miss_score: u32,
+    recent_dropped_synthetic_score: u32,
 }
 
 impl Default for GovernorState {
     fn default() -> Self {
         Self {
             mode: FluxmaRustGovernorMode::Bypass,
+            recent_deadline_miss_score: 0,
+            recent_dropped_synthetic_score: 0,
         }
     }
 }
@@ -465,24 +469,25 @@ impl RustOutputCore {
             classifier.allows_interpolation = allows_interpolation;
         }
 
-        let deadline_misses = self.deadline_miss_count.load(Ordering::Relaxed);
-        let dropped_synthetic = self.dropped_synthetic_count.load(Ordering::Relaxed);
-        let governor_mode = if deadline_misses >= 3 || dropped_synthetic >= 2 {
+        let mut governor = match self.governor.lock() {
+            Ok(governor) => governor,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let governor_mode =
+            if governor.recent_deadline_miss_score >= 3 ||
+                governor.recent_dropped_synthetic_score >= 2
+        {
             FluxmaRustGovernorMode::QualityLow
-        } else if deadline_misses >= 1 {
+        } else if governor.recent_deadline_miss_score >= 1 ||
+            governor.recent_dropped_synthetic_score >= 1
+        {
             FluxmaRustGovernorMode::QualityMedium
         } else if allows_interpolation {
             FluxmaRustGovernorMode::QualityHigh
         } else {
             FluxmaRustGovernorMode::Bypass
         };
-        {
-            let mut governor = match self.governor.lock() {
-                Ok(governor) => governor,
-                Err(poisoned) => poisoned.into_inner(),
-            };
-            governor.mode = governor_mode;
-        }
+        governor.mode = governor_mode;
 
         let scheduler_mode = if !allows_interpolation {
             FluxmaRustSchedulerMode::PassthroughOnly
@@ -540,6 +545,8 @@ impl RustOutputCore {
                 Err(poisoned) => poisoned.into_inner(),
             };
             governor.mode = FluxmaRustGovernorMode::Bypass;
+            governor.recent_deadline_miss_score = 0;
+            governor.recent_dropped_synthetic_score = 0;
         }
         {
             let mut scheduler = match self.scheduler.lock() {
@@ -559,6 +566,28 @@ impl RustOutputCore {
 
         if feedback.dropped_synthetic != 0 {
             self.dropped_synthetic_count.fetch_add(1, Ordering::Relaxed);
+        }
+
+        {
+            let mut governor = match self.governor.lock() {
+                Ok(governor) => governor,
+                Err(poisoned) => poisoned.into_inner(),
+            };
+            if feedback.present_success == 0 {
+                governor.recent_deadline_miss_score =
+                    governor.recent_deadline_miss_score.saturating_add(1);
+            } else {
+                governor.recent_deadline_miss_score =
+                    governor.recent_deadline_miss_score.saturating_sub(1);
+            }
+
+            if feedback.dropped_synthetic != 0 {
+                governor.recent_dropped_synthetic_score =
+                    governor.recent_dropped_synthetic_score.saturating_add(1);
+            } else {
+                governor.recent_dropped_synthetic_score =
+                    governor.recent_dropped_synthetic_score.saturating_sub(1);
+            }
         }
 
         let mut state = match self.state.lock() {
@@ -1105,5 +1134,83 @@ mod tests {
             unsafe { addr_of!((*metrics_ptr).state_transition_count) as usize - metrics_ptr as usize },
             120
         );
+    }
+
+    #[test]
+    fn zero_timestamp_first_frame_does_not_fake_cadence() {
+        let core = RustOutputCore::new(FluxmaRustConfig {
+            enabled: 1,
+            reserved: [0; 7],
+        });
+
+        let mut first = frame(0);
+        first.timestamp_ns = 0;
+        let first_decision = core.evaluate_frame(first);
+
+        let mut second = frame(0);
+        second.frame_id = 2;
+        second.timestamp_ns = 33_333_333;
+        let second_decision = core.evaluate_frame(second);
+
+        let snapshot = core.snapshot_metrics();
+        assert_eq!(first_decision.state, FluxmaRustOutputState::Bypass);
+        assert_eq!(second_decision.state, FluxmaRustOutputState::Bypass);
+        assert_eq!(snapshot.cadence_status, FluxmaRustCadenceStatus::Unknown);
+        assert_eq!(snapshot.cadence_hz_millihz, 0);
+    }
+
+    #[test]
+    fn governor_recovers_after_successful_feedback() {
+        let core = RustOutputCore::new(FluxmaRustConfig {
+            enabled: 1,
+            reserved: [0; 7],
+        });
+
+        for frame_id in 1..=5u64 {
+            let mut descriptor = frame(0);
+            descriptor.frame_id = frame_id;
+            descriptor.timestamp_ns = 33_333_333 * frame_id;
+            let _ = core.evaluate_frame(descriptor);
+        }
+
+        for frame_id in 1..=3u64 {
+            core.note_present_feedback(FluxmaRustPresentFeedback {
+                frame_id,
+                presented_timestamp_ns: 33_333_333 * frame_id,
+                refresh_interval_ns: 16_666_667,
+                presentation_mode: FluxmaRustPresentationMode::VSync,
+                present_success: 0,
+                dropped_synthetic: 0,
+                reserved: [0; 5],
+            });
+        }
+
+        let mut degraded = frame(0);
+        degraded.frame_id = 6;
+        degraded.timestamp_ns = 33_333_333 * 6;
+        assert_eq!(
+            core.evaluate_frame(degraded).state,
+            FluxmaRustOutputState::Degraded
+        );
+
+        for frame_id in 4..=6u64 {
+            core.note_present_feedback(FluxmaRustPresentFeedback {
+                frame_id,
+                presented_timestamp_ns: 33_333_333 * frame_id,
+                refresh_interval_ns: 16_666_667,
+                presentation_mode: FluxmaRustPresentationMode::VSync,
+                present_success: 1,
+                dropped_synthetic: 0,
+                reserved: [0; 5],
+            });
+        }
+
+        let mut recovered = frame(0);
+        recovered.frame_id = 7;
+        recovered.timestamp_ns = 33_333_333 * 7;
+        let recovered_decision = core.evaluate_frame(recovered);
+        let snapshot = core.snapshot_metrics();
+        assert_eq!(recovered_decision.state, FluxmaRustOutputState::Active2x);
+        assert_eq!(snapshot.governor_mode, FluxmaRustGovernorMode::QualityHigh);
     }
 }

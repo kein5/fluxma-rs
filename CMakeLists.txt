@@ -54,6 +54,7 @@ add_library(fluxma_native_skeleton STATIC
     src/cpp/fluxma_kwin_native_bridge.cpp
     src/cpp/fluxma_logger.cpp
     src/cpp/fluxma_present_feedback_tap.cpp
+    src/cpp/fluxma_synthetic_scheduler.cpp
 )
 add_dependencies(fluxma_native_skeleton fluxma_rust_core)
 
@@ -382,6 +383,22 @@ target_include_directories(fluxma_abi_layout_smoke
         ${CMAKE_CURRENT_SOURCE_DIR}/src/rust/include
 )
 
+add_executable(fluxma_fake_synth_plan_smoke
+    tests/cpp/fake_synth_plan_smoke.cpp
+)
+add_dependencies(fluxma_fake_synth_plan_smoke fluxma_rust_core)
+
+target_include_directories(fluxma_fake_synth_plan_smoke
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/rust/include
+)
+
+target_link_libraries(fluxma_fake_synth_plan_smoke
+    PRIVATE
+        fluxma_native_skeleton
+)
+
 if(BUILD_TESTING)
     add_test(NAME fluxma_bridge_smoke COMMAND fluxma_bridge_smoke)
     add_test(NAME fluxma_disabled_smoke COMMAND fluxma_disabled_smoke)
@@ -418,4 +435,5 @@ if(BUILD_TESTING)
     )
     add_test(NAME fluxma_state_core_smoke COMMAND fluxma_state_core_smoke)
     add_test(NAME fluxma_abi_layout_smoke COMMAND fluxma_abi_layout_smoke)
+    add_test(NAME fluxma_fake_synth_plan_smoke COMMAND fluxma_fake_synth_plan_smoke)
 endif()
