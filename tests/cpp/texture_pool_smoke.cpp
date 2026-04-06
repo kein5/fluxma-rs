@@ -22,7 +22,7 @@ int main() {
         return EXIT_FAILURE;
     }
 
-    if (!pool.release(first.slot_id) || pool.in_use_count() != 1) {
+    if (!pool.release(first) || pool.in_use_count() != 1) {
         std::cerr << "texture pool release mismatch\n";
         return EXIT_FAILURE;
     }
@@ -35,8 +35,16 @@ int main() {
         return EXIT_FAILURE;
     }
 
-    if (pool.acquire({}).acquired || pool.release(0) || pool.release(99)) {
+    if (pool.acquire({}).acquired ||
+        pool.release(fluxma::GpuTextureLease {}) ||
+        pool.release(fluxma::GpuTextureLease {.slot_id = 99, .generation = 1, .acquired = true})) {
         std::cerr << "texture pool invalid descriptor handling mismatch\n";
+        return EXIT_FAILURE;
+    }
+
+    const auto stale_release = pool.release(first);
+    if (stale_release) {
+        std::cerr << "stale lease must not release reused slot\n";
         return EXIT_FAILURE;
     }
 

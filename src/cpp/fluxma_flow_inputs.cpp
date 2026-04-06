@@ -17,11 +17,23 @@ FlowInputBundle KfiFlowInputsBuilder::build(
     if (!previous.valid || !current.valid) {
         if (previous.valid) {
             luma_builder_.release(texture_pool_, previous.luma_pyramid);
-            static_cast<void>(texture_pool_.release(previous.source_texture.slot_id));
+            static_cast<void>(texture_pool_.release(previous.source_texture));
+            previous = FlowFrameResources {
+                .frame_id = previous.frame_id,
+                .valid = false,
+                .truncated = previous.truncated,
+                .placeholder_only = true,
+            };
         }
         if (current.valid) {
             luma_builder_.release(texture_pool_, current.luma_pyramid);
-            static_cast<void>(texture_pool_.release(current.source_texture.slot_id));
+            static_cast<void>(texture_pool_.release(current.source_texture));
+            current = FlowFrameResources {
+                .frame_id = current.frame_id,
+                .valid = false,
+                .truncated = current.truncated,
+                .placeholder_only = true,
+            };
         }
         return FlowInputBundle {
             .previous = previous,
@@ -44,11 +56,11 @@ FlowInputBundle KfiFlowInputsBuilder::build(
 void KfiFlowInputsBuilder::release(const FlowInputBundle& bundle) noexcept {
     if (bundle.previous.valid) {
         luma_builder_.release(texture_pool_, bundle.previous.luma_pyramid);
-        static_cast<void>(texture_pool_.release(bundle.previous.source_texture.slot_id));
+        static_cast<void>(texture_pool_.release(bundle.previous.source_texture));
     }
     if (bundle.current.valid) {
         luma_builder_.release(texture_pool_, bundle.current.luma_pyramid);
-        static_cast<void>(texture_pool_.release(bundle.current.source_texture.slot_id));
+        static_cast<void>(texture_pool_.release(bundle.current.source_texture));
     }
 }
 
@@ -72,7 +84,7 @@ FlowFrameResources KfiFlowInputsBuilder::build_frame_resources(
     const auto luma_pyramid = luma_builder_.build(frame_id, descriptor, texture_pool_);
     if (!luma_pyramid.valid || luma_pyramid.truncated) {
         luma_builder_.release(texture_pool_, luma_pyramid);
-        static_cast<void>(texture_pool_.release(source_texture.slot_id));
+        static_cast<void>(texture_pool_.release(source_texture));
         return FlowFrameResources {
             .frame_id = frame_id,
             .truncated = luma_pyramid.truncated,

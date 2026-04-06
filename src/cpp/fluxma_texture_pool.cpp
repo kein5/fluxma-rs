@@ -20,10 +20,12 @@ GpuTextureLease KfiTexturePool::acquire(const GpuTextureDescriptor& descriptor) 
             continue;
         }
 
+        ++slot.generation;
         slot.descriptor = descriptor;
         slot.in_use = true;
         return GpuTextureLease {
             .slot_id = static_cast<std::uint32_t>(index + 1),
+            .generation = slot.generation,
             .descriptor = descriptor,
             .acquired = true,
             .placeholder_only = true,
@@ -33,13 +35,14 @@ GpuTextureLease KfiTexturePool::acquire(const GpuTextureDescriptor& descriptor) 
     return {};
 }
 
-bool KfiTexturePool::release(std::uint32_t slot_id) noexcept {
-    if (slot_id == 0) {
+bool KfiTexturePool::release(const GpuTextureLease& lease) noexcept {
+    if (!lease.acquired || lease.slot_id == 0) {
         return false;
     }
 
-    const auto index = static_cast<std::size_t>(slot_id - 1);
-    if (index >= capacity_ || !slots_[index].in_use) {
+    const auto index = static_cast<std::size_t>(lease.slot_id - 1);
+    if (index >= capacity_ || !slots_[index].in_use ||
+        slots_[index].generation != lease.generation) {
         return false;
     }
 

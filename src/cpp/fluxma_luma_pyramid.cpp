@@ -33,6 +33,7 @@ LumaPyramidBuildResult KfiLumaPyramidBuilder::build(
             .width = width,
             .height = height,
             .texture_slot_id = lease.slot_id,
+            .texture_generation = lease.generation,
             .acquired = true,
             .placeholder_only = lease.placeholder_only,
         };
@@ -57,7 +58,12 @@ void KfiLumaPyramidBuilder::release(
     for (std::size_t index = 0; index < pyramid.built_levels; ++index) {
         const auto& level = pyramid.levels[index];
         if (level.acquired) {
-            static_cast<void>(pool.release(level.texture_slot_id));
+            static_cast<void>(pool.release(GpuTextureLease {
+                .slot_id = level.texture_slot_id,
+                .generation = level.texture_generation,
+                .acquired = true,
+                .placeholder_only = level.placeholder_only,
+            }));
         }
     }
 }

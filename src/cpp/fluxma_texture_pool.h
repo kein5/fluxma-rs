@@ -18,6 +18,7 @@ struct GpuTextureDescriptor {
 
 struct GpuTextureLease {
     std::uint32_t slot_id = 0;
+    std::uint32_t generation = 0;
     GpuTextureDescriptor descriptor {};
     bool acquired = false;
     bool placeholder_only = true;
@@ -30,12 +31,13 @@ class KfiTexturePool {
     explicit KfiTexturePool(std::size_t capacity = 4) noexcept;
 
     [[nodiscard]] GpuTextureLease acquire(const GpuTextureDescriptor& descriptor) noexcept;
-    [[nodiscard]] bool release(std::uint32_t slot_id) noexcept;
+    [[nodiscard]] bool release(const GpuTextureLease& lease) noexcept;
     [[nodiscard]] std::size_t capacity() const noexcept;
     [[nodiscard]] std::size_t in_use_count() const noexcept;
 
   private:
     struct Slot {
+        std::uint32_t generation = 0;
         GpuTextureDescriptor descriptor {};
         bool in_use = false;
     };
