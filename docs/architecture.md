@@ -208,6 +208,11 @@ install 実行前でも `gate + target + source/symbol + checklist` を 1 本の
 native bridge の install 前診断を扱えるようにする。
 `KfiPluginRoot::observe_native_bridge(...)` は `bringup + preflight + install stub` を
 1 つの observation report に束ね、plugin root から native bridge の状態を直接観測できる。
+`KfiPluginRoot::observe_native_bridge_bringup(...)` は hook completeness だけを追う用途、
+`observe_native_bridge_install(...)` は install gate と deferred state だけを追う用途、
+`observe_native_bridge(...)` は両者をまとめて残す用途として使い分ける。
+`observe_native_bridge_bringup(...)` は hook 入力の completeness/readiness だけを見たい場合に使い、
+`observe_native_bridge_install(...)` は install 前後の gate 一致だけを見たい場合に使う。
 
 ## 7.2 GpuFrameHandle
 

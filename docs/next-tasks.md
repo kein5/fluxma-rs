@@ -26,6 +26,7 @@ Epic 1〜2 skeleton の次に着手する順序を固定する。
 - frame/present をまとめた install 前診断は `preflight_install(KwinNativeInstallContext)` を使って 1 回記録する
 - root からは `observe_native_bridge(...)` を使って bring-up / preflight / install stub の 3 段を 1 回記録する
 - plugin root 観測は専用 smoke で version gate / precedence / incomplete bringup を固定し、bypass flow 本体の smoke と分離する
+- bringup だけを見る場合は `observe_native_bridge_bringup(...)`、install gate だけを見る場合は `observe_native_bridge_install(...)` を使い分ける
 - provenance context が `HookUnavailable` にならない形で final composed frame 境界を確認する
 - private/internal hook 利用箇所へ明示コメントを入れる
 
