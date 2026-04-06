@@ -2,6 +2,20 @@
 
 namespace fluxma {
 
+std::string KwinNativeBridgeObservationReport::summary() const {
+    std::string output;
+    output += "state=";
+    output += std::string(to_string(state));
+    output += " bringup{";
+    output += bringup_summary;
+    output += "} preflight{";
+    output += preflight_summary;
+    output += "} install{";
+    output += install_summary;
+    output += "}";
+    return output;
+}
+
 KfiPluginRoot::KfiPluginRoot(ModuleConfig config)
     : config_(config),
       primary_output_(0, config_),
@@ -40,6 +54,22 @@ KfiKwinNativeBridge& KfiPluginRoot::native_bridge() noexcept {
 
 const KfiKwinNativeBridge& KfiPluginRoot::native_bridge() const noexcept {
     return native_bridge_;
+}
+
+KwinNativeBridgeObservationReport KfiPluginRoot::observe_native_bridge(
+    const KwinCompositorFrameInputs& frame_inputs,
+    const KwinPresentFeedbackInputs& present_inputs,
+    const KwinNativeInstallContext& install_context
+) const {
+    const auto bringup = native_bridge_.build_report(frame_inputs, present_inputs);
+    const auto preflight = native_bridge_.preflight_install(install_context);
+    const auto install = native_bridge_.install_stub(install_context);
+    return KwinNativeBridgeObservationReport {
+        .state = native_bridge_.state(),
+        .bringup_summary = bringup.combined_summary(),
+        .preflight_summary = preflight.summary(),
+        .install_summary = install.summary(),
+    };
 }
 
 }  // namespace fluxma

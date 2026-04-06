@@ -24,6 +24,7 @@ Epic 1〜2 skeleton の次に着手する順序を固定する。
 - gate 条件の切り分け自体は `assess_install_gate(KwinNativeInstallContext)` を使って installer 実装と共有する
 - install 前の候補確認は `preflight_frame_install(KwinNativeInstallContext)` で残し、stub 実行と切り分ける
 - frame/present をまとめた install 前診断は `preflight_install(KwinNativeInstallContext)` を使って 1 回記録する
+- root からは `observe_native_bridge(...)` を使って bring-up / preflight / install stub の 3 段を 1 回記録する
 - provenance context が `HookUnavailable` にならない形で final composed frame 境界を確認する
 - private/internal hook 利用箇所へ明示コメントを入れる
 

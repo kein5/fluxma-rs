@@ -206,6 +206,8 @@ support 状態を install summary 1 本で確認できるようにしている�
 install 実行前でも `gate + target + source/symbol + checklist` を 1 本の report として確認できる。
 `preflight_install()` はその frame/present 両方を束ね、combined summary と同じ粒度で
 native bridge の install 前診断を扱えるようにする。
+`KfiPluginRoot::observe_native_bridge(...)` は `bringup + preflight + install stub` を
+1 つの observation report に束ね、plugin root から native bridge の状態を直接観測できる。
 
 ## 7.2 GpuFrameHandle
 

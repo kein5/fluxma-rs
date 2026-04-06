@@ -114,6 +114,30 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    const auto bridge_observation = plugin_root.observe_native_bridge(
+        normal_frame_inputs,
+        first_present,
+        fluxma::KwinNativeInstallContext {
+            .kwin_version_supported = true,
+            .backend_supported = false,
+            .kwin_version = "6.3.80",
+            .backend_name = "wayland",
+        }
+    );
+    const auto bridge_observation_summary = bridge_observation.summary();
+    if (bridge_observation.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
+        bridge_observation.bringup_summary.find("state=placeholder-only") == std::string::npos ||
+        bridge_observation.preflight_summary.find("backend-gate") == std::string::npos ||
+        bridge_observation.install_summary.find("backend gate blocked install for wayland") ==
+            std::string::npos ||
+        bridge_observation_summary.find("preflight{frame{deferred_reason=backend-gate") ==
+            std::string::npos ||
+        bridge_observation_summary.find("install{frame{result=deferred") ==
+            std::string::npos) {
+        std::cerr << "plugin root must surface native bridge observation summary\n";
+        return EXIT_FAILURE;
+    }
+
     const auto snapshot = output.snapshot_metrics();
     if (snapshot.frame_tap_count != 2 || snapshot.present_feedback_count != 2 ||
         snapshot.deadline_miss_count != 1 || snapshot.dropped_synthetic_count != 1 ||
