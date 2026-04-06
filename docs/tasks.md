@@ -150,6 +150,13 @@ Rust unit test を追加する。
 
 ## Epic 6: fake synthetic frame
 
+現状:
+- `KfiSyntheticScheduler` で placeholder synthetic plan を生成済み
+- `KfiFakeSynthGenerator` で placeholder artifact を生成済み
+- `KfiSyntheticPresentQueue` で placeholder submission へ変換済み
+- 30fps -> 60Hz 相当の smoke test で armed / generated / queued / dropped を確認済み
+- まだ real GPU synth / real present queue には接続していない
+
 ### Task 6.1
 本物の flow の前に fake synth frame を作る。
 
@@ -166,6 +173,9 @@ scheduler と synthetic present slot を接続する。
 ### 完了条件
 - synthetic frame の挿入経路が存在する
 - timing に応じて drop できる
+
+補足:
+- 現在の `synthetic_queued` は stateless placeholder 観測値であり、real present queue ready を意味しない
 
 ---
 
