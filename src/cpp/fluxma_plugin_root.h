@@ -15,9 +15,11 @@ struct KwinNativeBridgeObservationReport {
 
     // Use structured fields/helpers for code paths; keep summary() for logs and human diagnostics.
     [[nodiscard]] bool is_placeholder_state() const noexcept;
+    // Shorthand for "bring-up has all required fields populated for both frame and present".
     [[nodiscard]] bool bringup_complete() const noexcept;
     [[nodiscard]] bool frame_gate_matches() const noexcept;
     [[nodiscard]] bool present_gate_matches() const noexcept;
+    // This checks preflight/install consistency for both frame and present independently.
     [[nodiscard]] bool all_gates_match() const noexcept;
     [[nodiscard]] std::string summary() const;
 };

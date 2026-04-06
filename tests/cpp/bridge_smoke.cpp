@@ -135,25 +135,32 @@ int main() {
     );
     const auto install_observation_summary = install_observation.summary();
     const auto bridge_observation_frame_summary = bridge_observation.bringup.frame_summary();
-    if (bridge_observation.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
+    if (!bridge_observation.is_placeholder_state() ||
         bridge_observation.bringup.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
+        !bridge_observation.bringup_complete() ||
+        !bridge_observation.frame_gate_matches() ||
+        !bridge_observation.present_gate_matches() ||
+        !bridge_observation.all_gates_match() ||
         bridge_observation_frame_summary.find("hook=compositor-output-frame-ready") ==
             std::string::npos ||
         bridge_observation.preflight.frame.gate.deferred_reason !=
             fluxma::KwinNativeDeferredReason::BackendGate ||
         bridge_observation.install.frame.reason != "backend gate blocked install for wayland" ||
-        bridge_observation_summary.find("preflight{frame{deferred_reason=backend-gate") ==
+        bridge_observation_summary.find("preflight{") ==
             std::string::npos ||
-        bridge_observation_summary.find("install{frame{result=deferred") ==
+        bridge_observation_summary.find("install{") ==
             std::string::npos ||
-        install_observation.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
+        !install_observation.is_placeholder_state() ||
+        !install_observation.frame_gate_matches() ||
+        !install_observation.present_gate_matches() ||
+        !install_observation.all_gates_match() ||
         install_observation.preflight.frame.gate.deferred_reason !=
             fluxma::KwinNativeDeferredReason::KwinVersionGate ||
         install_observation.install.frame.reason !=
             "kwin version gate blocked install for 6.3.81" ||
-        install_observation_summary.find("preflight{frame{deferred_reason=kwin-version-gate") ==
+        install_observation_summary.find("preflight{") ==
             std::string::npos ||
-        install_observation_summary.find("install{frame{result=deferred") ==
+        install_observation_summary.find("install{") ==
             std::string::npos) {
         std::cerr << "plugin root must surface native bridge observation summary\n";
         return EXIT_FAILURE;
