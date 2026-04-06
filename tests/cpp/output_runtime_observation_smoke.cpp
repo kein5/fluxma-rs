@@ -48,6 +48,8 @@ int main() {
     );
 
     const auto report = plugin_root.observe_output_runtime(47'999'999);
+    const auto direct_sample = plugin_root.primary_output().sample_runtime(47'999'999);
+    const auto direct_hud = plugin_root.primary_output().render_hud_text(direct_sample);
     if (report.snapshot.state != fluxma::OutputState::Active2x ||
         !report.synthetic_armed() || report.synthetic_should_drop() ||
         !report.synthetic_generated() || !report.synthetic_queued() ||
@@ -55,6 +57,7 @@ int main() {
         report.synthetic_plan.synthetic_frame_id != 11 ||
         report.synthetic_artifact.synthetic_frame_id != 11 ||
         report.synthetic_submission.synthetic_frame_id != 11 ||
+        direct_hud != report.hud_text ||
         report.hud_text.find("scheduler=synthetic-2x") == std::string::npos ||
         report.hud_text.find("synthetic_generated=yes") == std::string::npos ||
         report.hud_text.find("synthetic_queued=yes") == std::string::npos ||
@@ -75,6 +78,30 @@ int main() {
         late_report.summary().find("synthetic-placeholder=yes") == std::string::npos ||
         late_report.summary().find("synthetic-submission-drop=yes") == std::string::npos) {
         std::cerr << "output runtime observation must surface synthetic deadline miss\n";
+        return EXIT_FAILURE;
+    }
+
+    fluxma::KfiPluginRoot hud_disabled_root(
+        {.enabled = true, .show_hud = false, .log_interval_frames = 1, .max_log_messages = 4}
+    );
+    for (std::uint64_t frame_id = 1; frame_id <= 5; ++frame_id) {
+        const auto _ = hud_disabled_root.primary_output().on_frame_tapped(frame(frame_id));
+    }
+    hud_disabled_root.primary_output().on_present_feedback(
+        fluxma::PresentFeedback {
+            .frame_id = 5,
+            .presented_timestamp_ns = 166'666'665,
+            .refresh_interval_ns = 16'666'667,
+            .presentation_mode = fluxma::PresentationMode::VSync,
+            .present_success = true,
+            .dropped_synthetic = false,
+        }
+    );
+    if (!hud_disabled_root.primary_output().render_hud_text().empty() ||
+        !hud_disabled_root.primary_output().render_hud_text(
+             hud_disabled_root.primary_output().sample_runtime(47'999'999)
+         ).empty()) {
+        std::cerr << "direct hud path must honor hud opt-out\n";
         return EXIT_FAILURE;
     }
 

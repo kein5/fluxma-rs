@@ -425,6 +425,9 @@ MVP の最初から本物の optical flow を作らない。
 `target_present_timestamp_ns` と `deadline_timestamp_ns` を決め、
 deadline miss 時は artifact/submission の両方で即 drop する。
 protected content や bypass state では synthetic plan 自体を arm しない。
+ただし `KfiSyntheticPresentQueue` は現段階では stateless projection であり、
+real queue/backpressure をまだ表現しない。`synthetic_queued` は placeholder chain の
+観測値であって、real present queue ready を意味しない。
 
 ### 13.2 初期実装
 初期版では、軽量な low-resolution flow または block matching を想定する。  
