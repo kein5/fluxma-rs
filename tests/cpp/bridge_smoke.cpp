@@ -147,9 +147,10 @@ int main() {
         bridge_observation_summary.find("install{frame{result=deferred") ==
             std::string::npos ||
         install_observation.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
-        install_observation.preflight_summary.find("kwin-version-gate") == std::string::npos ||
-        install_observation.install_summary.find("kwin version gate blocked install for 6.3.81") ==
-            std::string::npos ||
+        install_observation.preflight.frame.gate.deferred_reason !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        install_observation.install.frame.reason !=
+            "kwin version gate blocked install for 6.3.81" ||
         install_observation_summary.find("preflight{frame{deferred_reason=kwin-version-gate") ==
             std::string::npos ||
         install_observation_summary.find("install{frame{result=deferred") ==
