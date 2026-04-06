@@ -54,9 +54,13 @@ int main() {
             .refresh_interval_ns = 16'666'667,
         }
     );
+    const auto frame_summary = report.frame_summary();
+    const auto present_summary = report.present_summary();
     if (report.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
-        report.frame_summary.find("hook=compositor-output-frame-ready") == std::string::npos ||
-        report.present_summary.find("hook=output-frame-presented") == std::string::npos) {
+        report.frame.plan.hook_point != fluxma::KwinFrameHookPoint::CompositorOutputFrameReady ||
+        report.present.plan.hook_point != fluxma::KwinPresentHookPoint::OutputFramePresented ||
+        frame_summary.find("hook=compositor-output-frame-ready") == std::string::npos ||
+        present_summary.find("hook=output-frame-presented") == std::string::npos) {
         std::cerr << "native bridge report must surface preferred candidate summaries\n";
         return EXIT_FAILURE;
     }

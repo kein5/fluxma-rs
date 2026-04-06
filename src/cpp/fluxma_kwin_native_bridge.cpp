@@ -90,14 +90,22 @@ KwinNativeInstallReport make_deferred_install_report(
 
 }  // namespace
 
+std::string KwinNativeBringupReport::frame_summary() const {
+    return summarize(frame);
+}
+
+std::string KwinNativeBringupReport::present_summary() const {
+    return summarize(present);
+}
+
 std::string KwinNativeBringupReport::combined_summary() const {
     std::string summary;
     summary += "state=";
     summary += std::string(to_string(state));
     summary += " frame{";
-    summary += frame_summary;
+    summary += frame_summary();
     summary += "} present{";
-    summary += present_summary;
+    summary += present_summary();
     summary += "}";
     return summary;
 }
@@ -349,8 +357,8 @@ KwinNativeBringupReport KfiKwinNativeBridge::build_report(
 ) const {
     return KwinNativeBringupReport {
         .state = state(),
-        .frame_summary = hook_adapter_.summarize_frame_candidate(frame_inputs),
-        .present_summary = hook_adapter_.summarize_present_candidate(present_inputs),
+        .frame = hook_adapter_.assess_frame_candidate(frame_inputs),
+        .present = hook_adapter_.assess_present_candidate(present_inputs),
     };
 }
 

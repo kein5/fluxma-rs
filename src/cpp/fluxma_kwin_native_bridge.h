@@ -5,6 +5,7 @@
 #include <string_view>
 
 #include "fluxma_kwin_hook_adapter.h"
+#include "fluxma_kwin_hook_candidates.h"
 
 namespace fluxma {
 
@@ -33,9 +34,11 @@ struct KwinNativeInstallContext {
 
 struct KwinNativeBringupReport {
     KwinNativeBridgeState state = KwinNativeBridgeState::PlaceholderOnly;
-    std::string frame_summary {};
-    std::string present_summary {};
+    KwinFrameHookReadiness frame {};
+    KwinPresentHookReadiness present {};
 
+    [[nodiscard]] std::string frame_summary() const;
+    [[nodiscard]] std::string present_summary() const;
     [[nodiscard]] std::string combined_summary() const;
 };
 

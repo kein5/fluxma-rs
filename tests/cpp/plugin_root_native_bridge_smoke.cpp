@@ -50,9 +50,12 @@ int main() {
         }
     );
     const auto version_gate_summary = version_gate_observation.summary();
+    const auto version_gate_frame_summary = version_gate_observation.bringup.frame_summary();
     if (version_gate_observation.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
         version_gate_observation.bringup.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
-        version_gate_observation.bringup.frame_summary.find(
+        version_gate_observation.bringup.frame.plan.hook_point !=
+            fluxma::KwinFrameHookPoint::CompositorOutputFrameReady ||
+        version_gate_frame_summary.find(
             "hook=compositor-output-frame-ready"
         ) == std::string::npos ||
         version_gate_observation.preflight.frame.gate.deferred_reason !=
@@ -149,10 +152,13 @@ int main() {
         fluxma::KwinNativeInstallContext {}
     );
     const auto incomplete_summary = incomplete_observation.summary();
-    if (incomplete_observation.bringup.frame_summary.find("ready=no") == std::string::npos ||
-        incomplete_observation.bringup.frame_summary.find("missing=frame-id,width") ==
+    const auto incomplete_frame_summary = incomplete_observation.bringup.frame_summary();
+    const auto incomplete_present_summary = incomplete_observation.bringup.present_summary();
+    if (incomplete_observation.bringup.frame.ready || incomplete_observation.bringup.present.ready ||
+        incomplete_frame_summary.find("ready=no") == std::string::npos ||
+        incomplete_frame_summary.find("missing=frame-id,width") ==
             std::string::npos ||
-        incomplete_observation.bringup.present_summary.find(
+        incomplete_present_summary.find(
             "missing=frame-id,refresh-interval-ns"
         ) ==
             std::string::npos ||
@@ -162,8 +168,8 @@ int main() {
             std::string::npos ||
         incomplete_summary.find("install{frame{result=deferred") == std::string::npos) {
         std::cerr << "plugin root observation must preserve incomplete bringup diagnostics\n"
-                  << "frame_summary=" << incomplete_observation.bringup.frame_summary << '\n'
-                  << "present_summary=" << incomplete_observation.bringup.present_summary << '\n'
+                  << "frame_summary=" << incomplete_frame_summary << '\n'
+                  << "present_summary=" << incomplete_present_summary << '\n'
                   << "summary=" << incomplete_summary << '\n';
         return EXIT_FAILURE;
     }

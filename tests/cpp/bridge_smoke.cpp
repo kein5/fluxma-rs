@@ -134,9 +134,10 @@ int main() {
         }
     );
     const auto install_observation_summary = install_observation.summary();
+    const auto bridge_observation_frame_summary = bridge_observation.bringup.frame_summary();
     if (bridge_observation.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
         bridge_observation.bringup.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
-        bridge_observation.bringup.frame_summary.find("hook=compositor-output-frame-ready") ==
+        bridge_observation_frame_summary.find("hook=compositor-output-frame-ready") ==
             std::string::npos ||
         bridge_observation.preflight.frame.gate.deferred_reason !=
             fluxma::KwinNativeDeferredReason::BackendGate ||
