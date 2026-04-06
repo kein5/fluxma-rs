@@ -109,6 +109,7 @@ OutputDecision KfiOutputController::on_frame_tapped(const FrameDescriptor& frame
     maybe_log_state_change(snapshot);
     maybe_log_synthetic_plan(snapshot);
     maybe_log_synthetic_artifact(snapshot);
+    maybe_log_synthetic_submission(snapshot);
     update_runtime(snapshot);
     return last_decision_;
 }
@@ -148,6 +149,7 @@ void KfiOutputController::on_present_feedback(const PresentFeedback& feedback) n
     maybe_log_present_feedback(feedback, snapshot);
     maybe_log_synthetic_plan(snapshot);
     maybe_log_synthetic_artifact(snapshot);
+    maybe_log_synthetic_submission(snapshot);
     update_runtime(snapshot);
 }
 
@@ -162,11 +164,13 @@ std::string KfiOutputController::render_hud_text() const {
 
     const auto snapshot = snapshot_metrics();
     const auto synthetic_plan = plan_synthetic_frame(snapshot.last_presented_timestamp_ns);
+    const auto synthetic_artifact = fake_synth_generator_.generate(synthetic_plan);
     return hud_renderer_.compose_text(
         output_id_,
         snapshot,
         synthetic_plan,
-        fake_synth_generator_.generate(synthetic_plan)
+        synthetic_artifact,
+        synthetic_present_queue_.enqueue_placeholder(synthetic_artifact)
     );
 }
 
@@ -294,6 +298,24 @@ void KfiOutputController::maybe_log_synthetic_artifact(const MetricsSnapshot& sn
                 last_decision_,
                 snapshot,
                 snapshot.last_presented_timestamp_ns
+            )
+        )
+    );
+}
+
+void KfiOutputController::maybe_log_synthetic_submission(const MetricsSnapshot& snapshot) {
+    logger_.note_synthetic_submission(
+        output_id_,
+        snapshot.frame_tap_count,
+        synthetic_present_queue_.enqueue_placeholder(
+            fake_synth_generator_.generate(
+                synthetic_scheduler_.plan_placeholder_synthetic(
+                    output_id_,
+                    last_submission_,
+                    last_decision_,
+                    snapshot,
+                    snapshot.last_presented_timestamp_ns
+                )
             )
         )
     );

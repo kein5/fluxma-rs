@@ -12,7 +12,8 @@ class KfiHudRenderer {
         std::uint32_t output_id,
         const MetricsSnapshot& snapshot,
         const SyntheticFramePlan& synthetic_plan,
-        const SyntheticFrameArtifact& synthetic_artifact
+        const SyntheticFrameArtifact& synthetic_artifact,
+        const SyntheticPresentSubmission& synthetic_submission
     ) const;
 };
 

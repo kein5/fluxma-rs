@@ -80,5 +80,26 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    synth_logger.note_synthetic_submission(
+        0,
+        4,
+        fluxma::SyntheticPresentSubmission {
+            .output_id = 0,
+            .source_frame_id = 5,
+            .synthetic_frame_id = 11,
+            .target_present_timestamp_ns = 183333332,
+            .queued = true,
+            .dropped = false,
+            .placeholder_only = true,
+        }
+    );
+    const auto submission_logs = synth_logger.snapshot_messages();
+    if (submission_logs.size() != 3 ||
+        submission_logs.back().find("synthetic-queued=yes") == std::string::npos ||
+        submission_logs.back().find("synthetic-frame-id=11") == std::string::npos) {
+        std::cerr << "synthetic submission logger mismatch\n";
+        return EXIT_FAILURE;
+    }
+
     return EXIT_SUCCESS;
 }

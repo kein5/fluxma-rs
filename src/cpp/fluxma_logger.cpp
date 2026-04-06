@@ -51,6 +51,7 @@ void KfiRateLimitedLogger::note_state_transition(
             .synthetic_armed = false,
             .synthetic_should_drop = false,
             .synthetic_generated = false,
+            .synthetic_queued = false,
             .synthetic_placeholder_only = true,
             .synthetic_target_timestamp_ns = 0,
             .synthetic_deadline_timestamp_ns = 0,
@@ -93,6 +94,7 @@ void KfiRateLimitedLogger::note_present_feedback_issue(
             .synthetic_armed = false,
             .synthetic_should_drop = false,
             .synthetic_generated = false,
+            .synthetic_queued = false,
             .synthetic_placeholder_only = true,
             .synthetic_target_timestamp_ns = 0,
             .synthetic_deadline_timestamp_ns = 0,
@@ -137,6 +139,7 @@ void KfiRateLimitedLogger::note_present_feedback_mismatch(
             .synthetic_armed = false,
             .synthetic_should_drop = false,
             .synthetic_generated = false,
+            .synthetic_queued = false,
             .synthetic_placeholder_only = true,
             .synthetic_target_timestamp_ns = 0,
             .synthetic_deadline_timestamp_ns = 0,
@@ -183,6 +186,7 @@ void KfiRateLimitedLogger::note_synthetic_plan(
             .synthetic_armed = plan.armed,
             .synthetic_should_drop = plan.should_drop,
             .synthetic_generated = false,
+            .synthetic_queued = false,
             .synthetic_placeholder_only = true,
             .synthetic_target_timestamp_ns = plan.target_present_timestamp_ns,
             .synthetic_deadline_timestamp_ns = plan.deadline_timestamp_ns,
@@ -230,11 +234,60 @@ void KfiRateLimitedLogger::note_synthetic_artifact(
             .synthetic_armed = false,
             .synthetic_should_drop = artifact.dropped,
             .synthetic_generated = artifact.generated,
+            .synthetic_queued = false,
             .synthetic_placeholder_only = artifact.placeholder_only,
             .synthetic_target_timestamp_ns = artifact.target_present_timestamp_ns,
             .synthetic_deadline_timestamp_ns = 0,
             .expected_frame_id = artifact.source_frame_id,
             .actual_frame_id = artifact.synthetic_frame_id,
+        }
+    );
+}
+
+void KfiRateLimitedLogger::note_synthetic_submission(
+    std::uint32_t output_id,
+    std::uint64_t frame_tap_count,
+    const SyntheticPresentSubmission& submission
+) noexcept {
+    const bool state_changed = !has_last_logged_synthetic_submission_frame_tap_count_ ||
+        submission.queued != last_logged_synthetic_queued_ ||
+        submission.dropped != last_logged_synthetic_submission_dropped_;
+    if (!state_changed && has_last_logged_synthetic_submission_frame_tap_count_ &&
+        frame_tap_count <
+            (last_logged_synthetic_submission_frame_tap_count_ + interval_frames_)) {
+        return;
+    }
+
+    last_logged_synthetic_submission_frame_tap_count_ = frame_tap_count;
+    has_last_logged_synthetic_submission_frame_tap_count_ = true;
+    last_logged_synthetic_queued_ = submission.queued;
+    last_logged_synthetic_submission_dropped_ = submission.dropped;
+
+    append(
+        LogEvent {
+            .kind = LogEventKind::SyntheticSubmission,
+            .output_id = output_id,
+            .sequence = 0,
+            .frame_tap_count = frame_tap_count,
+            .present_feedback_count = 0,
+            .state = OutputState::Bypass,
+            .bypass_reason = BypassReason::None,
+            .cadence_status = CadenceStatus::Unknown,
+            .governor_mode = GovernorMode::Bypass,
+            .scheduler_mode = SchedulerMode::PassthroughOnly,
+            .classifier_allows_interpolation = false,
+            .protected_content = false,
+            .present_success = true,
+            .dropped_synthetic = false,
+            .synthetic_armed = false,
+            .synthetic_should_drop = submission.dropped,
+            .synthetic_generated = false,
+            .synthetic_queued = submission.queued,
+            .synthetic_placeholder_only = submission.placeholder_only,
+            .synthetic_target_timestamp_ns = submission.target_present_timestamp_ns,
+            .synthetic_deadline_timestamp_ns = 0,
+            .expected_frame_id = submission.source_frame_id,
+            .actual_frame_id = submission.synthetic_frame_id,
         }
     );
 }
@@ -298,6 +351,15 @@ std::string KfiRateLimitedLogger::render_event(const LogEvent& event) {
     case LogEventKind::SyntheticArtifact:
         stream << "output=" << event.output_id
                << " synthetic-generated=" << to_bool_string(event.synthetic_generated)
+               << " synthetic-drop=" << to_bool_string(event.synthetic_should_drop)
+               << " synthetic-placeholder=" << to_bool_string(event.synthetic_placeholder_only)
+               << " source-frame-id=" << event.expected_frame_id
+               << " synthetic-frame-id=" << event.actual_frame_id
+               << " synthetic-target-ns=" << event.synthetic_target_timestamp_ns;
+        break;
+    case LogEventKind::SyntheticSubmission:
+        stream << "output=" << event.output_id
+               << " synthetic-queued=" << to_bool_string(event.synthetic_queued)
                << " synthetic-drop=" << to_bool_string(event.synthetic_should_drop)
                << " synthetic-placeholder=" << to_bool_string(event.synthetic_placeholder_only)
                << " source-frame-id=" << event.expected_frame_id

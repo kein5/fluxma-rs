@@ -56,6 +56,7 @@ int main() {
         report.synthetic_submission.synthetic_frame_id != 11 ||
         report.hud_text.find("scheduler=synthetic-2x") == std::string::npos ||
         report.hud_text.find("synthetic_generated=yes") == std::string::npos ||
+        report.hud_text.find("synthetic_queued=yes") == std::string::npos ||
         report.summary().find("synthetic-armed=yes") == std::string::npos ||
         report.summary().find("synthetic-generated=yes") == std::string::npos ||
         report.summary().find("synthetic-queued=yes") == std::string::npos) {
