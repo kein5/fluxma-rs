@@ -205,6 +205,9 @@ int main() {
         ) == std::string::npos ||
         install_summary.find("frame{result=deferred") == std::string::npos ||
         install_summary.find("present{result=deferred") == std::string::npos ||
+        install.frame_deferred_reason() != fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        install.present_deferred_reason() != fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        !install.frame_is_deferred() || !install.present_is_deferred() ||
         frame_preflight.gate.deferred_reason != fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
         frame_preflight.deferred_reason() != fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
         !frame_preflight.is_placeholder_only() || frame_preflight.is_version_gate() ||
@@ -219,6 +222,12 @@ int main() {
         frame_preflight_summary.find("deferred_reason=placeholder-only") == std::string::npos ||
         frame_preflight_summary.find("target=compositor-output-frame-ready") ==
             std::string::npos ||
+        combined_preflight.frame_deferred_reason() !=
+            fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        combined_preflight.present_deferred_reason() !=
+            fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        combined_preflight.frame_has_any_blocker() ||
+        combined_preflight.present_has_any_blocker() ||
         combined_preflight.frame.target != "compositor-output-frame-ready" ||
         combined_preflight.present.target != "output-frame-presented" ||
         combined_preflight_summary.find("frame{deferred_reason=placeholder-only") ==

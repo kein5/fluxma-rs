@@ -107,6 +107,10 @@ struct KwinNativeCombinedPreflightReport {
     KwinNativeInstallPreflightReport frame {};
     KwinNativeInstallPreflightReport present {};
 
+    [[nodiscard]] KwinNativeDeferredReason frame_deferred_reason() const noexcept;
+    [[nodiscard]] KwinNativeDeferredReason present_deferred_reason() const noexcept;
+    [[nodiscard]] bool frame_has_any_blocker() const noexcept;
+    [[nodiscard]] bool present_has_any_blocker() const noexcept;
     [[nodiscard]] std::string summary() const;
 };
 
@@ -114,6 +118,10 @@ struct KwinNativeCombinedInstallReport {
     KwinNativeInstallReport frame {};
     KwinNativeInstallReport present {};
 
+    [[nodiscard]] KwinNativeDeferredReason frame_deferred_reason() const noexcept;
+    [[nodiscard]] KwinNativeDeferredReason present_deferred_reason() const noexcept;
+    [[nodiscard]] bool frame_is_deferred() const noexcept;
+    [[nodiscard]] bool present_is_deferred() const noexcept;
     [[nodiscard]] std::string summary() const;
 };
 

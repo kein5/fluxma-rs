@@ -254,6 +254,24 @@ std::string KwinNativeInstallPreflightReport::summary() const {
     return output;
 }
 
+KwinNativeDeferredReason KwinNativeCombinedPreflightReport::frame_deferred_reason(
+) const noexcept {
+    return frame.deferred_reason();
+}
+
+KwinNativeDeferredReason KwinNativeCombinedPreflightReport::present_deferred_reason(
+) const noexcept {
+    return present.deferred_reason();
+}
+
+bool KwinNativeCombinedPreflightReport::frame_has_any_blocker() const noexcept {
+    return frame.has_any_blocker();
+}
+
+bool KwinNativeCombinedPreflightReport::present_has_any_blocker() const noexcept {
+    return present.has_any_blocker();
+}
+
 std::string KwinNativeCombinedPreflightReport::summary() const {
     std::string output;
     output += "frame{";
@@ -262,6 +280,22 @@ std::string KwinNativeCombinedPreflightReport::summary() const {
     output += present.summary();
     output += "}";
     return output;
+}
+
+KwinNativeDeferredReason KwinNativeCombinedInstallReport::frame_deferred_reason() const noexcept {
+    return frame.deferred_reason;
+}
+
+KwinNativeDeferredReason KwinNativeCombinedInstallReport::present_deferred_reason() const noexcept {
+    return present.deferred_reason;
+}
+
+bool KwinNativeCombinedInstallReport::frame_is_deferred() const noexcept {
+    return frame.is_deferred();
+}
+
+bool KwinNativeCombinedInstallReport::present_is_deferred() const noexcept {
+    return present.is_deferred();
 }
 
 std::string KwinNativeCombinedInstallReport::summary() const {
