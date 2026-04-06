@@ -50,6 +50,22 @@ KwinNativeDeferredReason KwinNativeBridgeObservationReport::present_install_defe
     return install.present.deferred_reason;
 }
 
+bool KwinNativeBridgeObservationReport::frame_preflight_version_blocked() const noexcept {
+    return preflight.frame.gate.version_blocked;
+}
+
+bool KwinNativeBridgeObservationReport::present_preflight_version_blocked() const noexcept {
+    return preflight.present.gate.version_blocked;
+}
+
+bool KwinNativeBridgeObservationReport::frame_preflight_backend_blocked() const noexcept {
+    return preflight.frame.gate.backend_blocked;
+}
+
+bool KwinNativeBridgeObservationReport::present_preflight_backend_blocked() const noexcept {
+    return preflight.present.gate.backend_blocked;
+}
+
 bool KwinNativeBridgeObservationReport::all_gates_match() const noexcept {
     return frame_gate_matches() && present_gate_matches();
 }
@@ -122,6 +138,22 @@ KwinNativeBridgeInstallObservationReport::frame_install_deferred_reason() const 
 KwinNativeDeferredReason
 KwinNativeBridgeInstallObservationReport::present_install_deferred_reason() const noexcept {
     return install.present.deferred_reason;
+}
+
+bool KwinNativeBridgeInstallObservationReport::frame_preflight_version_blocked() const noexcept {
+    return preflight.frame.gate.version_blocked;
+}
+
+bool KwinNativeBridgeInstallObservationReport::present_preflight_version_blocked() const noexcept {
+    return preflight.present.gate.version_blocked;
+}
+
+bool KwinNativeBridgeInstallObservationReport::frame_preflight_backend_blocked() const noexcept {
+    return preflight.frame.gate.backend_blocked;
+}
+
+bool KwinNativeBridgeInstallObservationReport::present_preflight_backend_blocked() const noexcept {
+    return preflight.present.gate.backend_blocked;
 }
 
 bool KwinNativeBridgeInstallObservationReport::all_gates_match() const noexcept {

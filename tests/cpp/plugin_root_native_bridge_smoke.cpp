@@ -88,6 +88,10 @@ int main() {
             frame_gate_only_match.install.frame.deferred_reason ||
         frame_gate_only_match.present_install_deferred_reason() !=
             frame_gate_only_match.install.present.deferred_reason ||
+        frame_gate_only_match.frame_preflight_version_blocked() ||
+        frame_gate_only_match.present_preflight_version_blocked() ||
+        frame_gate_only_match.frame_preflight_backend_blocked() ||
+        !frame_gate_only_match.present_preflight_backend_blocked() ||
         frame_gate_only_match.all_gates_match() ||
         !frame_gate_only_match.frame_install_deferred() ||
         frame_gate_only_match.present_install_deferred() ||
@@ -138,6 +142,10 @@ int main() {
             present_gate_only_match.install.frame.deferred_reason ||
         present_gate_only_match.present_install_deferred_reason() !=
             present_gate_only_match.install.present.deferred_reason ||
+        present_gate_only_match.frame_preflight_version_blocked() ||
+        !present_gate_only_match.present_preflight_version_blocked() ||
+        !present_gate_only_match.frame_preflight_backend_blocked() ||
+        present_gate_only_match.present_preflight_backend_blocked() ||
         present_gate_only_match.all_gates_match() ||
         present_gate_only_match.frame_install_deferred() ||
         !present_gate_only_match.present_install_deferred() ||
@@ -274,6 +282,10 @@ int main() {
             fluxma::KwinNativeDeferredReason::KwinVersionGate ||
         version_gate_observation.present_install_deferred_reason() !=
             fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        !version_gate_observation.frame_preflight_version_blocked() ||
+        !version_gate_observation.present_preflight_version_blocked() ||
+        version_gate_observation.frame_preflight_backend_blocked() ||
+        version_gate_observation.present_preflight_backend_blocked() ||
         version_gate_summary.find("state=") == std::string::npos ||
         version_gate_summary.find("bringup{") == std::string::npos ||
         version_gate_summary.find("preflight{") ==
@@ -380,6 +392,10 @@ int main() {
             fluxma::KwinNativeDeferredReason::BackendGate ||
         install_only_observation.present_install_deferred_reason() !=
             fluxma::KwinNativeDeferredReason::BackendGate ||
+        install_only_observation.frame_preflight_version_blocked() ||
+        install_only_observation.present_preflight_version_blocked() ||
+        !install_only_observation.frame_preflight_backend_blocked() ||
+        !install_only_observation.present_preflight_backend_blocked() ||
         install_only_preflight_summary.find("frame{deferred_reason=backend-gate") ==
             std::string::npos ||
         install_only_install_summary.find("present{result=deferred") == std::string::npos ||

@@ -28,6 +28,10 @@ struct KwinNativeBridgeObservationReport {
     [[nodiscard]] KwinNativeDeferredReason present_preflight_deferred_reason() const noexcept;
     [[nodiscard]] KwinNativeDeferredReason frame_install_deferred_reason() const noexcept;
     [[nodiscard]] KwinNativeDeferredReason present_install_deferred_reason() const noexcept;
+    [[nodiscard]] bool frame_preflight_version_blocked() const noexcept;
+    [[nodiscard]] bool present_preflight_version_blocked() const noexcept;
+    [[nodiscard]] bool frame_preflight_backend_blocked() const noexcept;
+    [[nodiscard]] bool present_preflight_backend_blocked() const noexcept;
     // This checks preflight/install consistency for both frame and present independently.
     [[nodiscard]] bool all_gates_match() const noexcept;
     // These reflect the current skeleton contract where native bridge install remains deferred.
@@ -55,6 +59,10 @@ struct KwinNativeBridgeInstallObservationReport {
     [[nodiscard]] KwinNativeDeferredReason present_preflight_deferred_reason() const noexcept;
     [[nodiscard]] KwinNativeDeferredReason frame_install_deferred_reason() const noexcept;
     [[nodiscard]] KwinNativeDeferredReason present_install_deferred_reason() const noexcept;
+    [[nodiscard]] bool frame_preflight_version_blocked() const noexcept;
+    [[nodiscard]] bool present_preflight_version_blocked() const noexcept;
+    [[nodiscard]] bool frame_preflight_backend_blocked() const noexcept;
+    [[nodiscard]] bool present_preflight_backend_blocked() const noexcept;
     // This checks preflight/install consistency for both frame and present independently.
     [[nodiscard]] bool all_gates_match() const noexcept;
     // These reflect the current skeleton contract where native bridge install remains deferred.
