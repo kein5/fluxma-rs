@@ -90,6 +90,18 @@ KwinNativeInstallReport make_deferred_install_report(
 
 }  // namespace
 
+bool KwinNativeBringupReport::frame_ready() const noexcept {
+    return frame.ready;
+}
+
+bool KwinNativeBringupReport::present_ready() const noexcept {
+    return present.ready;
+}
+
+bool KwinNativeBringupReport::fully_ready() const noexcept {
+    return frame_ready() && present_ready();
+}
+
 std::string KwinNativeBringupReport::frame_summary() const {
     return summarize(frame);
 }

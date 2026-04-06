@@ -53,6 +53,9 @@ int main() {
     const auto version_gate_frame_summary = version_gate_observation.bringup.frame_summary();
     if (version_gate_observation.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
         version_gate_observation.bringup.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
+        !version_gate_observation.bringup.frame_ready() ||
+        !version_gate_observation.bringup.present_ready() ||
+        !version_gate_observation.bringup.fully_ready() ||
         version_gate_observation.bringup.frame.plan.hook_point !=
             fluxma::KwinFrameHookPoint::CompositorOutputFrameReady ||
         version_gate_frame_summary.find(
@@ -140,6 +143,30 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    const auto install_only_observation = plugin_root.observe_native_bridge_install(
+        fluxma::KwinNativeInstallContext {
+            .kwin_version_supported = true,
+            .backend_supported = false,
+            .kwin_version = "6.3.83",
+            .backend_name = "wayland",
+        }
+    );
+    const auto install_only_summary = install_only_observation.summary();
+    if (install_only_observation.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
+        install_only_observation.preflight_summary.find(
+            "frame{deferred_reason=backend-gate"
+        ) == std::string::npos ||
+        install_only_observation.install_summary.find(
+            "frame{result=deferred deferred_reason=backend-gate"
+        ) == std::string::npos ||
+        install_only_summary.find("state=placeholder-only") == std::string::npos ||
+        install_only_summary.find("preflight{frame{deferred_reason=backend-gate") ==
+            std::string::npos ||
+        install_only_summary.find("install{frame{result=deferred") == std::string::npos) {
+        std::cerr << "plugin root install observation must preserve backend gate diagnostics\n";
+        return EXIT_FAILURE;
+    }
+
     auto incomplete_frame = complete_frame_inputs();
     incomplete_frame.frame_id = 0;
     incomplete_frame.width = 0;
@@ -154,7 +181,9 @@ int main() {
     const auto incomplete_summary = incomplete_observation.summary();
     const auto incomplete_frame_summary = incomplete_observation.bringup.frame_summary();
     const auto incomplete_present_summary = incomplete_observation.bringup.present_summary();
-    if (incomplete_observation.bringup.frame.ready || incomplete_observation.bringup.present.ready ||
+    if (incomplete_observation.bringup.frame_ready() ||
+        incomplete_observation.bringup.present_ready() ||
+        incomplete_observation.bringup.fully_ready() ||
         incomplete_frame_summary.find("ready=no") == std::string::npos ||
         incomplete_frame_summary.find("missing=frame-id,width") ==
             std::string::npos ||
