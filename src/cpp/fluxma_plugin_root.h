@@ -80,6 +80,22 @@ struct KwinNativeBridgeInstallObservationReport {
     [[nodiscard]] std::string summary() const;
 };
 
+struct OutputRuntimeObservationReport {
+    MetricsSnapshot snapshot {};
+    SyntheticFramePlan synthetic_plan {};
+    std::string hud_text {};
+
+    [[nodiscard]] bool synthetic_armed() const noexcept {
+        return synthetic_plan.armed;
+    }
+
+    [[nodiscard]] bool synthetic_should_drop() const noexcept {
+        return synthetic_plan.should_drop;
+    }
+
+    [[nodiscard]] std::string summary() const;
+};
+
 class KfiPluginRoot {
   public:
     explicit KfiPluginRoot(ModuleConfig config = {});
@@ -103,6 +119,9 @@ class KfiPluginRoot {
     ) const;
     [[nodiscard]] KwinNativeBridgeInstallObservationReport observe_native_bridge_install(
         const KwinNativeInstallContext& install_context
+    ) const;
+    [[nodiscard]] OutputRuntimeObservationReport observe_output_runtime(
+        std::uint64_t now_ns
     ) const;
 
   private:

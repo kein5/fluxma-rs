@@ -399,6 +399,22 @@ target_link_libraries(fluxma_fake_synth_plan_smoke
         fluxma_native_skeleton
 )
 
+add_executable(fluxma_output_runtime_observation_smoke
+    tests/cpp/output_runtime_observation_smoke.cpp
+)
+add_dependencies(fluxma_output_runtime_observation_smoke fluxma_rust_core)
+
+target_include_directories(fluxma_output_runtime_observation_smoke
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/rust/include
+)
+
+target_link_libraries(fluxma_output_runtime_observation_smoke
+    PRIVATE
+        fluxma_native_skeleton
+)
+
 if(BUILD_TESTING)
     add_test(NAME fluxma_bridge_smoke COMMAND fluxma_bridge_smoke)
     add_test(NAME fluxma_disabled_smoke COMMAND fluxma_disabled_smoke)
@@ -436,4 +452,8 @@ if(BUILD_TESTING)
     add_test(NAME fluxma_state_core_smoke COMMAND fluxma_state_core_smoke)
     add_test(NAME fluxma_abi_layout_smoke COMMAND fluxma_abi_layout_smoke)
     add_test(NAME fluxma_fake_synth_plan_smoke COMMAND fluxma_fake_synth_plan_smoke)
+    add_test(
+        NAME fluxma_output_runtime_observation_smoke
+        COMMAND fluxma_output_runtime_observation_smoke
+    )
 endif()

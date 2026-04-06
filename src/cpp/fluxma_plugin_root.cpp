@@ -208,6 +208,19 @@ std::string KwinNativeBridgeInstallObservationReport::summary() const {
     return output;
 }
 
+std::string OutputRuntimeObservationReport::summary() const {
+    std::string output;
+    output += "state=";
+    output += std::string(to_string(snapshot.state));
+    output += " bypass=";
+    output += std::string(to_string(snapshot.bypass_reason));
+    output += " synthetic-armed=";
+    output += std::string(to_bool_string(synthetic_plan.armed));
+    output += " synthetic-drop=";
+    output += std::string(to_bool_string(synthetic_plan.should_drop));
+    return output;
+}
+
 KfiPluginRoot::KfiPluginRoot(ModuleConfig config)
     : config_(config),
       primary_output_(0, config_),
@@ -280,6 +293,14 @@ KwinNativeBridgeInstallObservationReport KfiPluginRoot::observe_native_bridge_in
         .state = native_bridge_.state(),
         .preflight = preflight,
         .install = install,
+    };
+}
+
+OutputRuntimeObservationReport KfiPluginRoot::observe_output_runtime(std::uint64_t now_ns) const {
+    return OutputRuntimeObservationReport {
+        .snapshot = primary_output_.snapshot_metrics(),
+        .synthetic_plan = primary_output_.plan_synthetic_frame(now_ns),
+        .hud_text = primary_output_.render_hud_text(),
     };
 }
 
