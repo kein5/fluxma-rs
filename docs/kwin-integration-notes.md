@@ -138,6 +138,7 @@ KWin source 上の観察:
 - `assess_install_gate(KwinNativeInstallContext)` も追加し、gate 判定そのものを real installer 導入前から共通 helper として使い回せる
 - `preflight_frame_install()` / `preflight_present_install()` も追加し、install 前の candidate/gate/checklist を stub 実行なしで確認できる
 - `preflight_install()` で frame/present 両方の preflight を 1 行 summary に束ねられる
+- combined preflight/install report 自体にも frame/present 単位の helper を持たせ、combined report を unpack せずに deferred reason や deferred state を追えるようにした
 - `KfiPluginRoot::observe_native_bridge(...)` で bring-up / preflight / install stub を plugin root 側から 1 本の report として引ける
 - `observe_native_bridge_bringup()` / `observe_native_bridge_install()` / `observe_native_bridge()` を分け、hook completeness と install gate を別々にも追える
 - plugin root の observation report には bring-up unresolved helper も持たせ、required field が揃っていても candidate semantics が未解決な状態を code path から追えるようにした
