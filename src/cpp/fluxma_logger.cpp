@@ -50,6 +50,8 @@ void KfiRateLimitedLogger::note_state_transition(
             .dropped_synthetic = false,
             .synthetic_armed = false,
             .synthetic_should_drop = false,
+            .synthetic_generated = false,
+            .synthetic_placeholder_only = true,
             .synthetic_target_timestamp_ns = 0,
             .synthetic_deadline_timestamp_ns = 0,
         }
@@ -90,6 +92,8 @@ void KfiRateLimitedLogger::note_present_feedback_issue(
             .dropped_synthetic = dropped_synthetic,
             .synthetic_armed = false,
             .synthetic_should_drop = false,
+            .synthetic_generated = false,
+            .synthetic_placeholder_only = true,
             .synthetic_target_timestamp_ns = 0,
             .synthetic_deadline_timestamp_ns = 0,
             .expected_frame_id = 0,
@@ -132,6 +136,8 @@ void KfiRateLimitedLogger::note_present_feedback_mismatch(
             .dropped_synthetic = false,
             .synthetic_armed = false,
             .synthetic_should_drop = false,
+            .synthetic_generated = false,
+            .synthetic_placeholder_only = true,
             .synthetic_target_timestamp_ns = 0,
             .synthetic_deadline_timestamp_ns = 0,
             .expected_frame_id = expected_frame_id,
@@ -176,10 +182,59 @@ void KfiRateLimitedLogger::note_synthetic_plan(
             .dropped_synthetic = false,
             .synthetic_armed = plan.armed,
             .synthetic_should_drop = plan.should_drop,
+            .synthetic_generated = false,
+            .synthetic_placeholder_only = true,
             .synthetic_target_timestamp_ns = plan.target_present_timestamp_ns,
             .synthetic_deadline_timestamp_ns = plan.deadline_timestamp_ns,
             .expected_frame_id = plan.source_frame_id,
             .actual_frame_id = plan.synthetic_frame_id,
+        }
+    );
+}
+
+void KfiRateLimitedLogger::note_synthetic_artifact(
+    std::uint32_t output_id,
+    std::uint64_t frame_tap_count,
+    const SyntheticFrameArtifact& artifact
+) noexcept {
+    const bool state_changed = !has_last_logged_synthetic_artifact_frame_tap_count_ ||
+        artifact.generated != last_logged_synthetic_generated_ ||
+        artifact.dropped != last_logged_synthetic_dropped_;
+    if (!state_changed && has_last_logged_synthetic_artifact_frame_tap_count_ &&
+        frame_tap_count <
+            (last_logged_synthetic_artifact_frame_tap_count_ + interval_frames_)) {
+        return;
+    }
+
+    last_logged_synthetic_artifact_frame_tap_count_ = frame_tap_count;
+    has_last_logged_synthetic_artifact_frame_tap_count_ = true;
+    last_logged_synthetic_generated_ = artifact.generated;
+    last_logged_synthetic_dropped_ = artifact.dropped;
+
+    append(
+        LogEvent {
+            .kind = LogEventKind::SyntheticArtifact,
+            .output_id = output_id,
+            .sequence = 0,
+            .frame_tap_count = frame_tap_count,
+            .present_feedback_count = 0,
+            .state = OutputState::Bypass,
+            .bypass_reason = BypassReason::None,
+            .cadence_status = CadenceStatus::Unknown,
+            .governor_mode = GovernorMode::Bypass,
+            .scheduler_mode = SchedulerMode::PassthroughOnly,
+            .classifier_allows_interpolation = false,
+            .protected_content = false,
+            .present_success = true,
+            .dropped_synthetic = false,
+            .synthetic_armed = false,
+            .synthetic_should_drop = artifact.dropped,
+            .synthetic_generated = artifact.generated,
+            .synthetic_placeholder_only = artifact.placeholder_only,
+            .synthetic_target_timestamp_ns = artifact.target_present_timestamp_ns,
+            .synthetic_deadline_timestamp_ns = 0,
+            .expected_frame_id = artifact.source_frame_id,
+            .actual_frame_id = artifact.synthetic_frame_id,
         }
     );
 }
@@ -239,6 +294,15 @@ std::string KfiRateLimitedLogger::render_event(const LogEvent& event) {
                << " synthetic-frame-id=" << event.actual_frame_id
                << " synthetic-target-ns=" << event.synthetic_target_timestamp_ns
                << " synthetic-deadline-ns=" << event.synthetic_deadline_timestamp_ns;
+        break;
+    case LogEventKind::SyntheticArtifact:
+        stream << "output=" << event.output_id
+               << " synthetic-generated=" << to_bool_string(event.synthetic_generated)
+               << " synthetic-drop=" << to_bool_string(event.synthetic_should_drop)
+               << " synthetic-placeholder=" << to_bool_string(event.synthetic_placeholder_only)
+               << " source-frame-id=" << event.expected_frame_id
+               << " synthetic-frame-id=" << event.actual_frame_id
+               << " synthetic-target-ns=" << event.synthetic_target_timestamp_ns;
         break;
     }
 

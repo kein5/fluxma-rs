@@ -55,7 +55,8 @@ int main() {
         report.synthetic_artifact.synthetic_frame_id != 11 ||
         report.hud_text.find("scheduler=synthetic-2x") == std::string::npos ||
         report.hud_text.find("synthetic_generated=yes") == std::string::npos ||
-        report.summary().find("synthetic-armed=yes") == std::string::npos) {
+        report.summary().find("synthetic-armed=yes") == std::string::npos ||
+        report.summary().find("synthetic-generated=yes") == std::string::npos) {
         std::cerr << "output runtime observation mismatch\n";
         return EXIT_FAILURE;
     }

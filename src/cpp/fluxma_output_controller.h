@@ -74,6 +74,7 @@ class KfiOutputController {
         const MetricsSnapshot& snapshot
     );
     void maybe_log_synthetic_plan(const MetricsSnapshot& snapshot);
+    void maybe_log_synthetic_artifact(const MetricsSnapshot& snapshot);
 
     std::uint32_t output_id_ = 0;
     ModuleConfig config_ {};
