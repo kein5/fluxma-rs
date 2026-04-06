@@ -47,6 +47,7 @@ add_library(fluxma_native_skeleton STATIC
     src/cpp/fluxma_config.cpp
     src/cpp/fluxma_frame_tap.cpp
     src/cpp/fluxma_fake_synth_generator.cpp
+    src/cpp/fluxma_flow_inputs.cpp
     src/cpp/fluxma_gpu_services.cpp
     src/cpp/fluxma_hud_renderer.cpp
     src/cpp/fluxma_kwin_hook_builders.cpp
@@ -451,6 +452,22 @@ target_link_libraries(fluxma_luma_pyramid_smoke
         fluxma_native_skeleton
 )
 
+add_executable(fluxma_flow_inputs_smoke
+    tests/cpp/flow_inputs_smoke.cpp
+)
+add_dependencies(fluxma_flow_inputs_smoke fluxma_rust_core)
+
+target_include_directories(fluxma_flow_inputs_smoke
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/rust/include
+)
+
+target_link_libraries(fluxma_flow_inputs_smoke
+    PRIVATE
+        fluxma_native_skeleton
+)
+
 if(BUILD_TESTING)
     add_test(NAME fluxma_bridge_smoke COMMAND fluxma_bridge_smoke)
     add_test(NAME fluxma_disabled_smoke COMMAND fluxma_disabled_smoke)
@@ -494,4 +511,5 @@ if(BUILD_TESTING)
     )
     add_test(NAME fluxma_texture_pool_smoke COMMAND fluxma_texture_pool_smoke)
     add_test(NAME fluxma_luma_pyramid_smoke COMMAND fluxma_luma_pyramid_smoke)
+    add_test(NAME fluxma_flow_inputs_smoke COMMAND fluxma_flow_inputs_smoke)
 endif()

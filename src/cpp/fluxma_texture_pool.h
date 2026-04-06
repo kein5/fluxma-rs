@@ -25,7 +25,7 @@ struct GpuTextureLease {
 
 class KfiTexturePool {
   public:
-    static constexpr std::size_t kMaxSlots = 8;
+    static constexpr std::size_t kMaxSlots = 16;
 
     explicit KfiTexturePool(std::size_t capacity = 4) noexcept;
 
