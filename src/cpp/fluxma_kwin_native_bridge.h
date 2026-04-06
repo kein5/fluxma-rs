@@ -64,6 +64,11 @@ struct KwinNativeInstallReport {
     std::string checklist_hint_secondary {};
     std::string checklist_all {};
 
+    [[nodiscard]] bool is_deferred() const noexcept;
+    [[nodiscard]] bool is_installed() const noexcept;
+    [[nodiscard]] bool is_placeholder_only() const noexcept;
+    [[nodiscard]] bool is_version_gate() const noexcept;
+    [[nodiscard]] bool is_backend_gate() const noexcept;
     [[nodiscard]] std::string summary() const;
 };
 
@@ -90,6 +95,11 @@ struct KwinNativeInstallPreflightReport {
     std::string checklist_hint {};
     std::string checklist_hint_secondary {};
 
+    [[nodiscard]] KwinNativeDeferredReason deferred_reason() const noexcept;
+    [[nodiscard]] bool is_placeholder_only() const noexcept;
+    [[nodiscard]] bool is_version_gate() const noexcept;
+    [[nodiscard]] bool is_backend_gate() const noexcept;
+    [[nodiscard]] bool has_any_blocker() const noexcept;
     [[nodiscard]] std::string summary() const;
 };
 
