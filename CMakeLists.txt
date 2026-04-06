@@ -53,6 +53,7 @@ add_library(fluxma_native_skeleton STATIC
     src/cpp/fluxma_kwin_hook_candidates.cpp
     src/cpp/fluxma_kwin_hook_adapter.cpp
     src/cpp/fluxma_kwin_native_bridge.cpp
+    src/cpp/fluxma_luma_pyramid.cpp
     src/cpp/fluxma_logger.cpp
     src/cpp/fluxma_present_feedback_tap.cpp
     src/cpp/fluxma_synthetic_scheduler.cpp
@@ -434,6 +435,22 @@ target_link_libraries(fluxma_texture_pool_smoke
         fluxma_native_skeleton
 )
 
+add_executable(fluxma_luma_pyramid_smoke
+    tests/cpp/luma_pyramid_smoke.cpp
+)
+add_dependencies(fluxma_luma_pyramid_smoke fluxma_rust_core)
+
+target_include_directories(fluxma_luma_pyramid_smoke
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/rust/include
+)
+
+target_link_libraries(fluxma_luma_pyramid_smoke
+    PRIVATE
+        fluxma_native_skeleton
+)
+
 if(BUILD_TESTING)
     add_test(NAME fluxma_bridge_smoke COMMAND fluxma_bridge_smoke)
     add_test(NAME fluxma_disabled_smoke COMMAND fluxma_disabled_smoke)
@@ -476,4 +493,5 @@ if(BUILD_TESTING)
         COMMAND fluxma_output_runtime_observation_smoke
     )
     add_test(NAME fluxma_texture_pool_smoke COMMAND fluxma_texture_pool_smoke)
+    add_test(NAME fluxma_luma_pyramid_smoke COMMAND fluxma_luma_pyramid_smoke)
 endif()
