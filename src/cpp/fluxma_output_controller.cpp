@@ -119,7 +119,13 @@ PassthroughSubmission KfiOutputController::last_submission() const noexcept {
 }
 
 OutputRuntimeSample KfiOutputController::sample_runtime(std::uint64_t now_ns) const noexcept {
-    const auto snapshot = snapshot_metrics();
+    return build_runtime_sample(now_ns, snapshot_metrics());
+}
+
+OutputRuntimeSample KfiOutputController::build_runtime_sample(
+    std::uint64_t now_ns,
+    const MetricsSnapshot& snapshot
+) const noexcept {
     const auto synthetic_plan = synthetic_scheduler_.plan_placeholder_synthetic(
         output_id_,
         last_submission_,
@@ -172,7 +178,8 @@ std::string KfiOutputController::render_hud_text() const {
         return {};
     }
 
-    return render_hud_text(sample_runtime(snapshot_metrics().last_presented_timestamp_ns));
+    const auto snapshot = snapshot_metrics();
+    return render_hud_text(build_runtime_sample(snapshot.last_presented_timestamp_ns, snapshot));
 }
 
 std::string KfiOutputController::render_hud_text(const OutputRuntimeSample& sample) const {

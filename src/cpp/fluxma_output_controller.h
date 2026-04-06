@@ -69,6 +69,10 @@ class KfiOutputController {
 
     void remember_submission(std::uint64_t frame_id) noexcept;
     [[nodiscard]] bool consume_matching_submission(std::uint64_t frame_id) noexcept;
+    [[nodiscard]] OutputRuntimeSample build_runtime_sample(
+        std::uint64_t now_ns,
+        const MetricsSnapshot& snapshot
+    ) const noexcept;
     void update_runtime(const MetricsSnapshot& snapshot) noexcept;
     void maybe_log_state_change(const MetricsSnapshot& snapshot);
     void maybe_log_present_feedback(
