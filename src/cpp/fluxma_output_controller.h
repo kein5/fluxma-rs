@@ -45,6 +45,7 @@ class KfiOutputController {
     [[nodiscard]] std::uint32_t output_id() const noexcept;
     [[nodiscard]] OutputDecision on_frame_tapped(const FrameDescriptor& frame) noexcept;
     [[nodiscard]] PassthroughSubmission last_submission() const noexcept;
+    [[nodiscard]] OutputRuntimeSample sample_runtime(std::uint64_t now_ns) const noexcept;
     [[nodiscard]] SyntheticFramePlan plan_synthetic_frame(std::uint64_t now_ns) const noexcept;
     [[nodiscard]] SyntheticFrameArtifact generate_fake_synthetic_frame(
         std::uint64_t now_ns
@@ -54,6 +55,7 @@ class KfiOutputController {
     ) const noexcept;
     void on_present_feedback(const PresentFeedback& feedback) noexcept;
     [[nodiscard]] MetricsSnapshot snapshot_metrics() const noexcept;
+    [[nodiscard]] std::string render_hud_text(const OutputRuntimeSample& sample) const;
     [[nodiscard]] std::string render_hud_text() const;
     [[nodiscard]] std::vector<std::string> log_messages() const;
 

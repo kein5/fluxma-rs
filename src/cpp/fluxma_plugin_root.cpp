@@ -305,14 +305,13 @@ KwinNativeBridgeInstallObservationReport KfiPluginRoot::observe_native_bridge_in
 }
 
 OutputRuntimeObservationReport KfiPluginRoot::observe_output_runtime(std::uint64_t now_ns) const {
-    const auto synthetic_plan = primary_output_.plan_synthetic_frame(now_ns);
-    const auto synthetic_artifact = primary_output_.generate_fake_synthetic_frame(now_ns);
+    const auto sample = primary_output_.sample_runtime(now_ns);
     return OutputRuntimeObservationReport {
-        .snapshot = primary_output_.snapshot_metrics(),
-        .synthetic_plan = synthetic_plan,
-        .synthetic_artifact = synthetic_artifact,
-        .synthetic_submission = primary_output_.submit_fake_synthetic_frame(now_ns),
-        .hud_text = primary_output_.render_hud_text(),
+        .snapshot = sample.snapshot,
+        .synthetic_plan = sample.synthetic_plan,
+        .synthetic_artifact = sample.synthetic_artifact,
+        .synthetic_submission = sample.synthetic_submission,
+        .hud_text = primary_output_.render_hud_text(sample),
     };
 }
 

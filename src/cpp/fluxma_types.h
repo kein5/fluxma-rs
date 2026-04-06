@@ -259,6 +259,13 @@ struct SyntheticPresentSubmission {
     bool placeholder_only = true;
 };
 
+struct OutputRuntimeSample {
+    MetricsSnapshot snapshot {};
+    SyntheticFramePlan synthetic_plan {};
+    SyntheticFrameArtifact synthetic_artifact {};
+    SyntheticPresentSubmission synthetic_submission {};
+};
+
 [[nodiscard]] inline std::string_view to_string(OutputState state) noexcept {
     switch (state) {
     case OutputState::Disabled:

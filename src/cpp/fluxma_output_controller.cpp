@@ -118,28 +118,38 @@ PassthroughSubmission KfiOutputController::last_submission() const noexcept {
     return last_submission_;
 }
 
-SyntheticFramePlan KfiOutputController::plan_synthetic_frame(std::uint64_t now_ns) const noexcept {
-    return synthetic_scheduler_.plan_placeholder_synthetic(
+OutputRuntimeSample KfiOutputController::sample_runtime(std::uint64_t now_ns) const noexcept {
+    const auto snapshot = snapshot_metrics();
+    const auto synthetic_plan = synthetic_scheduler_.plan_placeholder_synthetic(
         output_id_,
         last_submission_,
         last_decision_,
-        snapshot_metrics(),
+        snapshot,
         now_ns
     );
+    const auto synthetic_artifact = fake_synth_generator_.generate(synthetic_plan);
+    return OutputRuntimeSample {
+        .snapshot = snapshot,
+        .synthetic_plan = synthetic_plan,
+        .synthetic_artifact = synthetic_artifact,
+        .synthetic_submission = synthetic_present_queue_.enqueue_placeholder(synthetic_artifact),
+    };
+}
+
+SyntheticFramePlan KfiOutputController::plan_synthetic_frame(std::uint64_t now_ns) const noexcept {
+    return sample_runtime(now_ns).synthetic_plan;
 }
 
 SyntheticFrameArtifact KfiOutputController::generate_fake_synthetic_frame(
     std::uint64_t now_ns
 ) const noexcept {
-    return fake_synth_generator_.generate(plan_synthetic_frame(now_ns));
+    return sample_runtime(now_ns).synthetic_artifact;
 }
 
 SyntheticPresentSubmission KfiOutputController::submit_fake_synthetic_frame(
     std::uint64_t now_ns
 ) const noexcept {
-    return synthetic_present_queue_.enqueue_placeholder(
-        generate_fake_synthetic_frame(now_ns)
-    );
+    return sample_runtime(now_ns).synthetic_submission;
 }
 
 void KfiOutputController::on_present_feedback(const PresentFeedback& feedback) noexcept {
@@ -162,15 +172,20 @@ std::string KfiOutputController::render_hud_text() const {
         return {};
     }
 
-    const auto snapshot = snapshot_metrics();
-    const auto synthetic_plan = plan_synthetic_frame(snapshot.last_presented_timestamp_ns);
-    const auto synthetic_artifact = fake_synth_generator_.generate(synthetic_plan);
+    return render_hud_text(sample_runtime(snapshot_metrics().last_presented_timestamp_ns));
+}
+
+std::string KfiOutputController::render_hud_text(const OutputRuntimeSample& sample) const {
+    if (!config_.show_hud) {
+        return {};
+    }
+
     return hud_renderer_.compose_text(
         output_id_,
-        snapshot,
-        synthetic_plan,
-        synthetic_artifact,
-        synthetic_present_queue_.enqueue_placeholder(synthetic_artifact)
+        sample.snapshot,
+        sample.synthetic_plan,
+        sample.synthetic_artifact,
+        sample.synthetic_submission
     );
 }
 
