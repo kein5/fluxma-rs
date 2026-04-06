@@ -144,6 +144,20 @@ int main() {
         !bridge_observation.frame_install_deferred() ||
         !bridge_observation.present_install_deferred() ||
         !bridge_observation.all_installs_deferred() ||
+        bridge_observation.frame_preflight_deferred_reason() !=
+            fluxma::KwinNativeDeferredReason::BackendGate ||
+        bridge_observation.present_preflight_deferred_reason() !=
+            fluxma::KwinNativeDeferredReason::BackendGate ||
+        bridge_observation.frame_install_deferred_reason() !=
+            fluxma::KwinNativeDeferredReason::BackendGate ||
+        bridge_observation.present_install_deferred_reason() !=
+            fluxma::KwinNativeDeferredReason::BackendGate ||
+        bridge_observation.frame_preflight_version_blocked() ||
+        bridge_observation.present_preflight_version_blocked() ||
+        !bridge_observation.frame_preflight_backend_blocked() ||
+        !bridge_observation.present_preflight_backend_blocked() ||
+        !bridge_observation.frame_preflight_has_any_blocker() ||
+        !bridge_observation.present_preflight_has_any_blocker() ||
         bridge_observation_frame_summary.find("hook=compositor-output-frame-ready") ==
             std::string::npos ||
         bridge_observation.preflight.frame.gate.deferred_reason !=
@@ -160,6 +174,20 @@ int main() {
         !install_observation.frame_install_deferred() ||
         !install_observation.present_install_deferred() ||
         !install_observation.all_installs_deferred() ||
+        install_observation.frame_preflight_deferred_reason() !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        install_observation.present_preflight_deferred_reason() !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        install_observation.frame_install_deferred_reason() !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        install_observation.present_install_deferred_reason() !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        !install_observation.frame_preflight_version_blocked() ||
+        !install_observation.present_preflight_version_blocked() ||
+        install_observation.frame_preflight_backend_blocked() ||
+        install_observation.present_preflight_backend_blocked() ||
+        !install_observation.frame_preflight_has_any_blocker() ||
+        !install_observation.present_preflight_has_any_blocker() ||
         install_observation.preflight.frame.gate.deferred_reason !=
             fluxma::KwinNativeDeferredReason::KwinVersionGate ||
         install_observation.install.frame.reason !=
