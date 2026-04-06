@@ -356,6 +356,22 @@ target_link_libraries(fluxma_protected_unsupported_precedence_smoke
         fluxma_native_skeleton
 )
 
+add_executable(fluxma_state_core_smoke
+    tests/cpp/state_core_smoke.cpp
+)
+add_dependencies(fluxma_state_core_smoke fluxma_rust_core)
+
+target_include_directories(fluxma_state_core_smoke
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/rust/include
+)
+
+target_link_libraries(fluxma_state_core_smoke
+    PRIVATE
+        fluxma_native_skeleton
+)
+
 if(BUILD_TESTING)
     add_test(NAME fluxma_bridge_smoke COMMAND fluxma_bridge_smoke)
     add_test(NAME fluxma_disabled_smoke COMMAND fluxma_disabled_smoke)
@@ -390,4 +406,5 @@ if(BUILD_TESTING)
         NAME fluxma_protected_unsupported_precedence_smoke
         COMMAND fluxma_protected_unsupported_precedence_smoke
     )
+    add_test(NAME fluxma_state_core_smoke COMMAND fluxma_state_core_smoke)
 endif()

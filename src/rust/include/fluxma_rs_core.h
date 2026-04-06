@@ -47,6 +47,25 @@ typedef enum FluxmaRustContentType {
     FLUXMA_RUST_CONTENT_TYPE_GAME = 3,
 } FluxmaRustContentType;
 
+typedef enum FluxmaRustCadenceStatus {
+    FLUXMA_RUST_CADENCE_STATUS_UNKNOWN = 0,
+    FLUXMA_RUST_CADENCE_STATUS_UNSTABLE = 1,
+    FLUXMA_RUST_CADENCE_STATUS_STABLE = 2,
+} FluxmaRustCadenceStatus;
+
+typedef enum FluxmaRustGovernorMode {
+    FLUXMA_RUST_GOVERNOR_MODE_BYPASS = 0,
+    FLUXMA_RUST_GOVERNOR_MODE_QUALITY_LOW = 1,
+    FLUXMA_RUST_GOVERNOR_MODE_QUALITY_MEDIUM = 2,
+    FLUXMA_RUST_GOVERNOR_MODE_QUALITY_HIGH = 3,
+} FluxmaRustGovernorMode;
+
+typedef enum FluxmaRustSchedulerMode {
+    FLUXMA_RUST_SCHEDULER_MODE_PASSTHROUGH_ONLY = 0,
+    FLUXMA_RUST_SCHEDULER_MODE_WARMUP_HOLD = 1,
+    FLUXMA_RUST_SCHEDULER_MODE_SYNTHETIC_2X = 2,
+} FluxmaRustSchedulerMode;
+
 typedef struct FluxmaRustGpuFrameHandle {
     uint32_t backend_kind;
     uint64_t handle_id;
@@ -96,7 +115,8 @@ typedef struct FluxmaRustMetricsSnapshot {
     FluxmaRustBypassReason bypass_reason;
     uint8_t protected_content;
     uint8_t passthrough_only;
-    uint8_t reserved[6];
+    uint8_t classifier_allows_interpolation;
+    uint8_t reserved[5];
     uint64_t frame_tap_count;
     uint64_t present_feedback_count;
     uint64_t deadline_miss_count;
@@ -108,7 +128,12 @@ typedef struct FluxmaRustMetricsSnapshot {
     uint64_t last_predicted_render_time_ns;
     FluxmaRustPresentationMode last_presentation_mode;
     FluxmaRustContentType last_content_type;
-    uint8_t reserved_tail[6];
+    FluxmaRustCadenceStatus cadence_status;
+    FluxmaRustGovernorMode governor_mode;
+    FluxmaRustSchedulerMode scheduler_mode;
+    uint8_t reserved_tail[5];
+    uint32_t cadence_hz_millihz;
+    uint64_t state_transition_count;
 } FluxmaRustMetricsSnapshot;
 
 FluxmaRustCore* fluxma_rust_core_create(FluxmaRustConfig config);

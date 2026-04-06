@@ -42,6 +42,25 @@ enum class ContentType : std::uint8_t {
     Game = FLUXMA_RUST_CONTENT_TYPE_GAME,
 };
 
+enum class CadenceStatus : std::uint8_t {
+    Unknown = FLUXMA_RUST_CADENCE_STATUS_UNKNOWN,
+    Unstable = FLUXMA_RUST_CADENCE_STATUS_UNSTABLE,
+    Stable = FLUXMA_RUST_CADENCE_STATUS_STABLE,
+};
+
+enum class GovernorMode : std::uint8_t {
+    Bypass = FLUXMA_RUST_GOVERNOR_MODE_BYPASS,
+    QualityLow = FLUXMA_RUST_GOVERNOR_MODE_QUALITY_LOW,
+    QualityMedium = FLUXMA_RUST_GOVERNOR_MODE_QUALITY_MEDIUM,
+    QualityHigh = FLUXMA_RUST_GOVERNOR_MODE_QUALITY_HIGH,
+};
+
+enum class SchedulerMode : std::uint8_t {
+    PassthroughOnly = FLUXMA_RUST_SCHEDULER_MODE_PASSTHROUGH_ONLY,
+    WarmupHold = FLUXMA_RUST_SCHEDULER_MODE_WARMUP_HOLD,
+    Synthetic2x = FLUXMA_RUST_SCHEDULER_MODE_SYNTHETIC_2X,
+};
+
 struct GpuFrameHandle {
     std::uint32_t backend_kind = 0;
     std::uint64_t handle_id = 0;
@@ -135,6 +154,7 @@ struct MetricsSnapshot {
     BypassReason bypass_reason = BypassReason::None;
     bool protected_content = false;
     bool passthrough_only = true;
+    bool classifier_allows_interpolation = false;
     std::uint64_t frame_tap_count = 0;
     std::uint64_t present_feedback_count = 0;
     std::uint64_t deadline_miss_count = 0;
@@ -146,6 +166,11 @@ struct MetricsSnapshot {
     std::uint64_t last_predicted_render_time_ns = 0;
     PresentationMode last_presentation_mode = PresentationMode::VSync;
     ContentType last_content_type = ContentType::None;
+    CadenceStatus cadence_status = CadenceStatus::Unknown;
+    GovernorMode governor_mode = GovernorMode::Bypass;
+    SchedulerMode scheduler_mode = SchedulerMode::PassthroughOnly;
+    std::uint32_t cadence_hz_millihz = 0;
+    std::uint64_t state_transition_count = 0;
 
     [[nodiscard]] static MetricsSnapshot from_ffi(
         FluxmaRustMetricsSnapshot snapshot
@@ -155,6 +180,8 @@ struct MetricsSnapshot {
             .bypass_reason = static_cast<BypassReason>(snapshot.bypass_reason),
             .protected_content = snapshot.protected_content != 0,
             .passthrough_only = snapshot.passthrough_only != 0,
+            .classifier_allows_interpolation =
+                snapshot.classifier_allows_interpolation != 0,
             .frame_tap_count = snapshot.frame_tap_count,
             .present_feedback_count = snapshot.present_feedback_count,
             .deadline_miss_count = snapshot.deadline_miss_count,
@@ -168,6 +195,11 @@ struct MetricsSnapshot {
             .last_presentation_mode =
                 static_cast<PresentationMode>(snapshot.last_presentation_mode),
             .last_content_type = static_cast<ContentType>(snapshot.last_content_type),
+            .cadence_status = static_cast<CadenceStatus>(snapshot.cadence_status),
+            .governor_mode = static_cast<GovernorMode>(snapshot.governor_mode),
+            .scheduler_mode = static_cast<SchedulerMode>(snapshot.scheduler_mode),
+            .cadence_hz_millihz = snapshot.cadence_hz_millihz,
+            .state_transition_count = snapshot.state_transition_count,
         };
     }
 };
@@ -248,6 +280,47 @@ struct PassthroughSubmission {
         return "video";
     case ContentType::Game:
         return "game";
+    }
+
+    return "unknown";
+}
+
+[[nodiscard]] inline std::string_view to_string(CadenceStatus cadence_status) noexcept {
+    switch (cadence_status) {
+    case CadenceStatus::Unknown:
+        return "unknown";
+    case CadenceStatus::Unstable:
+        return "unstable";
+    case CadenceStatus::Stable:
+        return "stable";
+    }
+
+    return "unknown";
+}
+
+[[nodiscard]] inline std::string_view to_string(GovernorMode governor_mode) noexcept {
+    switch (governor_mode) {
+    case GovernorMode::Bypass:
+        return "bypass";
+    case GovernorMode::QualityLow:
+        return "quality-low";
+    case GovernorMode::QualityMedium:
+        return "quality-medium";
+    case GovernorMode::QualityHigh:
+        return "quality-high";
+    }
+
+    return "unknown";
+}
+
+[[nodiscard]] inline std::string_view to_string(SchedulerMode scheduler_mode) noexcept {
+    switch (scheduler_mode) {
+    case SchedulerMode::PassthroughOnly:
+        return "passthrough-only";
+    case SchedulerMode::WarmupHold:
+        return "warmup-hold";
+    case SchedulerMode::Synthetic2x:
+        return "synthetic-2x";
     }
 
     return "unknown";

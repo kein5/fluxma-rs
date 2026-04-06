@@ -23,7 +23,13 @@ std::string KfiHudRenderer::compose_text(
     stream << "target_present_ns=" << snapshot.last_target_presentation_timestamp_ns << '\n';
     stream << "predicted_render_ns=" << snapshot.last_predicted_render_time_ns << '\n';
     stream << "present_mode=" << to_string(snapshot.last_presentation_mode) << '\n';
-    stream << "content_type=" << to_string(snapshot.last_content_type);
+    stream << "content_type=" << to_string(snapshot.last_content_type) << '\n';
+    stream << "cadence_status=" << to_string(snapshot.cadence_status) << '\n';
+    stream << "cadence_millihz=" << snapshot.cadence_hz_millihz << '\n';
+    stream << "classifier=" << to_bool_string(snapshot.classifier_allows_interpolation) << '\n';
+    stream << "governor=" << to_string(snapshot.governor_mode) << '\n';
+    stream << "scheduler=" << to_string(snapshot.scheduler_mode) << '\n';
+    stream << "state_transitions=" << snapshot.state_transition_count;
     return stream.str();
 }
 

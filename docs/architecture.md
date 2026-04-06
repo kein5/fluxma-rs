@@ -256,6 +256,17 @@ HUD / logging 用の実行状態。
 - synth time
 - deadline miss count
 
+現状の skeleton では、`MetricsSnapshot` に加えて次も保持する。
+
+- cadence status
+- cadence millihz
+- classifier allow/interpolate flag
+- governor mode
+- scheduler mode
+- state transition count
+
+これらは Rust state core が更新し、C++ 側は HUD / log で読むだけに留める。
+
 ---
 
 ## 8. 状態機械
@@ -297,6 +308,11 @@ cadence estimator は、presentation feedback から source fps の安定性を�
 
 安定していない場合は補間を行わない。
 
+現状の skeleton では、まず frame timestamp の差分から cadence を見積もる。
+直近 small window の delta を nominal cadence
+(`24/25/30/50/60fps`) に snap し、jitter が小さい場合だけ stable とみなす。
+presentation feedback は governor/deadline 側へ返し、次段の scheduler 判断に使う。
+
 ---
 
 ## 10. classifier
@@ -324,6 +340,15 @@ classifier は、この区間で補間を行うべきか判定する。
 - deadline pressure
 - gpu fault
 
+現状の skeleton では、classifier は次だけを見る。
+
+- cadence stable
+- `ContentType::Video`
+- 一定以上の damage ratio
+- 速すぎない cursor velocity
+
+scene cut や subtitle band はまだ未実装で、後続 task に残す。
+
 ---
 
 ## 11. governor
@@ -338,6 +363,11 @@ MVP では次のような単純な段階で十分。
 - `Bypass`
 
 初期実装では、品質低下よりまず bypass を優先してもよい。
+
+現状の skeleton では、deadline miss / dropped synthetic の累積だけで
+`Bypass -> QualityMedium -> QualityLow` 相当の mode を返す。
+まだ real synth を持たないため、mode は HUD/metrics に出すだけで
+GPU 品質段階には接続していない。
 
 ---
 
@@ -355,6 +385,11 @@ MVP は 2x のみなので、基本形は次の通り。
 - synthetic frame が deadline に間に合わなければ捨てる
 - 連続 miss で degrade または bypass
 - 不安定なら real frame のみ出す
+
+現状の skeleton では、scheduler はまだ present queue を持たず、
+`PassthroughOnly / WarmupHold / Synthetic2x` の mode 判定だけを返す。
+state machine はこの mode を見て `Bypass / Warmup / Active2x / Degraded` を更新するが、
+実際の synthetic present slot 接続は Epic 6 以降で行う。
 
 ---
 
