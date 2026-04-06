@@ -11,6 +11,7 @@ struct FlowFrameResources {
     GpuTextureLease source_texture {};
     LumaPyramidBuildResult luma_pyramid {};
     bool valid = false;
+    bool truncated = false;
     bool placeholder_only = true;
 };
 
@@ -18,6 +19,7 @@ struct FlowInputBundle {
     FlowFrameResources previous {};
     FlowFrameResources current {};
     bool valid = false;
+    bool truncated = false;
     bool placeholder_only = true;
 };
 

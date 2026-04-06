@@ -23,13 +23,20 @@ FlowInputBundle KfiFlowInputsBuilder::build(
             luma_builder_.release(texture_pool_, current.luma_pyramid);
             static_cast<void>(texture_pool_.release(current.source_texture.slot_id));
         }
-        return {};
+        return FlowInputBundle {
+            .previous = previous,
+            .current = current,
+            .valid = false,
+            .truncated = previous.truncated || current.truncated,
+            .placeholder_only = true,
+        };
     }
 
     return FlowInputBundle {
         .previous = previous,
         .current = current,
         .valid = true,
+        .truncated = false,
         .placeholder_only = true,
     };
 }
@@ -54,18 +61,22 @@ FlowFrameResources KfiFlowInputsBuilder::build_frame_resources(
     const GpuTextureDescriptor& descriptor
 ) noexcept {
     if (!descriptor.is_valid()) {
-        return {};
+        return FlowFrameResources {.frame_id = frame_id};
     }
 
     const auto source_texture = texture_pool_.acquire(descriptor);
     if (!source_texture.acquired) {
-        return {};
+        return FlowFrameResources {.frame_id = frame_id, .truncated = true};
     }
 
     const auto luma_pyramid = luma_builder_.build(frame_id, descriptor, texture_pool_);
-    if (!luma_pyramid.valid) {
+    if (!luma_pyramid.valid || luma_pyramid.truncated) {
+        luma_builder_.release(texture_pool_, luma_pyramid);
         static_cast<void>(texture_pool_.release(source_texture.slot_id));
-        return {};
+        return FlowFrameResources {
+            .frame_id = frame_id,
+            .truncated = luma_pyramid.truncated,
+        };
     }
 
     return FlowFrameResources {
@@ -73,6 +84,7 @@ FlowFrameResources KfiFlowInputsBuilder::build_frame_resources(
         .source_texture = source_texture,
         .luma_pyramid = luma_pyramid,
         .valid = true,
+        .truncated = false,
         .placeholder_only = true,
     };
 }
