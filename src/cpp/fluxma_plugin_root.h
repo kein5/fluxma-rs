@@ -30,6 +30,9 @@ struct KwinNativeBridgeObservationReport {
     [[nodiscard]] bool frame_install_deferred() const noexcept;
     [[nodiscard]] bool present_install_deferred() const noexcept;
     [[nodiscard]] bool all_installs_deferred() const noexcept;
+    [[nodiscard]] std::string bringup_summary() const;
+    [[nodiscard]] std::string preflight_summary() const;
+    [[nodiscard]] std::string install_summary() const;
     [[nodiscard]] std::string summary() const;
 };
 
@@ -48,6 +51,8 @@ struct KwinNativeBridgeInstallObservationReport {
     [[nodiscard]] bool frame_install_deferred() const noexcept;
     [[nodiscard]] bool present_install_deferred() const noexcept;
     [[nodiscard]] bool all_installs_deferred() const noexcept;
+    [[nodiscard]] std::string preflight_summary() const;
+    [[nodiscard]] std::string install_summary() const;
     [[nodiscard]] std::string summary() const;
 };
 

@@ -35,6 +35,41 @@ fluxma::KwinPresentFeedbackInputs complete_present_inputs() {
 }  // namespace
 
 int main() {
+    const fluxma::KwinNativeBridgeObservationReport frame_only_unresolved {
+        .bringup = fluxma::KwinNativeBringupReport {
+            .frame = fluxma::KwinFrameHookReadiness {
+                .unresolved_fields = fluxma::KwinFrameInputField::FrameId,
+            },
+            .present = fluxma::KwinPresentHookReadiness {
+                .unresolved_fields = fluxma::KwinPresentInputField::None,
+            },
+        },
+    };
+    if (!frame_only_unresolved.frame_bringup_has_unresolved() ||
+        frame_only_unresolved.present_bringup_has_unresolved() ||
+        !frame_only_unresolved.bringup_has_unresolved_candidates()) {
+        std::cerr << "plugin root observation wrappers must preserve frame-only unresolved state\n";
+        return EXIT_FAILURE;
+    }
+
+    const fluxma::KwinNativeBridgeObservationReport present_only_unresolved {
+        .bringup = fluxma::KwinNativeBringupReport {
+            .frame = fluxma::KwinFrameHookReadiness {
+                .unresolved_fields = fluxma::KwinFrameInputField::None,
+            },
+            .present = fluxma::KwinPresentHookReadiness {
+                .unresolved_fields = fluxma::KwinPresentInputField::RefreshInterval,
+            },
+        },
+    };
+    if (present_only_unresolved.frame_bringup_has_unresolved() ||
+        !present_only_unresolved.present_bringup_has_unresolved() ||
+        !present_only_unresolved.bringup_has_unresolved_candidates()) {
+        std::cerr
+            << "plugin root observation wrappers must preserve present-only unresolved state\n";
+        return EXIT_FAILURE;
+    }
+
     fluxma::KfiPluginRoot plugin_root(
         {.enabled = true, .show_hud = true, .log_interval_frames = 1, .max_log_messages = 4}
     );
@@ -69,6 +104,9 @@ int main() {
         }
     );
     const auto version_gate_summary = version_gate_observation.summary();
+    const auto version_gate_bringup_summary = version_gate_observation.bringup_summary();
+    const auto version_gate_preflight_summary = version_gate_observation.preflight_summary();
+    const auto version_gate_install_summary = version_gate_observation.install_summary();
     const auto version_gate_frame_summary = version_gate_observation.bringup.frame_summary();
     if (!version_gate_observation.is_placeholder_state() ||
         !version_gate_observation.bringup.is_placeholder_state() ||
@@ -93,6 +131,11 @@ int main() {
         version_gate_frame_summary.find(
             "hook=compositor-output-frame-ready"
         ) == std::string::npos ||
+        version_gate_bringup_summary.find("frame{hook=compositor-output-frame-ready") ==
+            std::string::npos ||
+        version_gate_preflight_summary.find("frame{deferred_reason=kwin-version-gate") ==
+            std::string::npos ||
+        version_gate_install_summary.find("present{result=deferred") == std::string::npos ||
         version_gate_observation.preflight.frame.gate.deferred_reason !=
             fluxma::KwinNativeDeferredReason::KwinVersionGate ||
         version_gate_observation.preflight.present.gate.deferred_reason !=
@@ -186,6 +229,8 @@ int main() {
         }
     );
     const auto install_only_summary = install_only_observation.summary();
+    const auto install_only_preflight_summary = install_only_observation.preflight_summary();
+    const auto install_only_install_summary = install_only_observation.install_summary();
     if (!install_only_observation.is_placeholder_state() ||
         install_only_observation.preflight.frame.gate.deferred_reason !=
             fluxma::KwinNativeDeferredReason::BackendGate ||
@@ -205,6 +250,9 @@ int main() {
         !install_only_observation.present_gate_matches() ||
         !install_only_observation.all_gates_match() ||
         !install_only_observation.all_installs_deferred() ||
+        install_only_preflight_summary.find("frame{deferred_reason=backend-gate") ==
+            std::string::npos ||
+        install_only_install_summary.find("present{result=deferred") == std::string::npos ||
         install_only_summary.find("state=") == std::string::npos ||
         install_only_summary.find("preflight{") == std::string::npos ||
         install_only_summary.find("install{") == std::string::npos ||

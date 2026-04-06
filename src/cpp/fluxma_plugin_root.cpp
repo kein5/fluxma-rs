@@ -46,16 +46,28 @@ bool KwinNativeBridgeObservationReport::all_installs_deferred() const noexcept {
     return frame_install_deferred() && present_install_deferred();
 }
 
+std::string KwinNativeBridgeObservationReport::bringup_summary() const {
+    return bringup.combined_summary();
+}
+
+std::string KwinNativeBridgeObservationReport::preflight_summary() const {
+    return preflight.summary();
+}
+
+std::string KwinNativeBridgeObservationReport::install_summary() const {
+    return install.summary();
+}
+
 std::string KwinNativeBridgeObservationReport::summary() const {
     std::string output;
     output += "state=";
     output += std::string(to_string(state));
     output += " bringup{";
-    output += bringup.combined_summary();
+    output += bringup_summary();
     output += "} preflight{";
-    output += preflight.summary();
+    output += preflight_summary();
     output += "} install{";
-    output += install.summary();
+    output += install_summary();
     output += "}";
     return output;
 }
@@ -88,14 +100,22 @@ bool KwinNativeBridgeInstallObservationReport::all_installs_deferred() const noe
     return frame_install_deferred() && present_install_deferred();
 }
 
+std::string KwinNativeBridgeInstallObservationReport::preflight_summary() const {
+    return preflight.summary();
+}
+
+std::string KwinNativeBridgeInstallObservationReport::install_summary() const {
+    return install.summary();
+}
+
 std::string KwinNativeBridgeInstallObservationReport::summary() const {
     std::string output;
     output += "state=";
     output += std::string(to_string(state));
     output += " preflight{";
-    output += preflight.summary();
+    output += preflight_summary();
     output += "} install{";
-    output += install.summary();
+    output += install_summary();
     output += "}";
     return output;
 }
