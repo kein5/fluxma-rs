@@ -56,7 +56,7 @@ int main() {
     );
     const auto frame_summary = report.frame_summary();
     const auto present_summary = report.present_summary();
-    if (report.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
+    if (!report.is_placeholder_state() ||
         !report.frame_complete() || !report.present_complete() || !report.fully_populated() ||
         report.frame.plan.hook_point != fluxma::KwinFrameHookPoint::CompositorOutputFrameReady ||
         report.present.plan.hook_point != fluxma::KwinPresentHookPoint::OutputFramePresented ||

@@ -52,13 +52,14 @@ int main() {
     const auto version_gate_summary = version_gate_observation.summary();
     const auto version_gate_frame_summary = version_gate_observation.bringup.frame_summary();
     if (!version_gate_observation.is_placeholder_state() ||
-        version_gate_observation.bringup.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
+        !version_gate_observation.bringup.is_placeholder_state() ||
         !version_gate_observation.bringup.frame_complete() ||
         !version_gate_observation.bringup.present_complete() ||
         !version_gate_observation.bringup_complete() ||
         !version_gate_observation.frame_gate_matches() ||
         !version_gate_observation.present_gate_matches() ||
         !version_gate_observation.all_gates_match() ||
+        !version_gate_observation.all_installs_deferred() ||
         version_gate_observation.bringup.frame.plan.hook_point !=
             fluxma::KwinFrameHookPoint::CompositorOutputFrameReady ||
         version_gate_frame_summary.find(
@@ -175,6 +176,7 @@ int main() {
         !install_only_observation.frame_gate_matches() ||
         !install_only_observation.present_gate_matches() ||
         !install_only_observation.all_gates_match() ||
+        !install_only_observation.all_installs_deferred() ||
         install_only_summary.find("state=") == std::string::npos ||
         install_only_summary.find("preflight{") == std::string::npos ||
         install_only_summary.find("install{") == std::string::npos ||
@@ -220,6 +222,7 @@ int main() {
         install_only_version_gate.install.present.deferred_reason !=
             fluxma::KwinNativeDeferredReason::KwinVersionGate ||
         !install_only_version_gate.all_gates_match() ||
+        !install_only_version_gate.all_installs_deferred() ||
         install_only_version_gate.preflight.present.symbol != "OutputFrame::presented(...)" ||
         install_only_version_gate.install.present.checklist_hint_secondary !=
             "confirm backend completion timestamp semantics across backends" ||
@@ -247,6 +250,7 @@ int main() {
         install_only_precedence.install.present.deferred_reason !=
             fluxma::KwinNativeDeferredReason::KwinVersionGate ||
         !install_only_precedence.all_gates_match() ||
+        !install_only_precedence.all_installs_deferred() ||
         install_only_precedence.summary().find(
             "reason=kwin version gate blocked install for 6.3.85"
         ) == std::string::npos) {

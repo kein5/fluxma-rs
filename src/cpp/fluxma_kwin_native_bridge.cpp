@@ -90,6 +90,10 @@ KwinNativeInstallReport make_deferred_install_report(
 
 }  // namespace
 
+bool KwinNativeBringupReport::is_placeholder_state() const noexcept {
+    return state == KwinNativeBridgeState::PlaceholderOnly;
+}
+
 bool KwinNativeBringupReport::frame_complete() const noexcept {
     return frame.missing_fields == KwinFrameInputField::None;
 }
