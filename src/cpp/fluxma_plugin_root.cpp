@@ -10,6 +10,18 @@ bool KwinNativeBridgeObservationReport::bringup_complete() const noexcept {
     return bringup.fully_populated();
 }
 
+bool KwinNativeBridgeObservationReport::frame_bringup_has_unresolved() const noexcept {
+    return bringup.frame_has_unresolved();
+}
+
+bool KwinNativeBridgeObservationReport::present_bringup_has_unresolved() const noexcept {
+    return bringup.present_has_unresolved();
+}
+
+bool KwinNativeBridgeObservationReport::bringup_has_unresolved_candidates() const noexcept {
+    return bringup.has_unresolved_candidates();
+}
+
 bool KwinNativeBridgeObservationReport::frame_gate_matches() const noexcept {
     return preflight.frame.gate.deferred_reason == install.frame.deferred_reason;
 }

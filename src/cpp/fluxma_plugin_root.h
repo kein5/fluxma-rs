@@ -17,6 +17,9 @@ struct KwinNativeBridgeObservationReport {
     [[nodiscard]] bool is_placeholder_state() const noexcept;
     // Shorthand for "bring-up has all required fields populated for both frame and present".
     [[nodiscard]] bool bringup_complete() const noexcept;
+    [[nodiscard]] bool frame_bringup_has_unresolved() const noexcept;
+    [[nodiscard]] bool present_bringup_has_unresolved() const noexcept;
+    [[nodiscard]] bool bringup_has_unresolved_candidates() const noexcept;
     [[nodiscard]] bool frame_gate_matches() const noexcept;
     [[nodiscard]] bool present_gate_matches() const noexcept;
     // This checks preflight/install consistency for both frame and present independently.

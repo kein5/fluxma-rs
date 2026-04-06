@@ -140,6 +140,7 @@ KWin source 上の観察:
 - `preflight_install()` で frame/present 両方の preflight を 1 行 summary に束ねられる
 - `KfiPluginRoot::observe_native_bridge(...)` で bring-up / preflight / install stub を plugin root 側から 1 本の report として引ける
 - `observe_native_bridge_bringup()` / `observe_native_bridge_install()` / `observe_native_bridge()` を分け、hook completeness と install gate を別々にも追える
+- plugin root の observation report には bring-up unresolved helper も持たせ、required field が揃っていても candidate semantics が未解決な状態を code path から追えるようにした
 - `KfiOutputPolicy` は provenance context も見るようにし、MVP で未対応な frame hook 境界は `HookUnavailable` bypass、unknown present hook 境界は ignore に倒す
 - present feedback では `frame_id/presented_timestamp_ns/refresh_interval_ns` が欠けた入力も ignore に倒し、欠損 metadata を Rust metrics に流さない
 - adapter 層では width/height/gpu handle の最低限 validation を行い、未対応入力は `unsupported-output` bypass に倒す
