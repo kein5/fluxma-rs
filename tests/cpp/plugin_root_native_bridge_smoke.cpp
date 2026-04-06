@@ -136,6 +136,9 @@ int main() {
         version_gate_preflight_summary.find("frame{deferred_reason=kwin-version-gate") ==
             std::string::npos ||
         version_gate_install_summary.find("present{result=deferred") == std::string::npos ||
+        version_gate_bringup_summary != version_gate_observation.bringup.combined_summary() ||
+        version_gate_preflight_summary != version_gate_observation.preflight.summary() ||
+        version_gate_install_summary != version_gate_observation.install.summary() ||
         version_gate_observation.preflight.frame.gate.deferred_reason !=
             fluxma::KwinNativeDeferredReason::KwinVersionGate ||
         version_gate_observation.preflight.present.gate.deferred_reason !=
@@ -253,6 +256,8 @@ int main() {
         install_only_preflight_summary.find("frame{deferred_reason=backend-gate") ==
             std::string::npos ||
         install_only_install_summary.find("present{result=deferred") == std::string::npos ||
+        install_only_preflight_summary != install_only_observation.preflight.summary() ||
+        install_only_install_summary != install_only_observation.install.summary() ||
         install_only_summary.find("state=") == std::string::npos ||
         install_only_summary.find("preflight{") == std::string::npos ||
         install_only_summary.find("install{") == std::string::npos ||
@@ -283,6 +288,9 @@ int main() {
         ) == std::string::npos ||
         install_only_placeholder_install_summary.find("present{result=deferred") ==
             std::string::npos ||
+        install_only_placeholder_preflight_summary !=
+            install_only_placeholder.preflight.summary() ||
+        install_only_placeholder_install_summary != install_only_placeholder.install.summary() ||
         install_only_placeholder.summary().find("state=") ==
             std::string::npos) {
         std::cerr << "plugin root install observation must preserve placeholder diagnostics\n";
@@ -315,6 +323,8 @@ int main() {
         ) == std::string::npos ||
         install_only_version_install_summary.find("present{result=deferred") ==
             std::string::npos ||
+        install_only_version_preflight_summary != install_only_version_gate.preflight.summary() ||
+        install_only_version_install_summary != install_only_version_gate.install.summary() ||
         install_only_version_gate.preflight.present.symbol != "OutputFrame::presented(...)" ||
         install_only_version_gate.install.present.checklist_hint_secondary !=
             "confirm backend completion timestamp semantics across backends" ||
@@ -352,6 +362,8 @@ int main() {
         ) == std::string::npos ||
         install_only_precedence_install_summary.find("present{result=deferred") ==
             std::string::npos ||
+        install_only_precedence_preflight_summary != install_only_precedence.preflight.summary() ||
+        install_only_precedence_install_summary != install_only_precedence.install.summary() ||
         install_only_precedence.summary().find(
             "reason=kwin version gate blocked install for 6.3.85"
         ) == std::string::npos) {
