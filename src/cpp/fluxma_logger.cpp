@@ -48,6 +48,10 @@ void KfiRateLimitedLogger::note_state_transition(
             .protected_content = protected_content,
             .present_success = true,
             .dropped_synthetic = false,
+            .synthetic_armed = false,
+            .synthetic_should_drop = false,
+            .synthetic_target_timestamp_ns = 0,
+            .synthetic_deadline_timestamp_ns = 0,
         }
     );
 }
@@ -84,6 +88,10 @@ void KfiRateLimitedLogger::note_present_feedback_issue(
             .protected_content = false,
             .present_success = present_success,
             .dropped_synthetic = dropped_synthetic,
+            .synthetic_armed = false,
+            .synthetic_should_drop = false,
+            .synthetic_target_timestamp_ns = 0,
+            .synthetic_deadline_timestamp_ns = 0,
             .expected_frame_id = 0,
             .actual_frame_id = 0,
         }
@@ -122,8 +130,56 @@ void KfiRateLimitedLogger::note_present_feedback_mismatch(
             .protected_content = false,
             .present_success = true,
             .dropped_synthetic = false,
+            .synthetic_armed = false,
+            .synthetic_should_drop = false,
+            .synthetic_target_timestamp_ns = 0,
+            .synthetic_deadline_timestamp_ns = 0,
             .expected_frame_id = expected_frame_id,
             .actual_frame_id = actual_frame_id,
+        }
+    );
+}
+
+void KfiRateLimitedLogger::note_synthetic_plan(
+    std::uint32_t output_id,
+    std::uint64_t frame_tap_count,
+    const SyntheticFramePlan& plan
+) noexcept {
+    const bool state_changed = !has_last_logged_synthetic_plan_frame_tap_count_ ||
+        plan.armed != last_logged_synthetic_armed_ ||
+        plan.should_drop != last_logged_synthetic_should_drop_;
+    if (!state_changed && has_last_logged_synthetic_plan_frame_tap_count_ &&
+        frame_tap_count < (last_logged_synthetic_plan_frame_tap_count_ + interval_frames_)) {
+        return;
+    }
+
+    last_logged_synthetic_plan_frame_tap_count_ = frame_tap_count;
+    has_last_logged_synthetic_plan_frame_tap_count_ = true;
+    last_logged_synthetic_armed_ = plan.armed;
+    last_logged_synthetic_should_drop_ = plan.should_drop;
+
+    append(
+        LogEvent {
+            .kind = LogEventKind::SyntheticPlan,
+            .output_id = output_id,
+            .sequence = 0,
+            .frame_tap_count = frame_tap_count,
+            .present_feedback_count = 0,
+            .state = OutputState::Bypass,
+            .bypass_reason = BypassReason::None,
+            .cadence_status = CadenceStatus::Unknown,
+            .governor_mode = GovernorMode::Bypass,
+            .scheduler_mode = SchedulerMode::PassthroughOnly,
+            .classifier_allows_interpolation = false,
+            .protected_content = false,
+            .present_success = true,
+            .dropped_synthetic = false,
+            .synthetic_armed = plan.armed,
+            .synthetic_should_drop = plan.should_drop,
+            .synthetic_target_timestamp_ns = plan.target_present_timestamp_ns,
+            .synthetic_deadline_timestamp_ns = plan.deadline_timestamp_ns,
+            .expected_frame_id = plan.source_frame_id,
+            .actual_frame_id = plan.synthetic_frame_id,
         }
     );
 }
@@ -174,6 +230,15 @@ std::string KfiRateLimitedLogger::render_event(const LogEvent& event) {
                << " expected-frame-id=" << event.expected_frame_id
                << " actual-frame-id=" << event.actual_frame_id
                << " present-feedback-count=" << event.present_feedback_count;
+        break;
+    case LogEventKind::SyntheticPlan:
+        stream << "output=" << event.output_id
+               << " synthetic-armed=" << to_bool_string(event.synthetic_armed)
+               << " synthetic-drop=" << to_bool_string(event.synthetic_should_drop)
+               << " source-frame-id=" << event.expected_frame_id
+               << " synthetic-frame-id=" << event.actual_frame_id
+               << " synthetic-target-ns=" << event.synthetic_target_timestamp_ns
+               << " synthetic-deadline-ns=" << event.synthetic_deadline_timestamp_ns;
         break;
     }
 

@@ -174,6 +174,7 @@ int main() {
     );
     const auto install_observation_summary = install_observation.summary();
     const auto bridge_observation_frame_summary = bridge_observation.bringup.frame_summary();
+    const auto output_runtime_observation = plugin_root.observe_output_runtime(10'000'000);
     if (!bridge_observation.is_placeholder_state() ||
         bridge_observation.bringup.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
         !bridge_observation.bringup_complete() ||
@@ -234,6 +235,10 @@ int main() {
         install_observation_summary.find("preflight{") ==
             std::string::npos ||
         install_observation_summary.find("install{") ==
+            std::string::npos ||
+        !output_runtime_observation.synthetic_armed() ||
+        output_runtime_observation.synthetic_should_drop() ||
+        output_runtime_observation.summary().find("synthetic-armed=yes") ==
             std::string::npos) {
         std::cerr << "plugin root must surface native bridge observation summary\n";
         return EXIT_FAILURE;

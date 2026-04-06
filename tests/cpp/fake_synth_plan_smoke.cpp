@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <algorithm>
 #include <iostream>
 #include <string>
 
@@ -55,6 +56,7 @@ int main() {
 
     const auto ready_plan = output.plan_synthetic_frame(47'999'999);
     const auto hud = output.render_hud_text();
+    const auto logs = output.log_messages();
     if (!ready_plan.armed || ready_plan.should_drop ||
         ready_plan.source_frame_id != 5 || ready_plan.synthetic_frame_id != 11 ||
         ready_plan.target_present_timestamp_ns != 183'333'332 ||
@@ -63,6 +65,15 @@ int main() {
         hud.find("synthetic_drop=no") == std::string::npos ||
         hud.find("synthetic_target_ns=183333332") == std::string::npos) {
         std::cerr << "fake synth plan mismatch\n";
+        return EXIT_FAILURE;
+    }
+    const auto has_synthetic_plan_log =
+        std::any_of(logs.begin(), logs.end(), [](const std::string& log) {
+            return log.find("synthetic-armed=yes") != std::string::npos &&
+                log.find("synthetic-frame-id=11") != std::string::npos;
+        });
+    if (!has_synthetic_plan_log) {
+        std::cerr << "fake synth logger mismatch\n";
         return EXIT_FAILURE;
     }
 

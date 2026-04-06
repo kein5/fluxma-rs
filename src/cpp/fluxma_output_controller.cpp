@@ -107,6 +107,7 @@ OutputDecision KfiOutputController::on_frame_tapped(const FrameDescriptor& frame
     remember_submission(last_submission_.frame_id);
     const auto snapshot = rust_core_.snapshot_metrics();
     maybe_log_state_change(snapshot);
+    maybe_log_synthetic_plan(snapshot);
     update_runtime(snapshot);
     return last_decision_;
 }
@@ -246,6 +247,20 @@ void KfiOutputController::maybe_log_present_feedback_mismatch(
         snapshot.present_feedback_count,
         last_submission_.frame_id,
         feedback.frame_id
+    );
+}
+
+void KfiOutputController::maybe_log_synthetic_plan(const MetricsSnapshot& snapshot) {
+    logger_.note_synthetic_plan(
+        output_id_,
+        snapshot.frame_tap_count,
+        synthetic_scheduler_.plan_placeholder_synthetic(
+            output_id_,
+            last_submission_,
+            last_decision_,
+            snapshot,
+            snapshot.last_presented_timestamp_ns
+        )
     );
 }
 

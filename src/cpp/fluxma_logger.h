@@ -14,6 +14,7 @@ enum class LogEventKind : std::uint8_t {
     StateTransition = 0,
     PresentFeedbackIssue = 1,
     PresentFeedbackMismatch = 2,
+    SyntheticPlan = 3,
 };
 
 struct LogEvent {
@@ -31,6 +32,10 @@ struct LogEvent {
     bool protected_content = false;
     bool present_success = true;
     bool dropped_synthetic = false;
+    bool synthetic_armed = false;
+    bool synthetic_should_drop = false;
+    std::uint64_t synthetic_target_timestamp_ns = 0;
+    std::uint64_t synthetic_deadline_timestamp_ns = 0;
     std::uint64_t expected_frame_id = 0;
     std::uint64_t actual_frame_id = 0;
 };
@@ -65,6 +70,11 @@ class KfiRateLimitedLogger {
         std::uint64_t expected_frame_id,
         std::uint64_t actual_frame_id
     ) noexcept;
+    void note_synthetic_plan(
+        std::uint32_t output_id,
+        std::uint64_t frame_tap_count,
+        const SyntheticFramePlan& plan
+    ) noexcept;
     [[nodiscard]] std::vector<std::string> snapshot_messages() const;
 
   private:
@@ -80,6 +90,10 @@ class KfiRateLimitedLogger {
     bool has_last_logged_present_feedback_issue_count_ = false;
     std::uint64_t last_logged_present_feedback_mismatch_count_ = 0;
     bool has_last_logged_present_feedback_mismatch_count_ = false;
+    std::uint64_t last_logged_synthetic_plan_frame_tap_count_ = 0;
+    bool has_last_logged_synthetic_plan_frame_tap_count_ = false;
+    bool last_logged_synthetic_armed_ = false;
+    bool last_logged_synthetic_should_drop_ = false;
     std::array<LogEvent, 128> events_ {};
     std::size_t next_index_ = 0;
     std::size_t count_ = 0;
