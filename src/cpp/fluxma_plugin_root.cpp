@@ -220,6 +220,8 @@ std::string OutputRuntimeObservationReport::summary() const {
     output += std::string(to_bool_string(synthetic_plan.should_drop));
     output += " synthetic-generated=";
     output += std::string(to_bool_string(synthetic_artifact.generated));
+    output += " synthetic-placeholder=";
+    output += std::string(to_bool_string(synthetic_artifact.placeholder_only));
     return output;
 }
 

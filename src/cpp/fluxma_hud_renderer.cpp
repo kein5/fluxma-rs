@@ -7,7 +7,8 @@ namespace fluxma {
 std::string KfiHudRenderer::compose_text(
     std::uint32_t output_id,
     const MetricsSnapshot& snapshot,
-    const SyntheticFramePlan& synthetic_plan
+    const SyntheticFramePlan& synthetic_plan,
+    const SyntheticFrameArtifact& synthetic_artifact
 ) const {
     std::ostringstream stream;
     stream << "Fluxma output=" << output_id << '\n';
@@ -34,7 +35,9 @@ std::string KfiHudRenderer::compose_text(
     stream << "synthetic_armed=" << to_bool_string(synthetic_plan.armed) << '\n';
     stream << "synthetic_drop=" << to_bool_string(synthetic_plan.should_drop) << '\n';
     stream << "synthetic_target_ns=" << synthetic_plan.target_present_timestamp_ns << '\n';
-    stream << "synthetic_deadline_ns=" << synthetic_plan.deadline_timestamp_ns;
+    stream << "synthetic_deadline_ns=" << synthetic_plan.deadline_timestamp_ns << '\n';
+    stream << "synthetic_generated=" << to_bool_string(synthetic_artifact.generated) << '\n';
+    stream << "synthetic_placeholder=" << to_bool_string(synthetic_artifact.placeholder_only);
     return stream.str();
 }
 

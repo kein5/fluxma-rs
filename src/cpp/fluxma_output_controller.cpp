@@ -151,10 +151,12 @@ std::string KfiOutputController::render_hud_text() const {
     }
 
     const auto snapshot = snapshot_metrics();
+    const auto synthetic_plan = plan_synthetic_frame(snapshot.last_presented_timestamp_ns);
     return hud_renderer_.compose_text(
         output_id_,
         snapshot,
-        plan_synthetic_frame(snapshot.last_presented_timestamp_ns)
+        synthetic_plan,
+        fake_synth_generator_.generate(synthetic_plan)
     );
 }
 

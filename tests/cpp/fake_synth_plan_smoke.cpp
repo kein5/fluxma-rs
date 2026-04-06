@@ -66,7 +66,9 @@ int main() {
         ready_artifact.synthetic_frame_id != 11 ||
         hud.find("synthetic_armed=yes") == std::string::npos ||
         hud.find("synthetic_drop=no") == std::string::npos ||
-        hud.find("synthetic_target_ns=183333332") == std::string::npos) {
+        hud.find("synthetic_target_ns=183333332") == std::string::npos ||
+        hud.find("synthetic_generated=yes") == std::string::npos ||
+        hud.find("synthetic_placeholder=yes") == std::string::npos) {
         std::cerr << "fake synth plan mismatch\n";
         return EXIT_FAILURE;
     }

@@ -11,7 +11,8 @@ class KfiHudRenderer {
     [[nodiscard]] std::string compose_text(
         std::uint32_t output_id,
         const MetricsSnapshot& snapshot,
-        const SyntheticFramePlan& synthetic_plan
+        const SyntheticFramePlan& synthetic_plan,
+        const SyntheticFrameArtifact& synthetic_artifact
     ) const;
 };
 
