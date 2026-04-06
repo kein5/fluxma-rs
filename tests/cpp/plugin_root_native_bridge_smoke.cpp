@@ -45,7 +45,8 @@ int main() {
     );
     if (bringup_only.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
         !bringup_only.frame_complete() || !bringup_only.present_complete() ||
-        !bringup_only.fully_populated() ||
+        !bringup_only.fully_populated() || !bringup_only.frame_has_unresolved() ||
+        !bringup_only.present_has_unresolved() || !bringup_only.has_unresolved_candidates() ||
         bringup_only.frame.plan.hook_point !=
             fluxma::KwinFrameHookPoint::CompositorOutputFrameReady ||
         bringup_only.present.plan.hook_point !=
@@ -74,6 +75,9 @@ int main() {
         !version_gate_observation.bringup.frame_complete() ||
         !version_gate_observation.bringup.present_complete() ||
         !version_gate_observation.bringup_complete() ||
+        !version_gate_observation.bringup.frame_has_unresolved() ||
+        !version_gate_observation.bringup.present_has_unresolved() ||
+        !version_gate_observation.bringup.has_unresolved_candidates() ||
         !version_gate_observation.frame_gate_matches() ||
         !version_gate_observation.present_gate_matches() ||
         !version_gate_observation.all_gates_match() ||
@@ -293,6 +297,9 @@ int main() {
     if (incomplete_observation.bringup.frame_complete() ||
         incomplete_observation.bringup.present_complete() ||
         incomplete_observation.bringup_complete() ||
+        !incomplete_observation.bringup.frame_has_unresolved() ||
+        !incomplete_observation.bringup.present_has_unresolved() ||
+        !incomplete_observation.bringup.has_unresolved_candidates() ||
         incomplete_frame_summary.find("ready=no") == std::string::npos ||
         incomplete_frame_summary.find("missing=frame-id,width") ==
             std::string::npos ||

@@ -43,6 +43,9 @@ struct KwinNativeBringupReport {
     [[nodiscard]] bool frame_complete() const noexcept;
     [[nodiscard]] bool present_complete() const noexcept;
     [[nodiscard]] bool fully_populated() const noexcept;
+    [[nodiscard]] bool frame_has_unresolved() const noexcept;
+    [[nodiscard]] bool present_has_unresolved() const noexcept;
+    [[nodiscard]] bool has_unresolved_candidates() const noexcept;
     [[nodiscard]] std::string frame_summary() const;
     [[nodiscard]] std::string present_summary() const;
     [[nodiscard]] std::string combined_summary() const;

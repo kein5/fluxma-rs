@@ -58,6 +58,8 @@ int main() {
     const auto present_summary = report.present_summary();
     if (!report.is_placeholder_state() ||
         !report.frame_complete() || !report.present_complete() || !report.fully_populated() ||
+        !report.frame_has_unresolved() || !report.present_has_unresolved() ||
+        !report.has_unresolved_candidates() ||
         report.frame.plan.hook_point != fluxma::KwinFrameHookPoint::CompositorOutputFrameReady ||
         report.present.plan.hook_point != fluxma::KwinPresentHookPoint::OutputFramePresented ||
         frame_summary.find("hook=compositor-output-frame-ready") == std::string::npos ||

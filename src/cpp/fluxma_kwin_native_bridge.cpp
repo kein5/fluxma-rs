@@ -106,6 +106,18 @@ bool KwinNativeBringupReport::fully_populated() const noexcept {
     return frame_complete() && present_complete();
 }
 
+bool KwinNativeBringupReport::frame_has_unresolved() const noexcept {
+    return frame.unresolved_fields != KwinFrameInputField::None;
+}
+
+bool KwinNativeBringupReport::present_has_unresolved() const noexcept {
+    return present.unresolved_fields != KwinPresentInputField::None;
+}
+
+bool KwinNativeBringupReport::has_unresolved_candidates() const noexcept {
+    return frame_has_unresolved() || present_has_unresolved();
+}
+
 std::string KwinNativeBringupReport::frame_summary() const {
     return summarize(frame);
 }
