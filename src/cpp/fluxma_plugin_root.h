@@ -24,6 +24,10 @@ struct KwinNativeBridgeObservationReport {
     [[nodiscard]] bool bringup_has_unresolved_candidates() const noexcept;
     [[nodiscard]] bool frame_gate_matches() const noexcept;
     [[nodiscard]] bool present_gate_matches() const noexcept;
+    [[nodiscard]] KwinNativeDeferredReason frame_preflight_deferred_reason() const noexcept;
+    [[nodiscard]] KwinNativeDeferredReason present_preflight_deferred_reason() const noexcept;
+    [[nodiscard]] KwinNativeDeferredReason frame_install_deferred_reason() const noexcept;
+    [[nodiscard]] KwinNativeDeferredReason present_install_deferred_reason() const noexcept;
     // This checks preflight/install consistency for both frame and present independently.
     [[nodiscard]] bool all_gates_match() const noexcept;
     // These reflect the current skeleton contract where native bridge install remains deferred.
@@ -47,6 +51,10 @@ struct KwinNativeBridgeInstallObservationReport {
     [[nodiscard]] bool is_placeholder_state() const noexcept;
     [[nodiscard]] bool frame_gate_matches() const noexcept;
     [[nodiscard]] bool present_gate_matches() const noexcept;
+    [[nodiscard]] KwinNativeDeferredReason frame_preflight_deferred_reason() const noexcept;
+    [[nodiscard]] KwinNativeDeferredReason present_preflight_deferred_reason() const noexcept;
+    [[nodiscard]] KwinNativeDeferredReason frame_install_deferred_reason() const noexcept;
+    [[nodiscard]] KwinNativeDeferredReason present_install_deferred_reason() const noexcept;
     // This checks preflight/install consistency for both frame and present independently.
     [[nodiscard]] bool all_gates_match() const noexcept;
     // These reflect the current skeleton contract where native bridge install remains deferred.

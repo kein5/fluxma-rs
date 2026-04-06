@@ -23,11 +23,31 @@ bool KwinNativeBridgeObservationReport::bringup_has_unresolved_candidates() cons
 }
 
 bool KwinNativeBridgeObservationReport::frame_gate_matches() const noexcept {
-    return preflight.frame.gate.deferred_reason == install.frame.deferred_reason;
+    return frame_preflight_deferred_reason() == frame_install_deferred_reason();
 }
 
 bool KwinNativeBridgeObservationReport::present_gate_matches() const noexcept {
-    return preflight.present.gate.deferred_reason == install.present.deferred_reason;
+    return present_preflight_deferred_reason() == present_install_deferred_reason();
+}
+
+KwinNativeDeferredReason KwinNativeBridgeObservationReport::frame_preflight_deferred_reason(
+) const noexcept {
+    return preflight.frame.gate.deferred_reason;
+}
+
+KwinNativeDeferredReason KwinNativeBridgeObservationReport::present_preflight_deferred_reason(
+) const noexcept {
+    return preflight.present.gate.deferred_reason;
+}
+
+KwinNativeDeferredReason KwinNativeBridgeObservationReport::frame_install_deferred_reason(
+) const noexcept {
+    return install.frame.deferred_reason;
+}
+
+KwinNativeDeferredReason KwinNativeBridgeObservationReport::present_install_deferred_reason(
+) const noexcept {
+    return install.present.deferred_reason;
 }
 
 bool KwinNativeBridgeObservationReport::all_gates_match() const noexcept {
@@ -77,11 +97,31 @@ bool KwinNativeBridgeInstallObservationReport::is_placeholder_state() const noex
 }
 
 bool KwinNativeBridgeInstallObservationReport::frame_gate_matches() const noexcept {
-    return preflight.frame.gate.deferred_reason == install.frame.deferred_reason;
+    return frame_preflight_deferred_reason() == frame_install_deferred_reason();
 }
 
 bool KwinNativeBridgeInstallObservationReport::present_gate_matches() const noexcept {
-    return preflight.present.gate.deferred_reason == install.present.deferred_reason;
+    return present_preflight_deferred_reason() == present_install_deferred_reason();
+}
+
+KwinNativeDeferredReason
+KwinNativeBridgeInstallObservationReport::frame_preflight_deferred_reason() const noexcept {
+    return preflight.frame.gate.deferred_reason;
+}
+
+KwinNativeDeferredReason
+KwinNativeBridgeInstallObservationReport::present_preflight_deferred_reason() const noexcept {
+    return preflight.present.gate.deferred_reason;
+}
+
+KwinNativeDeferredReason
+KwinNativeBridgeInstallObservationReport::frame_install_deferred_reason() const noexcept {
+    return install.frame.deferred_reason;
+}
+
+KwinNativeDeferredReason
+KwinNativeBridgeInstallObservationReport::present_install_deferred_reason() const noexcept {
+    return install.present.deferred_reason;
 }
 
 bool KwinNativeBridgeInstallObservationReport::all_gates_match() const noexcept {

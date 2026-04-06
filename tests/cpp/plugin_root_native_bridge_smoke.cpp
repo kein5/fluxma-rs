@@ -72,7 +72,15 @@ int main() {
         },
     };
     if (!frame_gate_only_match.frame_gate_matches() || frame_gate_only_match.present_gate_matches()
-        || frame_gate_only_match.all_gates_match() ||
+        || frame_gate_only_match.frame_preflight_deferred_reason() !=
+            fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        frame_gate_only_match.present_preflight_deferred_reason() !=
+            fluxma::KwinNativeDeferredReason::BackendGate ||
+        frame_gate_only_match.frame_install_deferred_reason() !=
+            fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        frame_gate_only_match.present_install_deferred_reason() !=
+            fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        frame_gate_only_match.all_gates_match() ||
         !frame_gate_only_match.frame_install_deferred() ||
         frame_gate_only_match.present_install_deferred() ||
         frame_gate_only_match.all_installs_deferred()) {
@@ -106,7 +114,15 @@ int main() {
         },
     };
     if (present_gate_only_match.frame_gate_matches() || !present_gate_only_match.present_gate_matches()
-        || present_gate_only_match.all_gates_match() ||
+        || present_gate_only_match.frame_preflight_deferred_reason() !=
+            fluxma::KwinNativeDeferredReason::BackendGate ||
+        present_gate_only_match.present_preflight_deferred_reason() !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        present_gate_only_match.frame_install_deferred_reason() !=
+            fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        present_gate_only_match.present_install_deferred_reason() !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        present_gate_only_match.all_gates_match() ||
         present_gate_only_match.frame_install_deferred() ||
         !present_gate_only_match.present_install_deferred() ||
         present_gate_only_match.all_installs_deferred()) {
@@ -234,6 +250,14 @@ int main() {
         version_gate_observation.install.present.symbol != "OutputFrame::presented(...)" ||
         version_gate_observation.install.present.checklist_hint_secondary !=
             "confirm backend completion timestamp semantics across backends" ||
+        version_gate_observation.frame_preflight_deferred_reason() !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        version_gate_observation.present_preflight_deferred_reason() !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        version_gate_observation.frame_install_deferred_reason() !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        version_gate_observation.present_install_deferred_reason() !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
         version_gate_summary.find("state=") == std::string::npos ||
         version_gate_summary.find("bringup{") == std::string::npos ||
         version_gate_summary.find("preflight{") ==
@@ -332,6 +356,14 @@ int main() {
         !install_only_observation.present_gate_matches() ||
         !install_only_observation.all_gates_match() ||
         !install_only_observation.all_installs_deferred() ||
+        install_only_observation.frame_preflight_deferred_reason() !=
+            fluxma::KwinNativeDeferredReason::BackendGate ||
+        install_only_observation.present_preflight_deferred_reason() !=
+            fluxma::KwinNativeDeferredReason::BackendGate ||
+        install_only_observation.frame_install_deferred_reason() !=
+            fluxma::KwinNativeDeferredReason::BackendGate ||
+        install_only_observation.present_install_deferred_reason() !=
+            fluxma::KwinNativeDeferredReason::BackendGate ||
         install_only_preflight_summary.find("frame{deferred_reason=backend-gate") ==
             std::string::npos ||
         install_only_install_summary.find("present{result=deferred") == std::string::npos ||
