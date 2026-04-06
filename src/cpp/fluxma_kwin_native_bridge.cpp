@@ -165,6 +165,26 @@ std::string KwinNativeInstallReport::summary() const {
     return output;
 }
 
+bool KwinNativeInstallReport::is_deferred() const noexcept {
+    return result == KwinNativeInstallResult::Deferred;
+}
+
+bool KwinNativeInstallReport::is_installed() const noexcept {
+    return result == KwinNativeInstallResult::Installed;
+}
+
+bool KwinNativeInstallReport::is_placeholder_only() const noexcept {
+    return deferred_reason == KwinNativeDeferredReason::PlaceholderOnly;
+}
+
+bool KwinNativeInstallReport::is_version_gate() const noexcept {
+    return deferred_reason == KwinNativeDeferredReason::KwinVersionGate;
+}
+
+bool KwinNativeInstallReport::is_backend_gate() const noexcept {
+    return deferred_reason == KwinNativeDeferredReason::BackendGate;
+}
+
 bool KwinNativeInstallGateAssessment::is_placeholder_only() const noexcept {
     return deferred_reason == KwinNativeDeferredReason::PlaceholderOnly;
 }
@@ -194,6 +214,26 @@ std::string KwinNativeInstallGateAssessment::summary() const {
     output += " backend_blocked=";
     output += backend_blocked ? "true" : "false";
     return output;
+}
+
+KwinNativeDeferredReason KwinNativeInstallPreflightReport::deferred_reason() const noexcept {
+    return gate.deferred_reason;
+}
+
+bool KwinNativeInstallPreflightReport::is_placeholder_only() const noexcept {
+    return gate.is_placeholder_only();
+}
+
+bool KwinNativeInstallPreflightReport::is_version_gate() const noexcept {
+    return gate.is_version_gate();
+}
+
+bool KwinNativeInstallPreflightReport::is_backend_gate() const noexcept {
+    return gate.is_backend_gate();
+}
+
+bool KwinNativeInstallPreflightReport::has_any_blocker() const noexcept {
+    return gate.has_any_blocker();
 }
 
 std::string KwinNativeInstallPreflightReport::summary() const {

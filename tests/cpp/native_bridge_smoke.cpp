@@ -79,6 +79,9 @@ int main() {
     const auto present_install = bridge.install_present_stub();
     if (frame_install.result != fluxma::KwinNativeInstallResult::Deferred ||
         frame_install.deferred_reason != fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        !frame_install.is_deferred() || frame_install.is_installed() ||
+        !frame_install.is_placeholder_only() || frame_install.is_version_gate() ||
+        frame_install.is_backend_gate() ||
         frame_install.reason != "native bridge is still placeholder-only" ||
         frame_install.context_summary !=
             "kwin=unspecified backend=unspecified version_supported=true backend_supported=true" ||
@@ -94,6 +97,9 @@ int main() {
         ) == std::string::npos ||
         present_install.result != fluxma::KwinNativeInstallResult::Deferred ||
         present_install.deferred_reason != fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        !present_install.is_deferred() || present_install.is_installed() ||
+        !present_install.is_placeholder_only() || present_install.is_version_gate() ||
+        present_install.is_backend_gate() ||
         present_install.target != "output-frame-presented" ||
         present_install.installer_entry != "KfiKwinNativeBridge::install_present_stub" ||
         present_install.source_file != "src/core/renderbackend.cpp" ||
@@ -200,6 +206,9 @@ int main() {
         install_summary.find("frame{result=deferred") == std::string::npos ||
         install_summary.find("present{result=deferred") == std::string::npos ||
         frame_preflight.gate.deferred_reason != fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        frame_preflight.deferred_reason() != fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        !frame_preflight.is_placeholder_only() || frame_preflight.is_version_gate() ||
+        frame_preflight.is_backend_gate() || frame_preflight.has_any_blocker() ||
         frame_preflight.target != "compositor-output-frame-ready" ||
         frame_preflight.installer_entry != "KfiKwinNativeBridge::install_frame_stub" ||
         frame_preflight.source_file != "src/compositor_wayland.cpp" ||
@@ -218,6 +227,10 @@ int main() {
             std::string::npos ||
         present_preflight.gate.deferred_reason !=
             fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        present_preflight.deferred_reason() !=
+            fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        !present_preflight.is_placeholder_only() || present_preflight.is_version_gate() ||
+        present_preflight.is_backend_gate() || present_preflight.has_any_blocker() ||
         present_preflight.target != "output-frame-presented" ||
         present_preflight.installer_entry != "KfiKwinNativeBridge::install_present_stub" ||
         present_preflight.source_file != "src/core/renderbackend.cpp" ||
@@ -247,6 +260,12 @@ int main() {
         backend_gate_assessment_summary.find("backend_blocked=true") == std::string::npos ||
         version_gate_install.frame.deferred_reason != fluxma::KwinNativeDeferredReason::KwinVersionGate ||
         version_gate_install.present.deferred_reason != fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        version_gate_install.frame.is_placeholder_only() ||
+        !version_gate_install.frame.is_version_gate() ||
+        version_gate_install.frame.is_backend_gate() ||
+        version_gate_install.present.is_placeholder_only() ||
+        !version_gate_install.present.is_version_gate() ||
+        version_gate_install.present.is_backend_gate() ||
         version_gate_install.frame.reason != "kwin version gate blocked install for 6.3.80" ||
         version_gate_install.frame.context_summary !=
             "kwin=6.3.80 backend=drm version_supported=false backend_supported=true" ||
@@ -258,6 +277,12 @@ int main() {
         ) == std::string::npos ||
         backend_gate_install.frame.deferred_reason != fluxma::KwinNativeDeferredReason::BackendGate ||
         backend_gate_install.present.deferred_reason != fluxma::KwinNativeDeferredReason::BackendGate ||
+        backend_gate_install.frame.is_placeholder_only() ||
+        backend_gate_install.frame.is_version_gate() ||
+        !backend_gate_install.frame.is_backend_gate() ||
+        backend_gate_install.present.is_placeholder_only() ||
+        backend_gate_install.present.is_version_gate() ||
+        !backend_gate_install.present.is_backend_gate() ||
         backend_gate_install.present.reason != "backend gate blocked install for wayland" ||
         backend_gate_install.present.context_summary !=
             "kwin=6.3.80 backend=wayland version_supported=true backend_supported=false" ||
