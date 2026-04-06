@@ -35,6 +35,73 @@ fluxma::KwinPresentFeedbackInputs complete_present_inputs() {
 }  // namespace
 
 int main() {
+    const fluxma::KwinNativeBridgeObservationReport frame_gate_only_match {
+        .preflight = fluxma::KwinNativeCombinedPreflightReport {
+            .frame = fluxma::KwinNativeInstallPreflightReport {
+                .gate = fluxma::KwinNativeInstallGateAssessment {
+                    .deferred_reason = fluxma::KwinNativeDeferredReason::PlaceholderOnly,
+                },
+            },
+            .present = fluxma::KwinNativeInstallPreflightReport {
+                .gate = fluxma::KwinNativeInstallGateAssessment {
+                    .deferred_reason = fluxma::KwinNativeDeferredReason::BackendGate,
+                },
+            },
+        },
+        .install = fluxma::KwinNativeCombinedInstallReport {
+            .frame = fluxma::KwinNativeInstallReport {
+                .result = fluxma::KwinNativeInstallResult::Deferred,
+                .deferred_reason = fluxma::KwinNativeDeferredReason::PlaceholderOnly,
+            },
+            .present = fluxma::KwinNativeInstallReport {
+                .result = fluxma::KwinNativeInstallResult::Installed,
+                .deferred_reason = fluxma::KwinNativeDeferredReason::PlaceholderOnly,
+            },
+        },
+    };
+    if (!frame_gate_only_match.frame_gate_matches() || frame_gate_only_match.present_gate_matches()
+        || frame_gate_only_match.all_gates_match() ||
+        !frame_gate_only_match.frame_install_deferred() ||
+        frame_gate_only_match.present_install_deferred() ||
+        frame_gate_only_match.all_installs_deferred()) {
+        std::cerr
+            << "plugin root observation gate/deferred helpers must preserve frame/present split\n";
+        return EXIT_FAILURE;
+    }
+
+    const fluxma::KwinNativeBridgeInstallObservationReport present_gate_only_match {
+        .preflight = fluxma::KwinNativeCombinedPreflightReport {
+            .frame = fluxma::KwinNativeInstallPreflightReport {
+                .gate = fluxma::KwinNativeInstallGateAssessment {
+                    .deferred_reason = fluxma::KwinNativeDeferredReason::BackendGate,
+                },
+            },
+            .present = fluxma::KwinNativeInstallPreflightReport {
+                .gate = fluxma::KwinNativeInstallGateAssessment {
+                    .deferred_reason = fluxma::KwinNativeDeferredReason::KwinVersionGate,
+                },
+            },
+        },
+        .install = fluxma::KwinNativeCombinedInstallReport {
+            .frame = fluxma::KwinNativeInstallReport {
+                .result = fluxma::KwinNativeInstallResult::Installed,
+                .deferred_reason = fluxma::KwinNativeDeferredReason::PlaceholderOnly,
+            },
+            .present = fluxma::KwinNativeInstallReport {
+                .result = fluxma::KwinNativeInstallResult::Deferred,
+                .deferred_reason = fluxma::KwinNativeDeferredReason::KwinVersionGate,
+            },
+        },
+    };
+    if (present_gate_only_match.frame_gate_matches() || !present_gate_only_match.present_gate_matches()
+        || present_gate_only_match.all_gates_match() ||
+        present_gate_only_match.frame_install_deferred() ||
+        !present_gate_only_match.present_install_deferred() ||
+        present_gate_only_match.all_installs_deferred()) {
+        std::cerr << "plugin root install observation helpers must preserve frame/present split\n";
+        return EXIT_FAILURE;
+    }
+
     const fluxma::KwinNativeBridgeObservationReport frame_only_unresolved {
         .bringup = fluxma::KwinNativeBringupReport {
             .frame = fluxma::KwinFrameHookReadiness {
