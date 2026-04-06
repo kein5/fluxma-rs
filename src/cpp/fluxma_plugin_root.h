@@ -57,6 +57,10 @@ class KfiPluginRoot {
     [[nodiscard]] const KfiKwinHookAdapter& primary_output_hook_adapter() const noexcept;
     [[nodiscard]] KfiKwinNativeBridge& native_bridge() noexcept;
     [[nodiscard]] const KfiKwinNativeBridge& native_bridge() const noexcept;
+    [[nodiscard]] KwinNativeBringupReport observe_native_bridge_bringup(
+        const KwinCompositorFrameInputs& frame_inputs,
+        const KwinPresentFeedbackInputs& present_inputs
+    ) const;
     [[nodiscard]] KwinNativeBridgeObservationReport observe_native_bridge(
         const KwinCompositorFrameInputs& frame_inputs,
         const KwinPresentFeedbackInputs& present_inputs,

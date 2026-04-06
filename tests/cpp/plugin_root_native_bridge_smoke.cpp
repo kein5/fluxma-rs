@@ -39,6 +39,24 @@ int main() {
         {.enabled = true, .show_hud = true, .log_interval_frames = 1, .max_log_messages = 4}
     );
 
+    const auto bringup_only = plugin_root.observe_native_bridge_bringup(
+        complete_frame_inputs(),
+        complete_present_inputs()
+    );
+    if (bringup_only.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
+        !bringup_only.frame_complete() || !bringup_only.present_complete() ||
+        !bringup_only.fully_populated() ||
+        bringup_only.frame.plan.hook_point !=
+            fluxma::KwinFrameHookPoint::CompositorOutputFrameReady ||
+        bringup_only.present.plan.hook_point !=
+            fluxma::KwinPresentHookPoint::OutputFramePresented ||
+        bringup_only.combined_summary().find("bringup") != std::string::npos ||
+        bringup_only.combined_summary().find("frame{hook=compositor-output-frame-ready") ==
+            std::string::npos) {
+        std::cerr << "plugin root bringup-only observation must preserve native bridge readiness\n";
+        return EXIT_FAILURE;
+    }
+
     const auto version_gate_observation = plugin_root.observe_native_bridge(
         complete_frame_inputs(),
         complete_present_inputs(),

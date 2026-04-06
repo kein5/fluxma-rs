@@ -128,6 +128,13 @@ const KfiKwinNativeBridge& KfiPluginRoot::native_bridge() const noexcept {
     return native_bridge_;
 }
 
+KwinNativeBringupReport KfiPluginRoot::observe_native_bridge_bringup(
+    const KwinCompositorFrameInputs& frame_inputs,
+    const KwinPresentFeedbackInputs& present_inputs
+) const {
+    return native_bridge_.build_report(frame_inputs, present_inputs);
+}
+
 KwinNativeBridgeObservationReport KfiPluginRoot::observe_native_bridge(
     const KwinCompositorFrameInputs& frame_inputs,
     const KwinPresentFeedbackInputs& present_inputs,
