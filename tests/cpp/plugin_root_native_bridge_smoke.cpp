@@ -55,7 +55,10 @@ int main() {
         version_gate_observation.bringup.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
         !version_gate_observation.bringup.frame_complete() ||
         !version_gate_observation.bringup.present_complete() ||
-        !version_gate_observation.bringup.fully_populated() ||
+        !version_gate_observation.bringup_complete() ||
+        !version_gate_observation.frame_gate_matches() ||
+        !version_gate_observation.present_gate_matches() ||
+        !version_gate_observation.all_gates_match() ||
         version_gate_observation.bringup.frame.plan.hook_point !=
             fluxma::KwinFrameHookPoint::CompositorOutputFrameReady ||
         version_gate_frame_summary.find(
@@ -106,6 +109,7 @@ int main() {
             fluxma::KwinNativeDeferredReason::BackendGate ||
         backend_gate_observation.install.present.deferred_reason !=
             fluxma::KwinNativeDeferredReason::BackendGate ||
+        !backend_gate_observation.all_gates_match() ||
         backend_gate_observation.preflight.present.source_file != "src/core/renderbackend.cpp" ||
         backend_gate_observation.preflight.present.symbol != "OutputFrame::presented(...)" ||
         backend_gate_observation.install.present.source_file != "src/core/renderbackend.cpp" ||
@@ -137,6 +141,7 @@ int main() {
             fluxma::KwinNativeDeferredReason::KwinVersionGate ||
         precedence_observation.install.present.deferred_reason !=
             fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        !precedence_observation.all_gates_match() ||
         precedence_observation.summary().find("reason=kwin version gate blocked install for 6.3.82")
             == std::string::npos) {
         std::cerr << "version gate must remain the first deferred reason\n";
@@ -266,7 +271,7 @@ int main() {
     const auto incomplete_present_summary = incomplete_observation.bringup.present_summary();
     if (incomplete_observation.bringup.frame_complete() ||
         incomplete_observation.bringup.present_complete() ||
-        incomplete_observation.bringup.fully_populated() ||
+        incomplete_observation.bringup_complete() ||
         incomplete_frame_summary.find("ready=no") == std::string::npos ||
         incomplete_frame_summary.find("missing=frame-id,width") ==
             std::string::npos ||
@@ -276,6 +281,7 @@ int main() {
             std::string::npos ||
         incomplete_observation.preflight.frame.gate.deferred_reason !=
             fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        !incomplete_observation.all_gates_match() ||
         incomplete_summary.find("preflight{frame{deferred_reason=placeholder-only") ==
             std::string::npos ||
         incomplete_summary.find("install{frame{result=deferred") == std::string::npos) {

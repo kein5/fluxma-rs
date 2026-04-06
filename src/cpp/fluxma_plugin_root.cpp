@@ -6,6 +6,22 @@ bool KwinNativeBridgeObservationReport::is_placeholder_state() const noexcept {
     return state == KwinNativeBridgeState::PlaceholderOnly;
 }
 
+bool KwinNativeBridgeObservationReport::bringup_complete() const noexcept {
+    return bringup.fully_populated();
+}
+
+bool KwinNativeBridgeObservationReport::frame_gate_matches() const noexcept {
+    return preflight.frame.gate.deferred_reason == install.frame.deferred_reason;
+}
+
+bool KwinNativeBridgeObservationReport::present_gate_matches() const noexcept {
+    return preflight.present.gate.deferred_reason == install.present.deferred_reason;
+}
+
+bool KwinNativeBridgeObservationReport::all_gates_match() const noexcept {
+    return frame_gate_matches() && present_gate_matches();
+}
+
 std::string KwinNativeBridgeObservationReport::summary() const {
     std::string output;
     output += "state=";
