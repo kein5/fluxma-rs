@@ -19,11 +19,11 @@ fluxma::FrameDescriptor frame(std::uint64_t frame_id) {
         .content_type = fluxma::ContentType::Video,
         .protected_content = false,
         .damage_ratio = 0.5,
-        .cursor_visible = false,
-        .cursor_x = 0.0,
-        .cursor_y = 0.0,
-        .cursor_velocity_x = 0.0,
-        .cursor_velocity_y = 0.0,
+        .cursor_visible = frame_id == 5,
+        .cursor_x = 960.0,
+        .cursor_y = 980.0,
+        .cursor_velocity_x = 20.0,
+        .cursor_velocity_y = 16.0,
         .gpu_handle = fluxma::GpuFrameHandle {.backend_kind = 1, .handle_id = frame_id + 100},
     };
 }
@@ -54,6 +54,9 @@ int main() {
         !report.synthetic_armed() || report.synthetic_should_drop() ||
         !report.synthetic_generated() || !report.synthetic_queued() ||
         report.synthetic_submission_dropped() || !report.synthetic_placeholder_only() ||
+        !report.cursor_passthrough() || !report.subtitle_band_active() ||
+        report.protection_plan.subtitle_band_top != 886 ||
+        report.protection_plan.subtitle_band_bottom != 1080 ||
         report.synthetic_plan.synthetic_frame_id != 11 ||
         report.synthetic_artifact.synthetic_frame_id != 11 ||
         report.synthetic_submission.synthetic_frame_id != 11 ||
@@ -61,9 +64,13 @@ int main() {
         report.hud_text.find("scheduler=synthetic-2x") == std::string::npos ||
         report.hud_text.find("synthetic_generated=yes") == std::string::npos ||
         report.hud_text.find("synthetic_queued=yes") == std::string::npos ||
+        report.hud_text.find("cursor_passthrough=yes") == std::string::npos ||
+        report.hud_text.find("subtitle_band=yes") == std::string::npos ||
         report.summary().find("synthetic-armed=yes") == std::string::npos ||
         report.summary().find("synthetic-generated=yes") == std::string::npos ||
         report.summary().find("synthetic-queued=yes") == std::string::npos ||
+        report.summary().find("cursor-passthrough=yes") == std::string::npos ||
+        report.summary().find("subtitle-band=yes") == std::string::npos ||
         report.summary().find("synthetic-submission-drop=no") == std::string::npos) {
         std::cerr << "output runtime observation mismatch\n";
         return EXIT_FAILURE;
@@ -73,6 +80,7 @@ int main() {
     if (!late_report.synthetic_should_drop() ||
         late_report.synthetic_generated() || late_report.synthetic_queued() ||
         !late_report.synthetic_submission_dropped() || !late_report.synthetic_placeholder_only() ||
+        !late_report.cursor_passthrough() || !late_report.subtitle_band_active() ||
         late_report.synthetic_submission.synthetic_frame_id != 11 ||
         late_report.summary().find("synthetic-drop=yes") == std::string::npos ||
         late_report.summary().find("synthetic-placeholder=yes") == std::string::npos ||

@@ -102,6 +102,8 @@ OutputDecision KfiOutputController::on_frame_tapped(const FrameDescriptor& frame
     // TODO: Attach this controller to a real per-output KWin integration point once the
     // final post-composition hook is confirmed.
     const auto tapped = bypass_pipeline_.capture_frame(frame);
+    last_frame_ = tapped;
+    has_last_frame_ = true;
     last_decision_ = rust_core_.evaluate(tapped);
     last_submission_ = bypass_pipeline_.submit_passthrough(output_id_, tapped, last_decision_);
     remember_submission(last_submission_.frame_id);
@@ -134,11 +136,15 @@ OutputRuntimeSample KfiOutputController::build_runtime_sample(
         now_ns
     );
     const auto synthetic_artifact = fake_synth_generator_.generate(synthetic_plan);
+    const auto protection_plan = has_last_frame_
+        ? protection_planner_.plan(last_frame_, snapshot, config_)
+        : ProtectionPlan {};
     return OutputRuntimeSample {
         .snapshot = snapshot,
         .synthetic_plan = synthetic_plan,
         .synthetic_artifact = synthetic_artifact,
         .synthetic_submission = synthetic_present_queue_.enqueue_placeholder(synthetic_artifact),
+        .protection_plan = protection_plan,
     };
 }
 
@@ -192,7 +198,8 @@ std::string KfiOutputController::render_hud_text(const OutputRuntimeSample& samp
         sample.snapshot,
         sample.synthetic_plan,
         sample.synthetic_artifact,
-        sample.synthetic_submission
+        sample.synthetic_submission,
+        sample.protection_plan
     );
 }
 

@@ -10,6 +10,7 @@
 #include "fluxma_config.h"
 #include "fluxma_hud_renderer.h"
 #include "fluxma_logger.h"
+#include "fluxma_protection_planner.h"
 #include "fluxma_synthetic_present_queue.h"
 #include "fluxma_synthetic_scheduler.h"
 #include "fluxma_types.h"
@@ -92,12 +93,15 @@ class KfiOutputController {
     KfiBypassPipeline bypass_pipeline_ {};
     KfiHudRenderer hud_renderer_ {};
     KfiFakeSynthGenerator fake_synth_generator_ {};
+    KfiProtectionPlanner protection_planner_ {};
     KfiSyntheticPresentQueue synthetic_present_queue_ {};
     KfiSyntheticScheduler synthetic_scheduler_ {};
     RustOutputCore rust_core_;
     bool rust_core_ready_ = false;
     OutputDecision last_decision_ {};
     PassthroughSubmission last_submission_ {};
+    FrameDescriptor last_frame_ {};
+    bool has_last_frame_ = false;
     ControllerRuntime runtime_ {};
     KfiRateLimitedLogger logger_;
 };

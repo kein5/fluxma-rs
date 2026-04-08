@@ -234,6 +234,13 @@ synthetic frame を present queue に返す。
 
 ## Epic 9: cursor / subtitle / overlay 保護
 
+現状:
+- `KfiProtectionPlanner` で cursor passthrough / recomposite flag を placeholder 判定済み
+- `ContentType::Video` 向けの placeholder subtitle band heuristic を追加済み
+- protected content では subtitle band を無効化し、cursor plan は descriptive flag のみ返す
+- `OutputRuntimeSample` / HUD / runtime observation まで protection plan を可視化済み
+- まだ real post-synth cursor recomposite / subtitle weighting / overlay exclusion には未接続
+
 ### Task 9.1
 cursor を補間パスから外す。
 

@@ -59,6 +59,7 @@ add_library(fluxma_native_skeleton STATIC
     src/cpp/fluxma_logger.cpp
     src/cpp/fluxma_midframe_synth.cpp
     src/cpp/fluxma_present_feedback_tap.cpp
+    src/cpp/fluxma_protection_planner.cpp
     src/cpp/fluxma_synthetic_scheduler.cpp
     src/cpp/fluxma_synthetic_present_queue.cpp
     src/cpp/fluxma_texture_pool.cpp
@@ -264,6 +265,22 @@ target_include_directories(fluxma_plugin_root_native_bridge_smoke
 )
 
 target_link_libraries(fluxma_plugin_root_native_bridge_smoke
+    PRIVATE
+        fluxma_native_skeleton
+)
+
+add_executable(fluxma_protection_planner_smoke
+    tests/cpp/protection_planner_smoke.cpp
+)
+add_dependencies(fluxma_protection_planner_smoke fluxma_rust_core)
+
+target_include_directories(fluxma_protection_planner_smoke
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/rust/include
+)
+
+target_link_libraries(fluxma_protection_planner_smoke
     PRIVATE
         fluxma_native_skeleton
 )
@@ -521,6 +538,7 @@ if(BUILD_TESTING)
         NAME fluxma_plugin_root_native_bridge_smoke
         COMMAND fluxma_plugin_root_native_bridge_smoke
     )
+    add_test(NAME fluxma_protection_planner_smoke COMMAND fluxma_protection_planner_smoke)
     add_test(NAME fluxma_hook_input_builder_smoke COMMAND fluxma_hook_input_builder_smoke)
     add_test(NAME fluxma_hook_field_source_smoke COMMAND fluxma_hook_field_source_smoke)
     add_test(NAME fluxma_hook_candidate_plan_smoke COMMAND fluxma_hook_candidate_plan_smoke)

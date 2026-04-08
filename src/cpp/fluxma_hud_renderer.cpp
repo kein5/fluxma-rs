@@ -9,7 +9,8 @@ std::string KfiHudRenderer::compose_text(
     const MetricsSnapshot& snapshot,
     const SyntheticFramePlan& synthetic_plan,
     const SyntheticFrameArtifact& synthetic_artifact,
-    const SyntheticPresentSubmission& synthetic_submission
+    const SyntheticPresentSubmission& synthetic_submission,
+    const ProtectionPlan& protection_plan
 ) const {
     std::ostringstream stream;
     stream << "Fluxma output=" << output_id << '\n';
@@ -39,7 +40,18 @@ std::string KfiHudRenderer::compose_text(
     stream << "synthetic_deadline_ns=" << synthetic_plan.deadline_timestamp_ns << '\n';
     stream << "synthetic_generated=" << to_bool_string(synthetic_artifact.generated) << '\n';
     stream << "synthetic_queued=" << to_bool_string(synthetic_submission.queued) << '\n';
-    stream << "synthetic_placeholder=" << to_bool_string(synthetic_artifact.placeholder_only);
+    stream << "synthetic_placeholder=" << to_bool_string(synthetic_artifact.placeholder_only)
+           << '\n';
+    stream << "cursor_passthrough=" << to_bool_string(protection_plan.cursor_passthrough)
+           << '\n';
+    stream << "cursor_recomposite=" << to_bool_string(protection_plan.cursor_recomposite)
+           << '\n';
+    stream << "subtitle_band=" << to_bool_string(protection_plan.subtitle_band_active) << '\n';
+    stream << "subtitle_band_top=" << protection_plan.subtitle_band_top << '\n';
+    stream << "subtitle_band_bottom=" << protection_plan.subtitle_band_bottom << '\n';
+    stream << "overlay_passthrough="
+           << to_bool_string(protection_plan.transient_overlay_passthrough) << '\n';
+    stream << "protection_placeholder=" << to_bool_string(protection_plan.placeholder_only);
     return stream.str();
 }
 

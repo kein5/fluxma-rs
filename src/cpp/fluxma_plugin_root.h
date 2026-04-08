@@ -85,6 +85,7 @@ struct OutputRuntimeObservationReport {
     SyntheticFramePlan synthetic_plan {};
     SyntheticFrameArtifact synthetic_artifact {};
     SyntheticPresentSubmission synthetic_submission {};
+    ProtectionPlan protection_plan {};
     std::string hud_text {};
 
     [[nodiscard]] bool synthetic_armed() const noexcept {
@@ -109,6 +110,14 @@ struct OutputRuntimeObservationReport {
 
     [[nodiscard]] bool synthetic_placeholder_only() const noexcept {
         return synthetic_submission.placeholder_only;
+    }
+
+    [[nodiscard]] bool cursor_passthrough() const noexcept {
+        return protection_plan.cursor_passthrough;
+    }
+
+    [[nodiscard]] bool subtitle_band_active() const noexcept {
+        return protection_plan.subtitle_band_active;
     }
 
     [[nodiscard]] std::string summary() const;

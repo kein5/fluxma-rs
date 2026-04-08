@@ -347,7 +347,9 @@ classifier は、この区間で補間を行うべきか判定する。
 - 一定以上の damage ratio
 - 速すぎない cursor velocity
 
-scene cut や subtitle band はまだ未実装で、後続 task に残す。
+scene cut はまだ未実装で、後続 task に残す。
+subtitle band は C++ 側 `KfiProtectionPlanner` で placeholder heuristic を持ち、
+現在は HUD / runtime observation に出すだけで synth weighting にはまだ接続していない。
 
 ---
 
@@ -474,8 +476,17 @@ real synthetic frame resource や real GPU present queue 返却はまだ行わ�
 cursor は補間しない。  
 補間後に現在位置で再合成する。
 
+現状の skeleton では `KfiProtectionPlanner` が
+`cursor_visible && cursor_protection` を見て
+`cursor_passthrough / cursor_recomposite` を立てる。
+まだ real post-synth recomposite には未接続で、HUD / observation のみ。
+
 ### subtitle
 画面下部の字幕帯は heuristic で検出し、その領域では current frame 側を強く優先する。
+
+現状の skeleton では `ContentType::Video` かつ non-protected の frame に対して、
+画面下部 18% を placeholder subtitle band として返す。
+まだ real synth weighting / mask 適用には未接続で、HUD / observation のみ。
 
 ### overlay
 一時的な OSD や UI は、可能なら補間対象から除外する。  

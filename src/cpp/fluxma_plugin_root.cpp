@@ -226,6 +226,10 @@ std::string OutputRuntimeObservationReport::summary() const {
     output += std::string(to_bool_string(synthetic_submission.queued));
     output += " synthetic-submission-drop=";
     output += std::string(to_bool_string(synthetic_submission.dropped));
+    output += " cursor-passthrough=";
+    output += std::string(to_bool_string(protection_plan.cursor_passthrough));
+    output += " subtitle-band=";
+    output += std::string(to_bool_string(protection_plan.subtitle_band_active));
     return output;
 }
 
@@ -311,6 +315,7 @@ OutputRuntimeObservationReport KfiPluginRoot::observe_output_runtime(std::uint64
         .synthetic_plan = sample.synthetic_plan,
         .synthetic_artifact = sample.synthetic_artifact,
         .synthetic_submission = sample.synthetic_submission,
+        .protection_plan = sample.protection_plan,
         .hud_text = primary_output_.render_hud_text(sample),
     };
 }

@@ -13,7 +13,8 @@ class KfiHudRenderer {
         const MetricsSnapshot& snapshot,
         const SyntheticFramePlan& synthetic_plan,
         const SyntheticFrameArtifact& synthetic_artifact,
-        const SyntheticPresentSubmission& synthetic_submission
+        const SyntheticPresentSubmission& synthetic_submission,
+        const ProtectionPlan& protection_plan
     ) const;
 };
 

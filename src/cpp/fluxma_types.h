@@ -259,11 +259,22 @@ struct SyntheticPresentSubmission {
     bool placeholder_only = true;
 };
 
+struct ProtectionPlan {
+    bool cursor_passthrough = false;
+    bool cursor_recomposite = false;
+    bool subtitle_band_active = false;
+    bool transient_overlay_passthrough = false;
+    std::uint32_t subtitle_band_top = 0;
+    std::uint32_t subtitle_band_bottom = 0;
+    bool placeholder_only = true;
+};
+
 struct OutputRuntimeSample {
     MetricsSnapshot snapshot {};
     SyntheticFramePlan synthetic_plan {};
     SyntheticFrameArtifact synthetic_artifact {};
     SyntheticPresentSubmission synthetic_submission {};
+    ProtectionPlan protection_plan {};
 };
 
 [[nodiscard]] inline std::string_view to_string(OutputState state) noexcept {
