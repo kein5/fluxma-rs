@@ -157,6 +157,8 @@ int main() {
             fluxma::KwinNativeDeferredReason::BackendGate ||
         backend_blocked_native_bridge.present_deferred_reason !=
             fluxma::KwinNativeDeferredReason::BackendGate ||
+        backend_blocked_native_bridge.state !=
+            fluxma::KwinNativeBridgeState::PlaceholderOnly ||
         backend_blocked_native_bridge.frame_version_blocked ||
         backend_blocked_native_bridge.present_version_blocked ||
         !backend_blocked_native_bridge.frame_backend_blocked ||
@@ -207,6 +209,8 @@ int main() {
             fluxma::KwinNativeDeferredReason::KwinVersionGate ||
         version_blocked_native_bridge.present_deferred_reason !=
             fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        version_blocked_native_bridge.state !=
+            fluxma::KwinNativeBridgeState::PlaceholderOnly ||
         !version_blocked_native_bridge.frame_version_blocked ||
         !version_blocked_native_bridge.present_version_blocked ||
         version_blocked_native_bridge.frame_backend_blocked ||
