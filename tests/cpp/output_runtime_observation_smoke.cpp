@@ -149,5 +149,28 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    fluxma::KfiPluginRoot protected_root;
+    for (std::uint64_t frame_id = 1; frame_id <= 5; ++frame_id) {
+        auto sample_frame = frame(frame_id);
+        if (frame_id == 5) {
+            sample_frame.protected_content = true;
+        }
+        const auto _ = protected_root.primary_output().on_frame_tapped(sample_frame);
+    }
+    const auto protected_report = protected_root.observe_output_runtime(200'000'000);
+    if (protected_report.snapshot.state != fluxma::OutputState::ProtectedBypass ||
+        !protected_report.snapshot.protected_content || protected_report.synthetic_armed() ||
+        protected_report.synthetic_generated() || protected_report.synthetic_queued() ||
+        !protected_report.synthetic_placeholder_only() ||
+        protected_report.synthetic_prefers_current_subtitle_band() ||
+        protected_report.synthetic_cursor_passthrough() ||
+        protected_report.synthetic_overlay_passthrough() ||
+        !protected_report.protection_placeholder_only() ||
+        protected_report.subtitle_band_active() || protected_report.overlay_passthrough() ||
+        protected_report.hud_text.find("protected=yes") == std::string::npos) {
+        std::cerr << "protected runtime observation mismatch\n";
+        return EXIT_FAILURE;
+    }
+
     return EXIT_SUCCESS;
 }

@@ -93,6 +93,17 @@ int main() {
         std::cerr << "fake synth logger mismatch\n";
         return EXIT_FAILURE;
     }
+    const auto has_synthetic_submission_log =
+        std::any_of(logs.begin(), logs.end(), [](const std::string& log) {
+            return log.find("synthetic-queued=yes") != std::string::npos &&
+                log.find("synthetic-cursor-passthrough=no") != std::string::npos &&
+                log.find("synthetic-overlay-passthrough=no") != std::string::npos &&
+                log.find("synthetic-subtitle-current=no") != std::string::npos;
+        });
+    if (!has_synthetic_submission_log) {
+        std::cerr << "fake synth submission logger mismatch\n";
+        return EXIT_FAILURE;
+    }
 
     const auto dropped_plan = output.plan_synthetic_frame(181'333'332);
     const auto dropped_artifact = output.generate_fake_synthetic_frame(181'333'332);

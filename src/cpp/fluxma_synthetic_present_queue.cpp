@@ -5,7 +5,8 @@
 namespace fluxma {
 
 SyntheticPresentSubmission KfiSyntheticPresentQueue::enqueue_placeholder(
-    const SyntheticFrameArtifact& artifact
+    const SyntheticFrameArtifact& artifact,
+    const ProtectionPlan& protection_plan
 ) const noexcept {
     return SyntheticPresentSubmission {
         .output_id = artifact.output_id,
@@ -14,7 +15,7 @@ SyntheticPresentSubmission KfiSyntheticPresentQueue::enqueue_placeholder(
         .target_present_timestamp_ns = artifact.target_present_timestamp_ns,
         .queued = artifact.generated,
         .dropped = artifact.dropped,
-        .protection_plan = ProtectionPlan {},
+        .protection_plan = protection_plan,
         .prefer_current_in_subtitle_band = false,
         .placeholder_only = artifact.placeholder_only,
     };
