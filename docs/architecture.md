@@ -519,7 +519,8 @@ protected content の区間では、次の動作のみ許可する。
 
 現状の skeleton では `MetricsSnapshot::is_protected_bypass()` と
 `OutputRuntimeObservationReport::synthetic_suppressed_by_protection()` を持ち、
-typed observation だけで protected passthrough-only を確認できる。
+さらに `SyntheticPresentSubmission::is_protected_suppressed()` も持つため、
+typed observation と synthetic submission の両方から protected passthrough-only を確認できる。
 
 ---
 

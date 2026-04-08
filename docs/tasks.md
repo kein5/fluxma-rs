@@ -282,6 +282,7 @@ protected で補間を試みないことをテストする。
 現状:
 - Rust core で protected frame は `ProtectedBypass` + passthrough-only 済み
 - C++ runtime observation に typed helper を追加し、protected bypass と synthetic suppression を確認可能
+- `SyntheticPresentSubmission` 自体にも protected/suppressed metadata を保持済み
 - fake synth / runtime observation の smoke test で protected 区間では synthetic が arm/queue されないことを固定済み
 
 ### 完了条件
