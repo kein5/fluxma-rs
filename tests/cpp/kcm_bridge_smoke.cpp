@@ -106,6 +106,97 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    const auto placeholder_native_diagnostics = kcm_bridge.native_bridge_diagnostics(
+        fluxma::KwinCompositorFrameInputs {
+            .output_id = 0,
+            .frame_id = 12,
+            .timestamp_ns = 2'000'000,
+            .target_presentation_timestamp_ns = 18'000'000,
+            .predicted_render_time_ns = 2'000'000,
+            .content_type = fluxma::ContentType::Video,
+            .width = 1920,
+            .height = 1080,
+            .gpu_handle = fluxma::GpuFrameHandle {.backend_kind = 1, .handle_id = 212},
+        },
+        fluxma::KwinPresentFeedbackInputs {
+            .output_id = 0,
+            .frame_id = 12,
+            .presented_timestamp_ns = 3'000'000,
+            .refresh_interval_ns = 16'666'667,
+            .presentation_mode = fluxma::PresentationMode::VSync,
+            .present_success = true,
+            .dropped_synthetic = false,
+        },
+        fluxma::KwinNativeInstallContext {}
+    );
+    if (placeholder_native_diagnostics.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
+        !placeholder_native_diagnostics.bringup_complete ||
+        !placeholder_native_diagnostics.has_unresolved_candidates ||
+        !placeholder_native_diagnostics.frame_gate_matches ||
+        !placeholder_native_diagnostics.present_gate_matches ||
+        placeholder_native_diagnostics.frame_has_any_blocker ||
+        placeholder_native_diagnostics.present_has_any_blocker ||
+        placeholder_native_diagnostics.frame_deferred_reason !=
+            fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        placeholder_native_diagnostics.present_deferred_reason !=
+            fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        placeholder_native_diagnostics.summary().find("frame-blocked=no") ==
+            std::string::npos ||
+        placeholder_native_diagnostics.diagnostics_summary.find(
+            "deferred_reason=placeholder-only"
+        ) == std::string::npos) {
+        std::cerr << "kcm placeholder native diagnostics snapshot mismatch\n";
+        return EXIT_FAILURE;
+    }
+
+    const auto backend_native_diagnostics = kcm_bridge.native_bridge_diagnostics(
+        fluxma::KwinCompositorFrameInputs {
+            .output_id = 0,
+            .frame_id = 13,
+            .timestamp_ns = 2'500'000,
+            .target_presentation_timestamp_ns = 18'500'000,
+            .predicted_render_time_ns = 2'000'000,
+            .content_type = fluxma::ContentType::Video,
+            .width = 1920,
+            .height = 1080,
+            .gpu_handle = fluxma::GpuFrameHandle {.backend_kind = 1, .handle_id = 213},
+        },
+        fluxma::KwinPresentFeedbackInputs {
+            .output_id = 0,
+            .frame_id = 13,
+            .presented_timestamp_ns = 3'500'000,
+            .refresh_interval_ns = 16'666'667,
+            .presentation_mode = fluxma::PresentationMode::VSync,
+            .present_success = true,
+            .dropped_synthetic = false,
+        },
+        fluxma::KwinNativeInstallContext {
+            .kwin_version_supported = true,
+            .backend_supported = false,
+            .kwin_version = "6.3.93",
+            .backend_name = "wayland",
+        }
+    );
+    if (backend_native_diagnostics.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
+        !backend_native_diagnostics.bringup_complete ||
+        !backend_native_diagnostics.has_unresolved_candidates ||
+        !backend_native_diagnostics.frame_gate_matches ||
+        !backend_native_diagnostics.present_gate_matches ||
+        !backend_native_diagnostics.frame_has_any_blocker ||
+        !backend_native_diagnostics.present_has_any_blocker ||
+        backend_native_diagnostics.frame_deferred_reason !=
+            fluxma::KwinNativeDeferredReason::BackendGate ||
+        backend_native_diagnostics.present_deferred_reason !=
+            fluxma::KwinNativeDeferredReason::BackendGate ||
+        backend_native_diagnostics.summary().find("present-blocked=yes") ==
+            std::string::npos ||
+        backend_native_diagnostics.diagnostics_summary.find(
+            "backend gate blocked install for wayland"
+        ) == std::string::npos) {
+        std::cerr << "kcm backend native diagnostics snapshot mismatch\n";
+        return EXIT_FAILURE;
+    }
+
     const auto native_diagnostics = kcm_bridge.native_bridge_diagnostics(
         fluxma::KwinCompositorFrameInputs {
             .output_id = 0,
