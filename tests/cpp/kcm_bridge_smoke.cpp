@@ -127,5 +127,31 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    fluxma::KfiPluginRoot degraded_root(config);
+    const fluxma::KfiKcmBridge degraded_bridge(degraded_root);
+    for (std::uint64_t frame_id = 1; frame_id <= 5; ++frame_id) {
+        const auto _ = degraded_root.primary_output().on_frame_tapped(frame(frame_id));
+    }
+    degraded_root.primary_output().on_present_feedback(
+        fluxma::PresentFeedback {
+            .frame_id = 5,
+            .presented_timestamp_ns = 166'666'665,
+            .refresh_interval_ns = 16'666'667,
+            .presentation_mode = fluxma::PresentationMode::VSync,
+            .present_success = false,
+            .dropped_synthetic = true,
+        }
+    );
+    const auto degraded_runtime = degraded_bridge.runtime(200'000'000);
+    if (degraded_runtime.frame_tap_count != 5 ||
+        degraded_runtime.present_feedback_count != 1 ||
+        degraded_runtime.deadline_miss_count != 1 ||
+        degraded_runtime.dropped_synthetic_count != 1 ||
+        degraded_runtime.summary().find("deadline-miss=1") == std::string::npos ||
+        degraded_runtime.summary().find("synthetic-dropped=1") == std::string::npos) {
+        std::cerr << "kcm degraded runtime counters mismatch\n";
+        return EXIT_FAILURE;
+    }
+
     return EXIT_SUCCESS;
 }
