@@ -93,5 +93,14 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    auto no_overlay_frame = video_frame();
+    no_overlay_frame.overlay_promoted = false;
+    const auto no_overlay_plan = planner.plan(no_overlay_frame, snapshot, fluxma::ModuleConfig {});
+    if (!no_overlay_plan.cursor_passthrough || no_overlay_plan.transient_overlay_passthrough ||
+        !no_overlay_plan.subtitle_band_active) {
+        std::cerr << "overlay false path must stay false\n";
+        return EXIT_FAILURE;
+    }
+
     return EXIT_SUCCESS;
 }

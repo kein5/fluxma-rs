@@ -117,5 +117,28 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    fluxma::KfiPluginRoot no_overlay_root;
+    for (std::uint64_t frame_id = 1; frame_id <= 5; ++frame_id) {
+        auto sample_frame = frame(frame_id);
+        sample_frame.overlay_promoted = false;
+        const auto _ = no_overlay_root.primary_output().on_frame_tapped(sample_frame);
+    }
+    no_overlay_root.primary_output().on_present_feedback(
+        fluxma::PresentFeedback {
+            .frame_id = 5,
+            .presented_timestamp_ns = 166'666'665,
+            .refresh_interval_ns = 16'666'667,
+            .presentation_mode = fluxma::PresentationMode::VSync,
+            .present_success = true,
+            .dropped_synthetic = false,
+        }
+    );
+    const auto no_overlay_report = no_overlay_root.observe_output_runtime(47'999'999);
+    if (no_overlay_report.protection_plan.transient_overlay_passthrough ||
+        no_overlay_report.hud_text.find("overlay_passthrough=no") == std::string::npos) {
+        std::cerr << "runtime observation must preserve overlay false path\n";
+        return EXIT_FAILURE;
+    }
+
     return EXIT_SUCCESS;
 }
