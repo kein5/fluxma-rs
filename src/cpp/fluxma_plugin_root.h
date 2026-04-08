@@ -179,6 +179,7 @@ class KfiPluginRoot {
     [[nodiscard]] const KfiKwinHookAdapter& primary_output_hook_adapter() const noexcept;
     [[nodiscard]] KfiKwinNativeBridge& native_bridge() noexcept;
     [[nodiscard]] const KfiKwinNativeBridge& native_bridge() const noexcept;
+    [[nodiscard]] const ModuleConfig& config() const noexcept;
     // Use this when only hook input completeness/readiness matters and install gate state is irrelevant.
     [[nodiscard]] KwinNativeBringupReport observe_native_bridge_bringup(
         const KwinCompositorFrameInputs& frame_inputs,

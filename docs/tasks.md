@@ -292,6 +292,12 @@ protected で補間を試みないことをテストする。
 
 ## Epic 11: KCM と仕上げ
 
+現状:
+- `src/kcm/fluxma_kcm_bridge.*` で KCM 向け settings/runtime snapshot bridge を追加済み
+- `enabled/show_hud/subtitle_protection/cursor_protection/logging` を plain C++ settings snapshot として取得可能
+- `state/bypass/protected/passthrough/synthetic/cadence/hud_text` を live runtime snapshot として取得可能
+- まだ Qt/QML/actual KCM page には未接続
+
 ### Task 11.1
 KCM の基本ページを作る。
 

@@ -544,6 +544,11 @@ typed observation と synthetic submission の両方から protected passthrough
 - scheduler
 - metrics
 
+### KCM bridge 層
+現状の skeleton では `src/kcm/fluxma_kcm_bridge.*` を追加し、
+`ModuleConfig` と `observe_output_runtime()` を plain C++ snapshot に変換している。
+これは将来の KCM UI 層を薄く保つための bridge で、まだ actual Qt/KCM page には未接続。
+
 原則:
 - render hot path に重い判断や QObject-heavy 処理を置かない
 - Rust は orchestration を担う
