@@ -211,6 +211,11 @@ confidence map の初期版を実装する。
 
 ## Epic 8: midframe synthesis
 
+現状:
+- `KfiMidframeSynthesizer` で placeholder midframe synthesis request/result を構築済み
+- usable な flow input bundle と confidence map が揃った場合のみ placeholder synthesis を返す
+- まだ real shader dispatch / real synthetic frame resource / real present queue 返却には進んでいない
+
 ### Task 8.1
 2x 用の midframe synthesis を実装する。
 

@@ -457,6 +457,14 @@ placeholder slice の範囲では real flow dispatch の成立を意味しない
 この skeleton の目的は、Epic 7 で必要になる GPU lifetime と pyramid 形状を
 C++ 側に固定することであり、Rust に GPU resource ownership を渡さない点は維持する。
 
+### 13.4 placeholder midframe synthesis
+Epic 8 の入口として、`KfiMidframeSynthesizer` を placeholder-only で追加している。
+これは usable な `FlowInputBundle` と `ConfidenceMapBuildResult`、および
+synthetic frame id / target present timestamp を受け取り、real shader dispatch をまだ行わずに
+midframe synthesis request/result の契約だけを先に固定する。
+この段階で返すのは metadata のみであり、real synthetic frame resource や
+real present queue 返却はまだ行わない。
+
 ---
 
 ## 14. cursor / subtitle / overlay 保護
