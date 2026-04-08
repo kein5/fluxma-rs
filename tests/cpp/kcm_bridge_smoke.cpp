@@ -98,5 +98,24 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    const fluxma::ModuleConfig disabled_config {
+        .enabled = false,
+        .show_hud = false,
+        .subtitle_protection = false,
+        .cursor_protection = false,
+        .log_interval_frames = 3,
+        .max_log_messages = 5,
+    };
+    fluxma::KfiPluginRoot disabled_root(disabled_config);
+    const fluxma::KfiKcmBridge disabled_bridge(disabled_root);
+    const auto disabled_settings = disabled_bridge.settings();
+    if (disabled_settings.enabled || disabled_settings.show_hud ||
+        disabled_settings.subtitle_protection || disabled_settings.cursor_protection ||
+        disabled_settings.log_interval_frames != 3 ||
+        disabled_settings.max_log_messages != 5) {
+        std::cerr << "kcm disabled settings snapshot mismatch\n";
+        return EXIT_FAILURE;
+    }
+
     return EXIT_SUCCESS;
 }
