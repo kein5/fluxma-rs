@@ -55,9 +55,11 @@ int main() {
         !report.synthetic_armed() || report.synthetic_should_drop() ||
         !report.synthetic_generated() || !report.synthetic_queued() ||
         report.synthetic_submission_dropped() || !report.synthetic_placeholder_only() ||
+        report.synthetic_cursor_passthrough() || report.synthetic_overlay_passthrough() ||
         report.synthetic_prefers_current_subtitle_band() ||
-        !report.cursor_passthrough() || !report.subtitle_band_active() ||
-        !report.protection_plan.transient_overlay_passthrough ||
+        !report.cursor_passthrough() || !report.cursor_recomposite() ||
+        !report.subtitle_band_active() || !report.overlay_passthrough() ||
+        !report.protection_placeholder_only() ||
         report.protection_plan.subtitle_band_top != 886 ||
         report.protection_plan.subtitle_band_bottom != 1080 ||
         report.synthetic_plan.synthetic_frame_id != 11 ||
@@ -85,9 +87,11 @@ int main() {
     if (!late_report.synthetic_should_drop() ||
         late_report.synthetic_generated() || late_report.synthetic_queued() ||
         !late_report.synthetic_submission_dropped() || !late_report.synthetic_placeholder_only() ||
+        late_report.synthetic_cursor_passthrough() || late_report.synthetic_overlay_passthrough() ||
         late_report.synthetic_prefers_current_subtitle_band() ||
-        !late_report.cursor_passthrough() || !late_report.subtitle_band_active() ||
-        !late_report.protection_plan.transient_overlay_passthrough ||
+        !late_report.cursor_passthrough() || !late_report.cursor_recomposite() ||
+        !late_report.subtitle_band_active() || !late_report.overlay_passthrough() ||
+        !late_report.protection_placeholder_only() ||
         late_report.synthetic_submission.synthetic_frame_id != 11 ||
         late_report.summary().find("synthetic-drop=yes") == std::string::npos ||
         late_report.summary().find("synthetic-placeholder=yes") == std::string::npos ||
@@ -137,7 +141,8 @@ int main() {
         }
     );
     const auto no_overlay_report = no_overlay_root.observe_output_runtime(47'999'999);
-    if (no_overlay_report.protection_plan.transient_overlay_passthrough ||
+    if (no_overlay_report.overlay_passthrough() || !no_overlay_report.cursor_recomposite() ||
+        !no_overlay_report.protection_placeholder_only() ||
         no_overlay_report.synthetic_prefers_current_subtitle_band() ||
         no_overlay_report.hud_text.find("overlay_passthrough=no") == std::string::npos) {
         std::cerr << "runtime observation must preserve overlay false path\n";

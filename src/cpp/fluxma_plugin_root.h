@@ -116,12 +116,32 @@ struct OutputRuntimeObservationReport {
         return synthetic_submission.prefer_current_in_subtitle_band;
     }
 
+    [[nodiscard]] bool synthetic_cursor_passthrough() const noexcept {
+        return synthetic_submission.protection_plan.cursor_passthrough;
+    }
+
+    [[nodiscard]] bool synthetic_overlay_passthrough() const noexcept {
+        return synthetic_submission.protection_plan.transient_overlay_passthrough;
+    }
+
     [[nodiscard]] bool cursor_passthrough() const noexcept {
         return protection_plan.cursor_passthrough;
     }
 
+    [[nodiscard]] bool cursor_recomposite() const noexcept {
+        return protection_plan.cursor_recomposite;
+    }
+
     [[nodiscard]] bool subtitle_band_active() const noexcept {
         return protection_plan.subtitle_band_active;
+    }
+
+    [[nodiscard]] bool overlay_passthrough() const noexcept {
+        return protection_plan.transient_overlay_passthrough;
+    }
+
+    [[nodiscard]] bool protection_placeholder_only() const noexcept {
+        return protection_plan.placeholder_only;
     }
 
     [[nodiscard]] std::string summary() const;
