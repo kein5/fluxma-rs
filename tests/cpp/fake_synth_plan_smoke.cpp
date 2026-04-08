@@ -67,13 +67,16 @@ int main() {
         ready_artifact.synthetic_frame_id != 11 ||
         !ready_submission.queued || ready_submission.dropped ||
         !ready_submission.placeholder_only ||
+        ready_submission.prefer_current_in_subtitle_band ||
+        ready_submission.protection_plan.subtitle_band_active ||
         ready_submission.synthetic_frame_id != 11 ||
         hud.find("synthetic_armed=yes") == std::string::npos ||
         hud.find("synthetic_drop=no") == std::string::npos ||
         hud.find("synthetic_target_ns=183333332") == std::string::npos ||
         hud.find("synthetic_generated=yes") == std::string::npos ||
         hud.find("synthetic_queued=yes") == std::string::npos ||
-        hud.find("synthetic_placeholder=yes") == std::string::npos) {
+        hud.find("synthetic_placeholder=yes") == std::string::npos ||
+        hud.find("synthetic_subtitle_current_priority=no") == std::string::npos) {
         std::cerr << "fake synth plan mismatch\n";
         return EXIT_FAILURE;
     }
@@ -93,7 +96,9 @@ int main() {
     if (!dropped_plan.armed || !dropped_plan.should_drop ||
         dropped_artifact.generated || !dropped_artifact.dropped ||
         dropped_submission.queued || !dropped_submission.dropped ||
-        !dropped_submission.placeholder_only) {
+        !dropped_submission.placeholder_only ||
+        dropped_submission.prefer_current_in_subtitle_band ||
+        dropped_submission.protection_plan.subtitle_band_active) {
         std::cerr << "fake synth plan must drop once deadline is missed\n";
         return EXIT_FAILURE;
     }
@@ -106,7 +111,9 @@ int main() {
         protected_plan.armed || protected_plan.should_drop ||
         protected_artifact.generated || protected_artifact.dropped ||
         protected_submission.queued || protected_submission.dropped ||
-        !protected_submission.placeholder_only) {
+        !protected_submission.placeholder_only ||
+        protected_submission.prefer_current_in_subtitle_band ||
+        protected_submission.protection_plan.subtitle_band_active) {
         std::cerr << "protected bypass must not arm fake synth plan\n";
         return EXIT_FAILURE;
     }

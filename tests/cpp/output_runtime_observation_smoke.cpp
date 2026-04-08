@@ -55,6 +55,7 @@ int main() {
         !report.synthetic_armed() || report.synthetic_should_drop() ||
         !report.synthetic_generated() || !report.synthetic_queued() ||
         report.synthetic_submission_dropped() || !report.synthetic_placeholder_only() ||
+        report.synthetic_prefers_current_subtitle_band() ||
         !report.cursor_passthrough() || !report.subtitle_band_active() ||
         !report.protection_plan.transient_overlay_passthrough ||
         report.protection_plan.subtitle_band_top != 886 ||
@@ -72,6 +73,7 @@ int main() {
         report.summary().find("synthetic-armed=yes") == std::string::npos ||
         report.summary().find("synthetic-generated=yes") == std::string::npos ||
         report.summary().find("synthetic-queued=yes") == std::string::npos ||
+        report.summary().find("synthetic-subtitle-current=no") == std::string::npos ||
         report.summary().find("cursor-passthrough=yes") == std::string::npos ||
         report.summary().find("subtitle-band=yes") == std::string::npos ||
         report.summary().find("synthetic-submission-drop=no") == std::string::npos) {
@@ -83,6 +85,7 @@ int main() {
     if (!late_report.synthetic_should_drop() ||
         late_report.synthetic_generated() || late_report.synthetic_queued() ||
         !late_report.synthetic_submission_dropped() || !late_report.synthetic_placeholder_only() ||
+        late_report.synthetic_prefers_current_subtitle_band() ||
         !late_report.cursor_passthrough() || !late_report.subtitle_band_active() ||
         !late_report.protection_plan.transient_overlay_passthrough ||
         late_report.synthetic_submission.synthetic_frame_id != 11 ||
@@ -135,6 +138,7 @@ int main() {
     );
     const auto no_overlay_report = no_overlay_root.observe_output_runtime(47'999'999);
     if (no_overlay_report.protection_plan.transient_overlay_passthrough ||
+        no_overlay_report.synthetic_prefers_current_subtitle_band() ||
         no_overlay_report.hud_text.find("overlay_passthrough=no") == std::string::npos) {
         std::cerr << "runtime observation must preserve overlay false path\n";
         return EXIT_FAILURE;
