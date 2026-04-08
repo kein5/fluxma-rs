@@ -31,5 +31,37 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    fluxma::FlowInputBundle truncated_bundle {};
+    truncated_bundle.previous.frame_id = 500;
+    truncated_bundle.current.frame_id = 501;
+    truncated_bundle.truncated = true;
+    const auto truncated_confidence = confidence_builder.build(truncated_bundle);
+    if (truncated_confidence.valid || truncated_confidence.built_levels != 0) {
+        std::cerr << "confidence map truncated bundle mismatch\n";
+        return EXIT_FAILURE;
+    }
+
+    fluxma::FlowInputBundle mismatched_bundle {};
+    mismatched_bundle.valid = true;
+    mismatched_bundle.previous.valid = true;
+    mismatched_bundle.current.valid = true;
+    mismatched_bundle.previous.frame_id = 600;
+    mismatched_bundle.current.frame_id = 601;
+    mismatched_bundle.previous.luma_pyramid.valid = true;
+    mismatched_bundle.current.luma_pyramid.valid = true;
+    mismatched_bundle.previous.luma_pyramid.built_levels = 3;
+    mismatched_bundle.current.luma_pyramid.built_levels = 1;
+    mismatched_bundle.previous.luma_pyramid.levels[0] =
+        fluxma::LumaPyramidLevel {.level_index = 0, .width = 640, .height = 360, .acquired = true};
+    mismatched_bundle.current.luma_pyramid.levels[0] =
+        fluxma::LumaPyramidLevel {.level_index = 0, .width = 640, .height = 360, .acquired = true};
+    const auto mismatched_confidence = confidence_builder.build(mismatched_bundle);
+    if (!mismatched_confidence.valid || mismatched_confidence.built_levels != 1 ||
+        mismatched_confidence.levels[0].width != 640 ||
+        mismatched_confidence.levels[0].height != 360) {
+        std::cerr << "confidence map level-count mismatch\n";
+        return EXIT_FAILURE;
+    }
+
     return EXIT_SUCCESS;
 }

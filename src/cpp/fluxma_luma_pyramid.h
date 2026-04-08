@@ -13,7 +13,7 @@ struct LumaPyramidLevel {
     std::uint32_t width = 0;
     std::uint32_t height = 0;
     std::uint32_t texture_slot_id = 0;
-    std::uint32_t texture_generation = 0;
+    std::uint64_t texture_generation = 0;
     bool acquired = false;
     bool placeholder_only = true;
 };

@@ -37,7 +37,7 @@ struct FlowInputBundle {
 
 class KfiFlowInputsBuilder {
   public:
-    explicit KfiFlowInputsBuilder(std::size_t texture_pool_capacity = 8) noexcept;
+    explicit KfiFlowInputsBuilder(std::size_t texture_pool_capacity = 16) noexcept;
 
     [[nodiscard]] FlowInputBundle build(
         std::uint64_t previous_frame_id,

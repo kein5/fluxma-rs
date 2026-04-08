@@ -18,7 +18,7 @@ struct GpuTextureDescriptor {
 
 struct GpuTextureLease {
     std::uint32_t slot_id = 0;
-    std::uint32_t generation = 0;
+    std::uint64_t generation = 0;
     GpuTextureDescriptor descriptor {};
     bool acquired = false;
     bool placeholder_only = true;
@@ -37,7 +37,7 @@ class KfiTexturePool {
 
   private:
     struct Slot {
-        std::uint32_t generation = 0;
+        std::uint64_t generation = 0;
         GpuTextureDescriptor descriptor {};
         bool in_use = false;
     };

@@ -186,7 +186,7 @@ scheduler と synthetic present slot を接続する。
 - `KfiLumaPyramidBuilder` で placeholder pyramid level を構築済み
 - `KfiFlowInputsBuilder` で prev/curr の placeholder flow input bundle を構築済み
 - `KfiConfidenceMapBuilder` で placeholder confidence map level を構築済み
-- overflow 時は fail-safe に acquire/build を止め、truncated として返す
+- overflow 時は fail-safe に acquire/build を止め、non-usable/truncated bundle を返す
 - まだ motion field / block matching には進んでいない
 
 ### Task 7.1
