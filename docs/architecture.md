@@ -556,6 +556,8 @@ actual installer や Qt/KCM page はまだ実装しない。
 加えて bringup 側も `frame/present complete` と `unresolved` を plain snapshot として
 取り出せる。KWin private/internal hook の未確定箇所は summary のまま露出し、
 KCM bridge 側で意味を決め打ちしない。
+さらに combined diagnostics snapshot では bringup/install をまとめて参照できるが、
+それでも KCM bridge 側は `gate match` や `blocker` の転写に留める。
 これは将来の KCM UI 層を薄く保つための bridge で、まだ actual Qt/KCM page には未接続。
 
 原則:

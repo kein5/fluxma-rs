@@ -60,6 +60,21 @@ struct KcmNativeBringupSnapshot {
     [[nodiscard]] std::string summary() const;
 };
 
+struct KcmNativeDiagnosticsSnapshot {
+    KwinNativeBridgeState state = KwinNativeBridgeState::PlaceholderOnly;
+    bool bringup_complete = false;
+    bool has_unresolved_candidates = false;
+    bool frame_gate_matches = false;
+    bool present_gate_matches = false;
+    bool frame_has_any_blocker = false;
+    bool present_has_any_blocker = false;
+    KwinNativeDeferredReason frame_deferred_reason = KwinNativeDeferredReason::PlaceholderOnly;
+    KwinNativeDeferredReason present_deferred_reason = KwinNativeDeferredReason::PlaceholderOnly;
+    std::string diagnostics_summary {};
+
+    [[nodiscard]] std::string summary() const;
+};
+
 class KfiKcmBridge {
   public:
     explicit KfiKcmBridge(const KfiPluginRoot& plugin_root) noexcept;
@@ -69,6 +84,11 @@ class KfiKcmBridge {
     [[nodiscard]] KcmNativeBringupSnapshot native_bridge_bringup(
         const KwinCompositorFrameInputs& frame_inputs,
         const KwinPresentFeedbackInputs& present_inputs
+    ) const;
+    [[nodiscard]] KcmNativeDiagnosticsSnapshot native_bridge_diagnostics(
+        const KwinCompositorFrameInputs& frame_inputs,
+        const KwinPresentFeedbackInputs& present_inputs,
+        const KwinNativeInstallContext& install_context
     ) const;
     [[nodiscard]] KcmNativeBridgeSnapshot native_bridge_install(
         const KwinNativeInstallContext& install_context

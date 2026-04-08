@@ -82,6 +82,32 @@ std::string KcmNativeBringupSnapshot::summary() const {
     return output;
 }
 
+std::string KcmNativeDiagnosticsSnapshot::summary() const {
+    std::string output;
+    output += "state=";
+    output += std::string(to_string(state));
+    output += " bringup-complete=";
+    output += std::string(to_bool_string(bringup_complete));
+    output += " unresolved-candidates=";
+    output += std::string(to_bool_string(has_unresolved_candidates));
+    output += " frame-gate-match=";
+    output += std::string(to_bool_string(frame_gate_matches));
+    output += " present-gate-match=";
+    output += std::string(to_bool_string(present_gate_matches));
+    output += " frame-blocked=";
+    output += std::string(to_bool_string(frame_has_any_blocker));
+    output += " present-blocked=";
+    output += std::string(to_bool_string(present_has_any_blocker));
+    output += " frame-deferred=";
+    output += std::string(to_string(frame_deferred_reason));
+    output += " present-deferred=";
+    output += std::string(to_string(present_deferred_reason));
+    output += " diagnostics{";
+    output += diagnostics_summary;
+    output += "}";
+    return output;
+}
+
 KfiKcmBridge::KfiKcmBridge(const KfiPluginRoot& plugin_root) noexcept
     : plugin_root_(plugin_root) {}
 
@@ -120,6 +146,27 @@ KcmNativeBringupSnapshot KfiKcmBridge::native_bridge_bringup(
         .frame_has_unresolved = report.frame_has_unresolved(),
         .present_has_unresolved = report.present_has_unresolved(),
         .bringup_summary = report.combined_summary(),
+    };
+}
+
+KcmNativeDiagnosticsSnapshot KfiKcmBridge::native_bridge_diagnostics(
+    const KwinCompositorFrameInputs& frame_inputs,
+    const KwinPresentFeedbackInputs& present_inputs,
+    const KwinNativeInstallContext& install_context
+) const {
+    const auto report =
+        plugin_root_.observe_native_bridge(frame_inputs, present_inputs, install_context);
+    return KcmNativeDiagnosticsSnapshot {
+        .state = report.state,
+        .bringup_complete = report.bringup_complete(),
+        .has_unresolved_candidates = report.bringup_has_unresolved_candidates(),
+        .frame_gate_matches = report.frame_gate_matches(),
+        .present_gate_matches = report.present_gate_matches(),
+        .frame_has_any_blocker = report.frame_preflight_has_any_blocker(),
+        .present_has_any_blocker = report.present_preflight_has_any_blocker(),
+        .frame_deferred_reason = report.frame_install_deferred_reason(),
+        .present_deferred_reason = report.present_install_deferred_reason(),
+        .diagnostics_summary = report.summary(),
     };
 }
 

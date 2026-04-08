@@ -106,6 +106,54 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    const auto native_diagnostics = kcm_bridge.native_bridge_diagnostics(
+        fluxma::KwinCompositorFrameInputs {
+            .output_id = 0,
+            .frame_id = 12,
+            .timestamp_ns = 2'000'000,
+            .target_presentation_timestamp_ns = 18'000'000,
+            .predicted_render_time_ns = 2'000'000,
+            .content_type = fluxma::ContentType::Video,
+            .width = 1920,
+            .height = 1080,
+            .gpu_handle = fluxma::GpuFrameHandle {.backend_kind = 1, .handle_id = 212},
+        },
+        fluxma::KwinPresentFeedbackInputs {
+            .output_id = 0,
+            .frame_id = 12,
+            .presented_timestamp_ns = 3'000'000,
+            .refresh_interval_ns = 16'666'667,
+            .presentation_mode = fluxma::PresentationMode::VSync,
+            .present_success = true,
+            .dropped_synthetic = false,
+        },
+        fluxma::KwinNativeInstallContext {
+            .kwin_version_supported = false,
+            .backend_supported = true,
+            .kwin_version = "6.3.92",
+            .backend_name = "drm",
+        }
+    );
+    if (native_diagnostics.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
+        !native_diagnostics.bringup_complete ||
+        !native_diagnostics.has_unresolved_candidates ||
+        !native_diagnostics.frame_gate_matches ||
+        !native_diagnostics.present_gate_matches ||
+        !native_diagnostics.frame_has_any_blocker ||
+        !native_diagnostics.present_has_any_blocker ||
+        native_diagnostics.frame_deferred_reason !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        native_diagnostics.present_deferred_reason !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        native_diagnostics.summary().find("bringup-complete=yes") == std::string::npos ||
+        native_diagnostics.diagnostics_summary.find("preflight{") == std::string::npos ||
+        native_diagnostics.diagnostics_summary.find(
+            "reason=kwin version gate blocked install for 6.3.92"
+        ) == std::string::npos) {
+        std::cerr << "kcm native diagnostics snapshot mismatch\n";
+        return EXIT_FAILURE;
+    }
+
     for (std::uint64_t frame_id = 1; frame_id <= 5; ++frame_id) {
         const auto _ = plugin_root.primary_output().on_frame_tapped(frame(frame_id));
     }
