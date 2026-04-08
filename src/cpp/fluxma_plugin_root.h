@@ -116,6 +116,16 @@ struct OutputRuntimeObservationReport {
         return synthetic_submission.prefer_current_in_subtitle_band;
     }
 
+    [[nodiscard]] bool is_protected_bypass() const noexcept {
+        return snapshot.is_protected_bypass();
+    }
+
+    [[nodiscard]] bool synthetic_suppressed_by_protection() const noexcept {
+        return is_protected_bypass() && !synthetic_plan.armed && !synthetic_artifact.generated &&
+            !synthetic_submission.queued && !synthetic_submission.dropped &&
+            !synthetic_submission.prefer_current_in_subtitle_band;
+    }
+
     [[nodiscard]] bool synthetic_cursor_passthrough() const noexcept {
         return synthetic_submission.protection_plan.cursor_passthrough;
     }

@@ -55,7 +55,7 @@ int main() {
         !report.synthetic_armed() || report.synthetic_should_drop() ||
         !report.synthetic_generated() || !report.synthetic_queued() ||
         report.synthetic_submission_dropped() || !report.synthetic_placeholder_only() ||
-        report.synthetic_cursor_passthrough() || report.synthetic_overlay_passthrough() ||
+        !report.synthetic_cursor_passthrough() || !report.synthetic_overlay_passthrough() ||
         report.synthetic_prefers_current_subtitle_band() ||
         !report.cursor_passthrough() || !report.cursor_recomposite() ||
         !report.subtitle_band_active() || !report.overlay_passthrough() ||
@@ -87,7 +87,7 @@ int main() {
     if (!late_report.synthetic_should_drop() ||
         late_report.synthetic_generated() || late_report.synthetic_queued() ||
         !late_report.synthetic_submission_dropped() || !late_report.synthetic_placeholder_only() ||
-        late_report.synthetic_cursor_passthrough() || late_report.synthetic_overlay_passthrough() ||
+        !late_report.synthetic_cursor_passthrough() || !late_report.synthetic_overlay_passthrough() ||
         late_report.synthetic_prefers_current_subtitle_band() ||
         !late_report.cursor_passthrough() || !late_report.cursor_recomposite() ||
         !late_report.subtitle_band_active() || !late_report.overlay_passthrough() ||
@@ -143,6 +143,8 @@ int main() {
     const auto no_overlay_report = no_overlay_root.observe_output_runtime(47'999'999);
     if (no_overlay_report.overlay_passthrough() || !no_overlay_report.cursor_recomposite() ||
         !no_overlay_report.protection_placeholder_only() ||
+        !no_overlay_report.synthetic_cursor_passthrough() ||
+        no_overlay_report.synthetic_overlay_passthrough() ||
         no_overlay_report.synthetic_prefers_current_subtitle_band() ||
         no_overlay_report.hud_text.find("overlay_passthrough=no") == std::string::npos) {
         std::cerr << "runtime observation must preserve overlay false path\n";
@@ -161,12 +163,18 @@ int main() {
     if (protected_report.snapshot.state != fluxma::OutputState::ProtectedBypass ||
         !protected_report.snapshot.protected_content || protected_report.synthetic_armed() ||
         protected_report.synthetic_generated() || protected_report.synthetic_queued() ||
+        !protected_report.is_protected_bypass() ||
+        !protected_report.synthetic_suppressed_by_protection() ||
         !protected_report.synthetic_placeholder_only() ||
         protected_report.synthetic_prefers_current_subtitle_band() ||
-        protected_report.synthetic_cursor_passthrough() ||
-        protected_report.synthetic_overlay_passthrough() ||
+        !protected_report.synthetic_cursor_passthrough() ||
+        !protected_report.synthetic_overlay_passthrough() ||
         !protected_report.protection_placeholder_only() ||
-        protected_report.subtitle_band_active() || protected_report.overlay_passthrough() ||
+        protected_report.subtitle_band_active() || !protected_report.cursor_passthrough() ||
+        !protected_report.cursor_recomposite() || !protected_report.overlay_passthrough() ||
+        protected_report.summary().find("protected-bypass=yes") == std::string::npos ||
+        protected_report.summary().find("synthetic-suppressed-by-protection=yes") ==
+            std::string::npos ||
         protected_report.hud_text.find("protected=yes") == std::string::npos) {
         std::cerr << "protected runtime observation mismatch\n";
         return EXIT_FAILURE;

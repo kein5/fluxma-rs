@@ -214,6 +214,8 @@ std::string OutputRuntimeObservationReport::summary() const {
     output += std::string(to_string(snapshot.state));
     output += " bypass=";
     output += std::string(to_string(snapshot.bypass_reason));
+    output += " protected-bypass=";
+    output += std::string(to_bool_string(is_protected_bypass()));
     output += " synthetic-armed=";
     output += std::string(to_bool_string(synthetic_plan.armed));
     output += " synthetic-drop=";
@@ -228,6 +230,8 @@ std::string OutputRuntimeObservationReport::summary() const {
     output += std::string(to_bool_string(synthetic_submission.dropped));
     output += " synthetic-subtitle-current=";
     output += std::string(to_bool_string(synthetic_submission.prefer_current_in_subtitle_band));
+    output += " synthetic-suppressed-by-protection=";
+    output += std::string(to_bool_string(synthetic_suppressed_by_protection()));
     output += " cursor-passthrough=";
     output += std::string(to_bool_string(protection_plan.cursor_passthrough));
     output += " subtitle-band=";

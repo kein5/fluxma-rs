@@ -517,6 +517,10 @@ protected content の区間では、次の動作のみ許可する。
 - 保存・書き出し
 - DRM 回避前提の設計
 
+現状の skeleton では `MetricsSnapshot::is_protected_bypass()` と
+`OutputRuntimeObservationReport::synthetic_suppressed_by_protection()` を持ち、
+typed observation だけで protected passthrough-only を確認できる。
+
 ---
 
 ## 16. スレッド方針

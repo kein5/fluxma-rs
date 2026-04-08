@@ -279,6 +279,11 @@ HUD / log で protected bypass を可視化する。
 ### Task 10.4
 protected で補間を試みないことをテストする。
 
+現状:
+- Rust core で protected frame は `ProtectedBypass` + passthrough-only 済み
+- C++ runtime observation に typed helper を追加し、protected bypass と synthetic suppression を確認可能
+- fake synth / runtime observation の smoke test で protected 区間では synthetic が arm/queue されないことを固定済み
+
 ### 完了条件
 - protected 区間は常に passthrough-only
 

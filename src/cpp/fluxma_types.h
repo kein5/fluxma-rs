@@ -188,6 +188,12 @@ struct MetricsSnapshot {
             governor_mode == GovernorMode::QualityMedium;
     }
 
+    [[nodiscard]] bool is_protected_bypass() const noexcept {
+        return state == OutputState::ProtectedBypass &&
+            bypass_reason == BypassReason::ProtectedContent && protected_content &&
+            passthrough_only;
+    }
+
     [[nodiscard]] static MetricsSnapshot from_ffi(
         FluxmaRustMetricsSnapshot snapshot
     ) noexcept {
