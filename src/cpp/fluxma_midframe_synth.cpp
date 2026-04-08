@@ -15,6 +15,8 @@ MidframeSynthesisResult KfiMidframeSynthesizer::synthesize(
         .current_frame_id = request.flow_inputs.current.frame_id,
         .synthetic_frame_id = request.synthetic_frame_id,
         .target_present_timestamp_ns = request.target_present_timestamp_ns,
+        .protection_plan = request.protection_plan,
+        .prefer_current_in_subtitle_band = request.protection_plan.subtitle_band_active,
         .synthesized = true,
         .placeholder_only = true,
     };

@@ -486,7 +486,9 @@ cursor は補間しない。
 
 現状の skeleton では `ContentType::Video` かつ non-protected の frame に対して、
 画面下部 18% を placeholder subtitle band として返す。
-まだ real synth weighting / mask 適用には未接続で、HUD / observation のみ。
+placeholder `MidframeSynthesisResult` には
+`prefer_current_in_subtitle_band` を通しているが、
+まだ real synth weighting / mask 適用には未接続で、HUD / observation / synth metadata のみ。
 
 ### overlay
 一時的な OSD や UI は、可能なら補間対象から除外する。  
