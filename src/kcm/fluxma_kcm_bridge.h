@@ -26,6 +26,10 @@ struct KcmRuntimeSnapshot {
     bool synthetic_armed = false;
     bool synthetic_queued = false;
     bool synthetic_suppressed_by_protection = false;
+    std::uint64_t frame_tap_count = 0;
+    std::uint64_t present_feedback_count = 0;
+    std::uint64_t deadline_miss_count = 0;
+    std::uint64_t dropped_synthetic_count = 0;
     std::uint32_t cadence_hz_millihz = 0;
     std::string hud_text {};
 

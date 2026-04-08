@@ -547,6 +547,9 @@ typed observation と synthetic submission の両方から protected passthrough
 ### KCM bridge 層
 現状の skeleton では `src/kcm/fluxma_kcm_bridge.*` を追加し、
 `ModuleConfig` と `observe_output_runtime()` を plain C++ snapshot に変換している。
+runtime 側は `state/bypass/protected/passthrough/synthetic/cadence/hud_text` に加えて
+`frame_tap_count/present_feedback_count/deadline_miss_count/dropped_synthetic_count`
+もそのまま KCM bridge へ渡す。
 これは将来の KCM UI 層を薄く保つための bridge で、まだ actual Qt/KCM page には未接続。
 
 原則:
