@@ -494,6 +494,11 @@ placeholder `MidframeSynthesisResult` には
 一時的な OSD や UI は、可能なら補間対象から除外する。  
 ただし MVP では完全な semantic 分離を目指さない。
 
+現状の skeleton では KWin hook context の `overlay_promoted` を
+`FrameDescriptor` と `ProtectionPlan` に通し、
+`transient_overlay_passthrough` として HUD / runtime observation に出す。
+まだ real mask / layer 分離には未接続。
+
 ---
 
 ## 15. protected content ポリシー

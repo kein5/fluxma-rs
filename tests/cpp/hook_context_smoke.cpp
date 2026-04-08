@@ -77,5 +77,42 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    const fluxma::KwinCompositorFrameInputs compositor_inputs {
+        .output_id = 0,
+        .frame_id = 92,
+        .timestamp_ns = 48'000'000,
+        .target_presentation_timestamp_ns = 64'666'667,
+        .predicted_render_time_ns = 1'500'000,
+        .content_type = fluxma::ContentType::Video,
+        .width = 1920,
+        .height = 1080,
+        .pixel_format = 0,
+        .color_space = 0,
+        .protected_content = false,
+        .damage_ratio = 0.2,
+        .cursor_visible = true,
+        .cursor_x = 960.0,
+        .cursor_y = 970.0,
+        .cursor_velocity_x = 8.0,
+        .cursor_velocity_y = 7.0,
+        .gpu_handle = fluxma::GpuFrameHandle {.backend_kind = 0, .handle_id = 9292},
+        .cursor_composited_in_frame = true,
+        .overlay_promoted = true,
+    };
+    const auto compositor_frame = fluxma::KfiKwinFrameBuilder::compositor_event(compositor_inputs);
+    const auto compositor_decision = hook_adapter.on_compositor_output_frame_ready(
+        fluxma::KfiKwinFrameBuilder::compositor_context(compositor_inputs),
+        compositor_inputs.output_id,
+        compositor_frame.metadata,
+        compositor_frame.payload
+    );
+    const auto sample = output.sample_runtime(64'666'667);
+    if (compositor_decision.bypass_reason != fluxma::BypassReason::None ||
+        !sample.protection_plan.transient_overlay_passthrough ||
+        !sample.protection_plan.cursor_passthrough) {
+        std::cerr << "compositor hook context must propagate overlay/cursor flags\n";
+        return EXIT_FAILURE;
+    }
+
     return EXIT_SUCCESS;
 }

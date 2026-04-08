@@ -83,6 +83,7 @@ struct FrameDescriptor {
     double cursor_y = 0.0;
     double cursor_velocity_x = 0.0;
     double cursor_velocity_y = 0.0;
+    bool overlay_promoted = false;
     GpuFrameHandle gpu_handle {};
 
     [[nodiscard]] FluxmaRustFrameDescriptor to_ffi() const noexcept {

@@ -119,7 +119,19 @@ OutputDecision KfiKwinHookAdapter::on_compositor_output_frame_ready(
 
     // TODO: When the real KWin hook is connected, extend this with boundary-specific checks
     // for scanout promotion, cursor-only updates, and backend-specific layer layouts.
-    return on_compositor_output_frame_ready(make_frame_event(output_id, metadata, payload));
+    const auto event = make_frame_event(output_id, metadata, payload);
+    const auto policy_decision = output_policy_.classify_frame_event(event);
+    if (policy_decision.bypass_reason == BypassReason::UnsupportedOutput ||
+        policy_decision.bypass_reason == BypassReason::ProtectedContent) {
+        if (policy_decision.bypass_reason == BypassReason::ProtectedContent &&
+            output_policy_.accepts_output(event.output_id)) {
+            return output_controller_.on_frame_tapped(to_frame_descriptor(context, event));
+        }
+
+        return policy_decision;
+    }
+
+    return output_controller_.on_frame_tapped(to_frame_descriptor(context, event));
 }
 
 OutputDecision KfiKwinHookAdapter::on_compositor_output_frame_ready(
@@ -243,6 +255,15 @@ PresentCompletedEvent KfiKwinHookAdapter::make_present_completed_event(
         .present_success = status.present_success,
         .dropped_synthetic = status.dropped_synthetic,
     };
+}
+
+FrameDescriptor KfiKwinHookAdapter::to_frame_descriptor(
+    const KwinFrameHookContext& context,
+    const FinalComposedFrameEvent& event
+) noexcept {
+    auto frame = to_frame_descriptor(event);
+    frame.overlay_promoted = context.overlay_promoted;
+    return frame;
 }
 
 FrameDescriptor KfiKwinHookAdapter::to_frame_descriptor(

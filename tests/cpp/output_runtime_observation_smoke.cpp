@@ -24,6 +24,7 @@ fluxma::FrameDescriptor frame(std::uint64_t frame_id) {
         .cursor_y = 980.0,
         .cursor_velocity_x = 20.0,
         .cursor_velocity_y = 16.0,
+        .overlay_promoted = frame_id == 5,
         .gpu_handle = fluxma::GpuFrameHandle {.backend_kind = 1, .handle_id = frame_id + 100},
     };
 }
@@ -55,6 +56,7 @@ int main() {
         !report.synthetic_generated() || !report.synthetic_queued() ||
         report.synthetic_submission_dropped() || !report.synthetic_placeholder_only() ||
         !report.cursor_passthrough() || !report.subtitle_band_active() ||
+        !report.protection_plan.transient_overlay_passthrough ||
         report.protection_plan.subtitle_band_top != 886 ||
         report.protection_plan.subtitle_band_bottom != 1080 ||
         report.synthetic_plan.synthetic_frame_id != 11 ||
@@ -66,6 +68,7 @@ int main() {
         report.hud_text.find("synthetic_queued=yes") == std::string::npos ||
         report.hud_text.find("cursor_passthrough=yes") == std::string::npos ||
         report.hud_text.find("subtitle_band=yes") == std::string::npos ||
+        report.hud_text.find("overlay_passthrough=yes") == std::string::npos ||
         report.summary().find("synthetic-armed=yes") == std::string::npos ||
         report.summary().find("synthetic-generated=yes") == std::string::npos ||
         report.summary().find("synthetic-queued=yes") == std::string::npos ||
@@ -81,6 +84,7 @@ int main() {
         late_report.synthetic_generated() || late_report.synthetic_queued() ||
         !late_report.synthetic_submission_dropped() || !late_report.synthetic_placeholder_only() ||
         !late_report.cursor_passthrough() || !late_report.subtitle_band_active() ||
+        !late_report.protection_plan.transient_overlay_passthrough ||
         late_report.synthetic_submission.synthetic_frame_id != 11 ||
         late_report.summary().find("synthetic-drop=yes") == std::string::npos ||
         late_report.summary().find("synthetic-placeholder=yes") == std::string::npos ||

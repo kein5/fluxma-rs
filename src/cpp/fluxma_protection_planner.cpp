@@ -20,6 +20,7 @@ ProtectionPlan KfiProtectionPlanner::plan(
 
     result.cursor_passthrough = config.cursor_protection && frame.cursor_visible;
     result.cursor_recomposite = result.cursor_passthrough;
+    result.transient_overlay_passthrough = frame.overlay_promoted;
 
     if (snapshot.protected_content || frame.protected_content) {
         return result;

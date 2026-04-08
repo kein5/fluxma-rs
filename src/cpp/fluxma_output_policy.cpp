@@ -16,7 +16,7 @@ bool KfiOutputPolicy::supports_frame_hook_context(
 ) const noexcept {
     switch (context.hook_point) {
     case KwinFrameHookPoint::CompositorOutputFrameReady:
-        return context.cursor_composited_in_frame && !context.overlay_promoted;
+        return context.cursor_composited_in_frame;
     case KwinFrameHookPoint::BackendPresentHandoff:
         return false;
     case KwinFrameHookPoint::Unknown:

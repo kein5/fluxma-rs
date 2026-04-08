@@ -23,6 +23,7 @@ fluxma::FrameDescriptor video_frame() {
         .cursor_y = 540.0,
         .cursor_velocity_x = 10.0,
         .cursor_velocity_y = 12.0,
+        .overlay_promoted = true,
         .gpu_handle = fluxma::GpuFrameHandle {.backend_kind = 1, .handle_id = 109},
     };
 }
@@ -42,7 +43,8 @@ int main() {
     const auto video_plan = planner.plan(video_frame(), snapshot, fluxma::ModuleConfig {});
     if (!video_plan.cursor_passthrough || !video_plan.cursor_recomposite ||
         !video_plan.subtitle_band_active || video_plan.subtitle_band_top != 886 ||
-        video_plan.subtitle_band_bottom != 1080 || !video_plan.placeholder_only) {
+        video_plan.subtitle_band_bottom != 1080 ||
+        !video_plan.transient_overlay_passthrough || !video_plan.placeholder_only) {
         std::cerr << "video protection plan mismatch\n";
         return EXIT_FAILURE;
     }
@@ -51,7 +53,8 @@ int main() {
     no_cursor_config.cursor_protection = false;
     const auto no_cursor_plan = planner.plan(video_frame(), snapshot, no_cursor_config);
     if (no_cursor_plan.cursor_passthrough || no_cursor_plan.cursor_recomposite ||
-        !no_cursor_plan.subtitle_band_active) {
+        !no_cursor_plan.subtitle_band_active ||
+        !no_cursor_plan.transient_overlay_passthrough) {
         std::cerr << "cursor protection opt-out mismatch\n";
         return EXIT_FAILURE;
     }
@@ -60,7 +63,8 @@ int main() {
     no_subtitle_config.subtitle_protection = false;
     const auto no_subtitle_plan = planner.plan(video_frame(), snapshot, no_subtitle_config);
     if (!no_subtitle_plan.cursor_passthrough || no_subtitle_plan.subtitle_band_active ||
-        no_subtitle_plan.subtitle_band_top != 0 || no_subtitle_plan.subtitle_band_bottom != 0) {
+        no_subtitle_plan.subtitle_band_top != 0 || no_subtitle_plan.subtitle_band_bottom != 0 ||
+        !no_subtitle_plan.transient_overlay_passthrough) {
         std::cerr << "subtitle protection opt-out mismatch\n";
         return EXIT_FAILURE;
     }
@@ -74,7 +78,8 @@ int main() {
     );
     if (!protected_plan.cursor_passthrough || !protected_plan.cursor_recomposite ||
         protected_plan.subtitle_band_active || protected_plan.subtitle_band_top != 0 ||
-        protected_plan.subtitle_band_bottom != 0) {
+        protected_plan.subtitle_band_bottom != 0 ||
+        !protected_plan.transient_overlay_passthrough) {
         std::cerr << "protected content must disable subtitle band only\n";
         return EXIT_FAILURE;
     }
@@ -82,7 +87,8 @@ int main() {
     auto photo_frame = video_frame();
     photo_frame.content_type = fluxma::ContentType::Photo;
     const auto photo_plan = planner.plan(photo_frame, snapshot, fluxma::ModuleConfig {});
-    if (!photo_plan.cursor_passthrough || photo_plan.subtitle_band_active) {
+    if (!photo_plan.cursor_passthrough || photo_plan.subtitle_band_active ||
+        !photo_plan.transient_overlay_passthrough) {
         std::cerr << "non-video content must skip subtitle band\n";
         return EXIT_FAILURE;
     }

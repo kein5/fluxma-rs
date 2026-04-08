@@ -164,6 +164,10 @@ class KfiKwinHookAdapter {
         const PresentCompletedStatus& status
     ) noexcept;
     [[nodiscard]] static FrameDescriptor to_frame_descriptor(
+        const KwinFrameHookContext& context,
+        const FinalComposedFrameEvent& event
+    ) noexcept;
+    [[nodiscard]] static FrameDescriptor to_frame_descriptor(
         const FinalComposedFrameEvent& event
     ) noexcept;
     [[nodiscard]] static PresentFeedback to_present_feedback(
