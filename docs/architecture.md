@@ -550,6 +550,9 @@ typed observation と synthetic submission の両方から protected passthrough
 runtime 側は `state/bypass/protected/passthrough/synthetic/cadence/hud_text` に加えて
 `frame_tap_count/present_feedback_count/deadline_miss_count/dropped_synthetic_count`
 もそのまま KCM bridge へ渡す。
+native bridge 側も install 診断だけを plain snapshot として取り出せる。
+ここでは `frame/present deferred reason` と `version/backend gate` のみを持たせ、
+actual installer や Qt/KCM page はまだ実装しない。
 これは将来の KCM UI 層を薄く保つための bridge で、まだ actual Qt/KCM page には未接続。
 
 原則:

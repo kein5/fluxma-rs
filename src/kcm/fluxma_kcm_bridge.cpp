@@ -42,6 +42,28 @@ std::string KcmRuntimeSnapshot::summary() const {
     return output;
 }
 
+std::string KcmNativeBridgeSnapshot::summary() const {
+    std::string output;
+    output += "state=";
+    output += std::string(to_string(state));
+    output += " frame-deferred=";
+    output += std::string(to_string(frame_deferred_reason));
+    output += " present-deferred=";
+    output += std::string(to_string(present_deferred_reason));
+    output += " frame-version-blocked=";
+    output += std::string(to_bool_string(frame_version_blocked));
+    output += " present-version-blocked=";
+    output += std::string(to_bool_string(present_version_blocked));
+    output += " frame-backend-blocked=";
+    output += std::string(to_bool_string(frame_backend_blocked));
+    output += " present-backend-blocked=";
+    output += std::string(to_bool_string(present_backend_blocked));
+    output += " install{";
+    output += install_summary;
+    output += "}";
+    return output;
+}
+
 KfiKcmBridge::KfiKcmBridge(const KfiPluginRoot& plugin_root) noexcept
     : plugin_root_(plugin_root) {}
 
@@ -65,6 +87,22 @@ KcmRuntimeSnapshot KfiKcmBridge::runtime(std::uint64_t now_ns) const {
         .dropped_synthetic_count = report.snapshot.dropped_synthetic_count,
         .cadence_hz_millihz = report.snapshot.cadence_hz_millihz,
         .hud_text = report.hud_text,
+    };
+}
+
+KcmNativeBridgeSnapshot KfiKcmBridge::native_bridge_install(
+    const KwinNativeInstallContext& install_context
+) const {
+    const auto report = plugin_root_.observe_native_bridge_install(install_context);
+    return KcmNativeBridgeSnapshot {
+        .state = report.state,
+        .frame_deferred_reason = report.frame_install_deferred_reason(),
+        .present_deferred_reason = report.present_install_deferred_reason(),
+        .frame_version_blocked = report.frame_preflight_version_blocked(),
+        .present_version_blocked = report.present_preflight_version_blocked(),
+        .frame_backend_blocked = report.frame_preflight_backend_blocked(),
+        .present_backend_blocked = report.present_preflight_backend_blocked(),
+        .install_summary = report.summary(),
     };
 }
 

@@ -127,6 +127,48 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    const auto placeholder_native_bridge =
+        kcm_bridge.native_bridge_install(fluxma::KwinNativeInstallContext {});
+    if (placeholder_native_bridge.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
+        placeholder_native_bridge.frame_deferred_reason !=
+            fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        placeholder_native_bridge.present_deferred_reason !=
+            fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        placeholder_native_bridge.frame_version_blocked ||
+        placeholder_native_bridge.present_version_blocked ||
+        placeholder_native_bridge.frame_backend_blocked ||
+        placeholder_native_bridge.present_backend_blocked ||
+        placeholder_native_bridge.summary().find("frame-deferred=placeholder-only") ==
+            std::string::npos ||
+        placeholder_native_bridge.install_summary.find("install{") == std::string::npos) {
+        std::cerr << "kcm native bridge placeholder snapshot mismatch\n";
+        return EXIT_FAILURE;
+    }
+
+    const auto backend_blocked_native_bridge = kcm_bridge.native_bridge_install(
+        fluxma::KwinNativeInstallContext {
+            .kwin_version_supported = true,
+            .backend_supported = false,
+            .kwin_version = "6.3.90",
+            .backend_name = "wayland",
+        }
+    );
+    if (backend_blocked_native_bridge.frame_deferred_reason !=
+            fluxma::KwinNativeDeferredReason::BackendGate ||
+        backend_blocked_native_bridge.present_deferred_reason !=
+            fluxma::KwinNativeDeferredReason::BackendGate ||
+        backend_blocked_native_bridge.frame_version_blocked ||
+        backend_blocked_native_bridge.present_version_blocked ||
+        !backend_blocked_native_bridge.frame_backend_blocked ||
+        !backend_blocked_native_bridge.present_backend_blocked ||
+        backend_blocked_native_bridge.summary().find("frame-backend-blocked=yes") ==
+            std::string::npos ||
+        backend_blocked_native_bridge.install_summary.find("backend gate blocked install for wayland")
+            == std::string::npos) {
+        std::cerr << "kcm native bridge backend gate snapshot mismatch\n";
+        return EXIT_FAILURE;
+    }
+
     fluxma::KfiPluginRoot degraded_root(config);
     const fluxma::KfiKcmBridge degraded_bridge(degraded_root);
     for (std::uint64_t frame_id = 1; frame_id <= 5; ++frame_id) {
@@ -150,6 +192,31 @@ int main() {
         degraded_runtime.summary().find("deadline-miss=1") == std::string::npos ||
         degraded_runtime.summary().find("synthetic-dropped=1") == std::string::npos) {
         std::cerr << "kcm degraded runtime counters mismatch\n";
+        return EXIT_FAILURE;
+    }
+
+    const auto version_blocked_native_bridge = degraded_bridge.native_bridge_install(
+        fluxma::KwinNativeInstallContext {
+            .kwin_version_supported = false,
+            .backend_supported = true,
+            .kwin_version = "6.3.91",
+            .backend_name = "drm",
+        }
+    );
+    if (version_blocked_native_bridge.frame_deferred_reason !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        version_blocked_native_bridge.present_deferred_reason !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        !version_blocked_native_bridge.frame_version_blocked ||
+        !version_blocked_native_bridge.present_version_blocked ||
+        version_blocked_native_bridge.frame_backend_blocked ||
+        version_blocked_native_bridge.present_backend_blocked ||
+        version_blocked_native_bridge.summary().find("present-version-blocked=yes") ==
+            std::string::npos ||
+        version_blocked_native_bridge.install_summary.find(
+            "kwin version gate blocked install for 6.3.91"
+        ) == std::string::npos) {
+        std::cerr << "kcm native bridge version gate snapshot mismatch\n";
         return EXIT_FAILURE;
     }
 

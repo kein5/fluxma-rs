@@ -36,12 +36,28 @@ struct KcmRuntimeSnapshot {
     [[nodiscard]] std::string summary() const;
 };
 
+struct KcmNativeBridgeSnapshot {
+    KwinNativeBridgeState state = KwinNativeBridgeState::PlaceholderOnly;
+    KwinNativeDeferredReason frame_deferred_reason = KwinNativeDeferredReason::PlaceholderOnly;
+    KwinNativeDeferredReason present_deferred_reason = KwinNativeDeferredReason::PlaceholderOnly;
+    bool frame_version_blocked = false;
+    bool present_version_blocked = false;
+    bool frame_backend_blocked = false;
+    bool present_backend_blocked = false;
+    std::string install_summary {};
+
+    [[nodiscard]] std::string summary() const;
+};
+
 class KfiKcmBridge {
   public:
     explicit KfiKcmBridge(const KfiPluginRoot& plugin_root) noexcept;
 
     [[nodiscard]] KcmSettingsSnapshot settings() const noexcept;
     [[nodiscard]] KcmRuntimeSnapshot runtime(std::uint64_t now_ns) const;
+    [[nodiscard]] KcmNativeBridgeSnapshot native_bridge_install(
+        const KwinNativeInstallContext& install_context
+    ) const;
 
   private:
     const KfiPluginRoot& plugin_root_;
