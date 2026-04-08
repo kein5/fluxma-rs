@@ -298,6 +298,7 @@ protected で補間を試みないことをテストする。
 - `state/bypass/protected/passthrough/synthetic/cadence/hud_text` を live runtime snapshot として取得可能
 - `frame_tap_count/present_feedback_count/deadline_miss_count/dropped_synthetic_count` も live runtime snapshot として取得可能
 - native bridge install diagnostics も `frame/present deferred reason` と `version/backend gate` だけ plain C++ snapshot として取得可能
+- native bridge bringup diagnostics も `frame/present complete` と `unresolved` を plain C++ snapshot として取得可能
 - まだ Qt/QML/actual KCM page には未接続
 
 ### Task 11.1

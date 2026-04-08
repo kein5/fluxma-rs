@@ -49,12 +49,27 @@ struct KcmNativeBridgeSnapshot {
     [[nodiscard]] std::string summary() const;
 };
 
+struct KcmNativeBringupSnapshot {
+    KwinNativeBridgeState state = KwinNativeBridgeState::PlaceholderOnly;
+    bool frame_complete = false;
+    bool present_complete = false;
+    bool frame_has_unresolved = false;
+    bool present_has_unresolved = false;
+    std::string bringup_summary {};
+
+    [[nodiscard]] std::string summary() const;
+};
+
 class KfiKcmBridge {
   public:
     explicit KfiKcmBridge(const KfiPluginRoot& plugin_root) noexcept;
 
     [[nodiscard]] KcmSettingsSnapshot settings() const noexcept;
     [[nodiscard]] KcmRuntimeSnapshot runtime(std::uint64_t now_ns) const;
+    [[nodiscard]] KcmNativeBringupSnapshot native_bridge_bringup(
+        const KwinCompositorFrameInputs& frame_inputs,
+        const KwinPresentFeedbackInputs& present_inputs
+    ) const;
     [[nodiscard]] KcmNativeBridgeSnapshot native_bridge_install(
         const KwinNativeInstallContext& install_context
     ) const;

@@ -553,6 +553,9 @@ runtime 側は `state/bypass/protected/passthrough/synthetic/cadence/hud_text` �
 native bridge 側も install 診断だけを plain snapshot として取り出せる。
 ここでは `frame/present deferred reason` と `version/backend gate` のみを持たせ、
 actual installer や Qt/KCM page はまだ実装しない。
+加えて bringup 側も `frame/present complete` と `unresolved` を plain snapshot として
+取り出せる。KWin private/internal hook の未確定箇所は summary のまま露出し、
+KCM bridge 側で意味を決め打ちしない。
 これは将来の KCM UI 層を薄く保つための bridge で、まだ actual Qt/KCM page には未接続。
 
 原則:

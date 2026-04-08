@@ -64,6 +64,24 @@ std::string KcmNativeBridgeSnapshot::summary() const {
     return output;
 }
 
+std::string KcmNativeBringupSnapshot::summary() const {
+    std::string output;
+    output += "state=";
+    output += std::string(to_string(state));
+    output += " frame-complete=";
+    output += std::string(to_bool_string(frame_complete));
+    output += " present-complete=";
+    output += std::string(to_bool_string(present_complete));
+    output += " frame-unresolved=";
+    output += std::string(to_bool_string(frame_has_unresolved));
+    output += " present-unresolved=";
+    output += std::string(to_bool_string(present_has_unresolved));
+    output += " bringup{";
+    output += bringup_summary;
+    output += "}";
+    return output;
+}
+
 KfiKcmBridge::KfiKcmBridge(const KfiPluginRoot& plugin_root) noexcept
     : plugin_root_(plugin_root) {}
 
@@ -87,6 +105,21 @@ KcmRuntimeSnapshot KfiKcmBridge::runtime(std::uint64_t now_ns) const {
         .dropped_synthetic_count = report.snapshot.dropped_synthetic_count,
         .cadence_hz_millihz = report.snapshot.cadence_hz_millihz,
         .hud_text = report.hud_text,
+    };
+}
+
+KcmNativeBringupSnapshot KfiKcmBridge::native_bridge_bringup(
+    const KwinCompositorFrameInputs& frame_inputs,
+    const KwinPresentFeedbackInputs& present_inputs
+) const {
+    const auto report = plugin_root_.observe_native_bridge_bringup(frame_inputs, present_inputs);
+    return KcmNativeBringupSnapshot {
+        .state = report.state,
+        .frame_complete = report.frame_complete(),
+        .present_complete = report.present_complete(),
+        .frame_has_unresolved = report.frame_has_unresolved(),
+        .present_has_unresolved = report.present_has_unresolved(),
+        .bringup_summary = report.combined_summary(),
     };
 }
 

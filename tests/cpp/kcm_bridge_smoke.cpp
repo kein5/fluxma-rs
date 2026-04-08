@@ -50,6 +50,62 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    const auto complete_bringup = kcm_bridge.native_bridge_bringup(
+        fluxma::KwinCompositorFrameInputs {
+            .output_id = 0,
+            .frame_id = 11,
+            .timestamp_ns = 1'000'000,
+            .target_presentation_timestamp_ns = 16'666'667,
+            .predicted_render_time_ns = 2'000'000,
+            .content_type = fluxma::ContentType::Video,
+            .width = 1920,
+            .height = 1080,
+            .gpu_handle = fluxma::GpuFrameHandle {.backend_kind = 1, .handle_id = 211},
+        },
+        fluxma::KwinPresentFeedbackInputs {
+            .output_id = 0,
+            .frame_id = 11,
+            .presented_timestamp_ns = 2'000'000,
+            .refresh_interval_ns = 16'666'667,
+            .presentation_mode = fluxma::PresentationMode::VSync,
+            .present_success = true,
+            .dropped_synthetic = false,
+        }
+    );
+    if (complete_bringup.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
+        !complete_bringup.frame_complete || !complete_bringup.present_complete ||
+        !complete_bringup.frame_has_unresolved || !complete_bringup.present_has_unresolved ||
+        complete_bringup.summary().find("frame-complete=yes") == std::string::npos ||
+        complete_bringup.bringup_summary.find("frame{hook=compositor-output-frame-ready") ==
+            std::string::npos) {
+        std::cerr << "kcm native bridge bringup snapshot mismatch\n";
+        return EXIT_FAILURE;
+    }
+
+    const auto incomplete_bringup = kcm_bridge.native_bridge_bringup(
+        fluxma::KwinCompositorFrameInputs {
+            .output_id = 0,
+            .timestamp_ns = 1'000'000,
+            .width = 1920,
+            .height = 1080,
+        },
+        fluxma::KwinPresentFeedbackInputs {
+            .output_id = 0,
+            .presented_timestamp_ns = 2'000'000,
+        }
+    );
+    if (incomplete_bringup.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
+        incomplete_bringup.frame_complete || incomplete_bringup.present_complete ||
+        !incomplete_bringup.frame_has_unresolved || !incomplete_bringup.present_has_unresolved ||
+        incomplete_bringup.summary().find("present-complete=no") == std::string::npos ||
+        incomplete_bringup.bringup_summary.find("missing=frame-id,gpu-handle") ==
+            std::string::npos ||
+        incomplete_bringup.bringup_summary.find("missing=frame-id,refresh-interval") ==
+            std::string::npos) {
+        std::cerr << "kcm native bridge incomplete bringup snapshot mismatch\n";
+        return EXIT_FAILURE;
+    }
+
     for (std::uint64_t frame_id = 1; frame_id <= 5; ++frame_id) {
         const auto _ = plugin_root.primary_output().on_frame_tapped(frame(frame_id));
     }
