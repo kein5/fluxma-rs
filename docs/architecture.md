@@ -462,8 +462,9 @@ Epic 8 の入口として、`KfiMidframeSynthesizer` を placeholder-only で追
 これは usable な `FlowInputBundle` と `ConfidenceMapBuildResult`、および
 synthetic frame id / target present timestamp を受け取り、real shader dispatch をまだ行わずに
 midframe synthesis request/result の契約だけを先に固定する。
-この段階で返すのは metadata のみであり、real synthetic frame resource や
-real present queue 返却はまだ行わない。
+この段階で返すのは metadata のみだが、`KfiSyntheticPresentQueue` へ
+placeholder synthesis result を渡す seam までは接続している。
+real synthetic frame resource や real GPU present queue 返却はまだ行わない。
 
 ---
 
