@@ -130,8 +130,20 @@ struct OutputRuntimeObservationReport {
         return synthetic_submission.protection_plan.cursor_passthrough;
     }
 
+    [[nodiscard]] bool synthetic_cursor_recomposite() const noexcept {
+        return synthetic_submission.protection_plan.cursor_recomposite;
+    }
+
     [[nodiscard]] bool synthetic_overlay_passthrough() const noexcept {
         return synthetic_submission.protection_plan.transient_overlay_passthrough;
+    }
+
+    [[nodiscard]] bool synthetic_subtitle_band_active() const noexcept {
+        return synthetic_submission.protection_plan.subtitle_band_active;
+    }
+
+    [[nodiscard]] bool synthetic_protection_placeholder_only() const noexcept {
+        return synthetic_submission.protection_plan.placeholder_only;
     }
 
     [[nodiscard]] bool cursor_passthrough() const noexcept {
