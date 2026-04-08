@@ -1,5 +1,7 @@
 #include "fluxma_synthetic_present_queue.h"
 
+#include "fluxma_midframe_synth.h"
+
 namespace fluxma {
 
 SyntheticPresentSubmission KfiSyntheticPresentQueue::enqueue_placeholder(
@@ -13,6 +15,21 @@ SyntheticPresentSubmission KfiSyntheticPresentQueue::enqueue_placeholder(
         .queued = artifact.generated,
         .dropped = artifact.dropped,
         .placeholder_only = artifact.placeholder_only,
+    };
+}
+
+SyntheticPresentSubmission KfiSyntheticPresentQueue::enqueue_synthesized_placeholder(
+    std::uint32_t output_id,
+    const MidframeSynthesisResult& result
+) const noexcept {
+    return SyntheticPresentSubmission {
+        .output_id = output_id,
+        .source_frame_id = result.current_frame_id,
+        .synthetic_frame_id = result.synthetic_frame_id,
+        .target_present_timestamp_ns = result.target_present_timestamp_ns,
+        .queued = result.synthesized,
+        .dropped = false,
+        .placeholder_only = result.placeholder_only,
     };
 }
 

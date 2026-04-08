@@ -3,6 +3,7 @@
 
 #include "fluxma_confidence_map.h"
 #include "fluxma_midframe_synth.h"
+#include "fluxma_synthetic_present_queue.h"
 
 int main() {
     fluxma::KfiFlowInputsBuilder flow_builder(16);
@@ -33,8 +34,19 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    fluxma::KfiSyntheticPresentQueue present_queue;
+    const auto submission = present_queue.enqueue_synthesized_placeholder(0, result);
+    if (!submission.queued || submission.dropped || !submission.placeholder_only ||
+        submission.output_id != 0 || submission.source_frame_id != 401 ||
+        submission.synthetic_frame_id != 801 ||
+        submission.target_present_timestamp_ns != 250'000'000) {
+        std::cerr << "midframe synth present submission mismatch\n";
+        return EXIT_FAILURE;
+    }
+
     const auto invalid = synthesizer.synthesize(fluxma::MidframeSynthesisRequest {});
-    if (invalid.synthesized) {
+    const auto invalid_submission = present_queue.enqueue_synthesized_placeholder(0, invalid);
+    if (invalid.synthesized || invalid_submission.queued) {
         std::cerr << "midframe synth invalid request mismatch\n";
         return EXIT_FAILURE;
     }
