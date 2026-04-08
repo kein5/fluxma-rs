@@ -98,6 +98,9 @@ int main() {
         submission_logs.back().find("synthetic-queued=yes") == std::string::npos ||
         submission_logs.back().find("synthetic-drop=no") == std::string::npos ||
         submission_logs.back().find("synthetic-placeholder=yes") == std::string::npos ||
+        submission_logs.back().find("synthetic-cursor-passthrough=no") == std::string::npos ||
+        submission_logs.back().find("synthetic-overlay-passthrough=no") == std::string::npos ||
+        submission_logs.back().find("synthetic-subtitle-current=no") == std::string::npos ||
         submission_logs.back().find("synthetic-frame-id=11") == std::string::npos) {
         std::cerr << "synthetic submission logger mismatch\n";
         return EXIT_FAILURE;
@@ -112,6 +115,17 @@ int main() {
             .target_present_timestamp_ns = 199999999,
             .queued = false,
             .dropped = true,
+            .protection_plan =
+                fluxma::ProtectionPlan {
+                    .cursor_passthrough = true,
+                    .cursor_recomposite = true,
+                    .subtitle_band_active = true,
+                    .transient_overlay_passthrough = true,
+                    .subtitle_band_top = 820,
+                    .subtitle_band_bottom = 1080,
+                    .placeholder_only = true,
+                },
+            .prefer_current_in_subtitle_band = true,
             .placeholder_only = true,
         }
     );
@@ -120,6 +134,12 @@ int main() {
         dropped_submission_logs.back().find("synthetic-queued=no") == std::string::npos ||
         dropped_submission_logs.back().find("synthetic-drop=yes") == std::string::npos ||
         dropped_submission_logs.back().find("synthetic-placeholder=yes") == std::string::npos ||
+        dropped_submission_logs.back().find("synthetic-cursor-passthrough=yes") ==
+            std::string::npos ||
+        dropped_submission_logs.back().find("synthetic-overlay-passthrough=yes") ==
+            std::string::npos ||
+        dropped_submission_logs.back().find("synthetic-subtitle-current=yes") ==
+            std::string::npos ||
         dropped_submission_logs.back().find("synthetic-frame-id=12") == std::string::npos) {
         std::cerr << "dropped synthetic submission logger mismatch\n";
         return EXIT_FAILURE;
