@@ -57,6 +57,7 @@ add_library(fluxma_native_skeleton STATIC
     src/cpp/fluxma_kwin_native_bridge.cpp
     src/cpp/fluxma_luma_pyramid.cpp
     src/cpp/fluxma_logger.cpp
+    src/cpp/fluxma_midframe_synth.cpp
     src/cpp/fluxma_present_feedback_tap.cpp
     src/cpp/fluxma_synthetic_scheduler.cpp
     src/cpp/fluxma_synthetic_present_queue.cpp
@@ -485,6 +486,22 @@ target_link_libraries(fluxma_confidence_map_smoke
         fluxma_native_skeleton
 )
 
+add_executable(fluxma_midframe_synth_smoke
+    tests/cpp/midframe_synth_smoke.cpp
+)
+add_dependencies(fluxma_midframe_synth_smoke fluxma_rust_core)
+
+target_include_directories(fluxma_midframe_synth_smoke
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/rust/include
+)
+
+target_link_libraries(fluxma_midframe_synth_smoke
+    PRIVATE
+        fluxma_native_skeleton
+)
+
 if(BUILD_TESTING)
     add_test(NAME fluxma_bridge_smoke COMMAND fluxma_bridge_smoke)
     add_test(NAME fluxma_disabled_smoke COMMAND fluxma_disabled_smoke)
@@ -530,4 +547,5 @@ if(BUILD_TESTING)
     add_test(NAME fluxma_luma_pyramid_smoke COMMAND fluxma_luma_pyramid_smoke)
     add_test(NAME fluxma_flow_inputs_smoke COMMAND fluxma_flow_inputs_smoke)
     add_test(NAME fluxma_confidence_map_smoke COMMAND fluxma_confidence_map_smoke)
+    add_test(NAME fluxma_midframe_synth_smoke COMMAND fluxma_midframe_synth_smoke)
 endif()
