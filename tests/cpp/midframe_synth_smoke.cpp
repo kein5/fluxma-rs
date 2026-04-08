@@ -39,8 +39,9 @@ int main() {
     if (!result.synthesized || !result.placeholder_only || result.previous_frame_id != 400 ||
         result.current_frame_id != 401 || result.synthetic_frame_id != 801 ||
         result.target_present_timestamp_ns != 250'000'000 ||
-        !result.prefer_current_in_subtitle_band || !result.protection_plan.cursor_passthrough ||
-        !result.protection_plan.subtitle_band_active ||
+        !result.prefer_current_in_subtitle_band || !result.cursor_passthrough() ||
+        !result.cursor_recomposite() || !result.subtitle_band_active() ||
+        result.overlay_passthrough() || !result.protection_placeholder_only() ||
         result.protection_plan.subtitle_band_top != 820 ||
         result.protection_plan.subtitle_band_bottom != 1080) {
         std::cerr << "midframe synth placeholder mismatch\n";
@@ -53,9 +54,9 @@ int main() {
         submission.output_id != 0 || submission.source_frame_id != 401 ||
         submission.synthetic_frame_id != 801 ||
         submission.target_present_timestamp_ns != 250'000'000 ||
-        !submission.prefer_current_in_subtitle_band ||
-        !submission.protection_plan.cursor_passthrough ||
-        !submission.protection_plan.subtitle_band_active ||
+        !submission.prefer_current_in_subtitle_band || !submission.cursor_passthrough() ||
+        !submission.cursor_recomposite() || !submission.subtitle_band_active() ||
+        submission.overlay_passthrough() || !submission.protection_placeholder_only() ||
         submission.protection_plan.subtitle_band_top != 820 ||
         submission.protection_plan.subtitle_band_bottom != 1080) {
         std::cerr << "midframe synth present submission mismatch\n";
@@ -65,9 +66,11 @@ int main() {
     const auto invalid = synthesizer.synthesize(fluxma::MidframeSynthesisRequest {});
     const auto invalid_submission = present_queue.enqueue_synthesized_placeholder(0, invalid);
     if (invalid.synthesized || invalid.prefer_current_in_subtitle_band ||
-        invalid.protection_plan.subtitle_band_active || invalid_submission.queued ||
+        invalid.subtitle_band_active() || invalid_submission.queued ||
         invalid_submission.prefer_current_in_subtitle_band ||
-        invalid_submission.protection_plan.subtitle_band_active) {
+        invalid_submission.subtitle_band_active() || invalid_submission.cursor_passthrough() ||
+        invalid_submission.cursor_recomposite() || invalid_submission.overlay_passthrough() ||
+        !invalid_submission.protection_placeholder_only()) {
         std::cerr << "midframe synth invalid request mismatch\n";
         return EXIT_FAILURE;
     }

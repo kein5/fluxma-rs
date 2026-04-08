@@ -68,11 +68,9 @@ int main() {
         !ready_submission.queued || ready_submission.dropped ||
         !ready_submission.placeholder_only ||
         ready_submission.prefer_current_in_subtitle_band ||
-        ready_submission.protection_plan.cursor_passthrough ||
-        ready_submission.protection_plan.cursor_recomposite ||
-        ready_submission.protection_plan.subtitle_band_active ||
-        ready_submission.protection_plan.transient_overlay_passthrough ||
-        !ready_submission.protection_plan.placeholder_only ||
+        ready_submission.cursor_passthrough() || ready_submission.cursor_recomposite() ||
+        !ready_submission.subtitle_band_active() || ready_submission.overlay_passthrough() ||
+        !ready_submission.protection_placeholder_only() ||
         ready_submission.synthetic_frame_id != 11 ||
         hud.find("synthetic_armed=yes") == std::string::npos ||
         hud.find("synthetic_drop=no") == std::string::npos ||
@@ -113,11 +111,9 @@ int main() {
         dropped_submission.queued || !dropped_submission.dropped ||
         !dropped_submission.placeholder_only ||
         dropped_submission.prefer_current_in_subtitle_band ||
-        dropped_submission.protection_plan.cursor_passthrough ||
-        dropped_submission.protection_plan.cursor_recomposite ||
-        dropped_submission.protection_plan.subtitle_band_active ||
-        dropped_submission.protection_plan.transient_overlay_passthrough ||
-        !dropped_submission.protection_plan.placeholder_only) {
+        dropped_submission.cursor_passthrough() || dropped_submission.cursor_recomposite() ||
+        !dropped_submission.subtitle_band_active() || dropped_submission.overlay_passthrough() ||
+        !dropped_submission.protection_placeholder_only()) {
         std::cerr << "fake synth plan must drop once deadline is missed\n";
         return EXIT_FAILURE;
     }
@@ -132,11 +128,11 @@ int main() {
         protected_submission.queued || protected_submission.dropped ||
         !protected_submission.placeholder_only ||
         protected_submission.prefer_current_in_subtitle_band ||
-        protected_submission.protection_plan.cursor_passthrough ||
-        protected_submission.protection_plan.cursor_recomposite ||
-        protected_submission.protection_plan.subtitle_band_active ||
-        protected_submission.protection_plan.transient_overlay_passthrough ||
-        !protected_submission.protection_plan.placeholder_only) {
+        protected_submission.cursor_passthrough() ||
+        protected_submission.cursor_recomposite() ||
+        protected_submission.subtitle_band_active() ||
+        protected_submission.overlay_passthrough() ||
+        !protected_submission.protection_placeholder_only()) {
         std::cerr << "protected bypass must not arm fake synth plan\n";
         return EXIT_FAILURE;
     }
