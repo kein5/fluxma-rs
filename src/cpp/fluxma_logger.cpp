@@ -236,9 +236,11 @@ void KfiRateLimitedLogger::note_synthetic_artifact(
             .synthetic_generated = artifact.generated,
             .synthetic_queued = false,
             .synthetic_placeholder_only = artifact.placeholder_only,
+            .synthetic_protected_content = false,
             .synthetic_cursor_passthrough = false,
             .synthetic_overlay_passthrough = false,
             .synthetic_subtitle_current_priority = false,
+            .synthetic_suppressed_by_protection = false,
             .synthetic_target_timestamp_ns = artifact.target_present_timestamp_ns,
             .synthetic_deadline_timestamp_ns = 0,
             .expected_frame_id = artifact.source_frame_id,
@@ -287,11 +289,13 @@ void KfiRateLimitedLogger::note_synthetic_submission(
             .synthetic_generated = false,
             .synthetic_queued = submission.queued,
             .synthetic_placeholder_only = submission.placeholder_only,
+            .synthetic_protected_content = submission.protected_content,
             .synthetic_cursor_passthrough = submission.protection_plan.cursor_passthrough,
             .synthetic_overlay_passthrough =
                 submission.protection_plan.transient_overlay_passthrough,
             .synthetic_subtitle_current_priority =
                 submission.prefer_current_in_subtitle_band,
+            .synthetic_suppressed_by_protection = submission.suppressed_by_protection,
             .synthetic_target_timestamp_ns = submission.target_present_timestamp_ns,
             .synthetic_deadline_timestamp_ns = 0,
             .expected_frame_id = submission.source_frame_id,
@@ -370,12 +374,15 @@ std::string KfiRateLimitedLogger::render_event(const LogEvent& event) {
                << " synthetic-queued=" << to_bool_string(event.synthetic_queued)
                << " synthetic-drop=" << to_bool_string(event.synthetic_should_drop)
                << " synthetic-placeholder=" << to_bool_string(event.synthetic_placeholder_only)
+               << " synthetic-protected=" << to_bool_string(event.synthetic_protected_content)
                << " synthetic-cursor-passthrough="
                << to_bool_string(event.synthetic_cursor_passthrough)
                << " synthetic-overlay-passthrough="
                << to_bool_string(event.synthetic_overlay_passthrough)
                << " synthetic-subtitle-current="
                << to_bool_string(event.synthetic_subtitle_current_priority)
+               << " synthetic-suppressed-by-protection="
+               << to_bool_string(event.synthetic_suppressed_by_protection)
                << " source-frame-id=" << event.expected_frame_id
                << " synthetic-frame-id=" << event.actual_frame_id
                << " synthetic-target-ns=" << event.synthetic_target_timestamp_ns;

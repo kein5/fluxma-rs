@@ -144,7 +144,12 @@ OutputRuntimeSample KfiOutputController::build_runtime_sample(
         .synthetic_plan = synthetic_plan,
         .synthetic_artifact = synthetic_artifact,
         .synthetic_submission =
-            synthetic_present_queue_.enqueue_placeholder(synthetic_artifact, protection_plan),
+            synthetic_present_queue_.enqueue_placeholder(
+                synthetic_artifact,
+                protection_plan,
+                snapshot.protected_content,
+                snapshot.is_protected_bypass()
+            ),
         .protection_plan = protection_plan,
     };
 }
@@ -348,7 +353,9 @@ void KfiOutputController::maybe_log_synthetic_submission(const MetricsSnapshot& 
                 )
             ),
             has_last_frame_ ? protection_planner_.plan(last_frame_, snapshot, config_)
-                            : ProtectionPlan {}
+                            : ProtectionPlan {},
+            snapshot.protected_content,
+            snapshot.is_protected_bypass()
         )
     );
 }

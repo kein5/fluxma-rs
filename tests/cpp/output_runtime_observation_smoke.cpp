@@ -169,6 +169,9 @@ int main() {
         !protected_report.is_protected_bypass() ||
         !protected_report.synthetic_suppressed_by_protection() ||
         !protected_report.synthetic_placeholder_only() ||
+        !protected_report.synthetic_submission.protected_content ||
+        !protected_report.synthetic_submission.suppressed_by_protection ||
+        !protected_report.synthetic_submission.is_protected_suppressed() ||
         protected_report.synthetic_subtitle_band_active() ||
         protected_report.synthetic_prefers_current_subtitle_band() ||
         !protected_report.synthetic_cursor_passthrough() ||
@@ -179,8 +182,10 @@ int main() {
         protected_report.subtitle_band_active() || !protected_report.cursor_passthrough() ||
         !protected_report.cursor_recomposite() || !protected_report.overlay_passthrough() ||
         protected_report.summary().find("protected-bypass=yes") == std::string::npos ||
+        protected_report.summary().find("synthetic-protected=yes") == std::string::npos ||
         protected_report.summary().find("synthetic-suppressed-by-protection=yes") ==
             std::string::npos ||
+        protected_report.hud_text.find("synthetic_protected=yes") == std::string::npos ||
         protected_report.hud_text.find("protected=yes") == std::string::npos) {
         std::cerr << "protected runtime observation mismatch\n";
         return EXIT_FAILURE;

@@ -6,7 +6,9 @@ namespace fluxma {
 
 SyntheticPresentSubmission KfiSyntheticPresentQueue::enqueue_placeholder(
     const SyntheticFrameArtifact& artifact,
-    const ProtectionPlan& protection_plan
+    const ProtectionPlan& protection_plan,
+    bool protected_content,
+    bool suppressed_by_protection
 ) const noexcept {
     return SyntheticPresentSubmission {
         .output_id = artifact.output_id,
@@ -15,8 +17,10 @@ SyntheticPresentSubmission KfiSyntheticPresentQueue::enqueue_placeholder(
         .target_present_timestamp_ns = artifact.target_present_timestamp_ns,
         .queued = artifact.generated,
         .dropped = artifact.dropped,
+        .protected_content = protected_content,
         .protection_plan = protection_plan,
         .prefer_current_in_subtitle_band = false,
+        .suppressed_by_protection = suppressed_by_protection,
         .placeholder_only = artifact.placeholder_only,
     };
 }
@@ -32,8 +36,10 @@ SyntheticPresentSubmission KfiSyntheticPresentQueue::enqueue_synthesized_placeho
         .target_present_timestamp_ns = result.target_present_timestamp_ns,
         .queued = result.synthesized,
         .dropped = false,
+        .protected_content = false,
         .protection_plan = result.protection_plan,
         .prefer_current_in_subtitle_band = result.prefer_current_in_subtitle_band,
+        .suppressed_by_protection = false,
         .placeholder_only = result.placeholder_only,
     };
 }

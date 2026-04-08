@@ -66,6 +66,8 @@ int main() {
         !ready_artifact.generated || ready_artifact.dropped ||
         ready_artifact.synthetic_frame_id != 11 ||
         !ready_submission.queued || ready_submission.dropped ||
+        ready_submission.protected_content ||
+        ready_submission.suppressed_by_protection ||
         !ready_submission.placeholder_only ||
         ready_submission.prefer_current_in_subtitle_band ||
         ready_submission.cursor_passthrough() || ready_submission.cursor_recomposite() ||
@@ -94,8 +96,10 @@ int main() {
     const auto has_synthetic_submission_log =
         std::any_of(logs.begin(), logs.end(), [](const std::string& log) {
             return log.find("synthetic-queued=yes") != std::string::npos &&
+                log.find("synthetic-protected=no") != std::string::npos &&
                 log.find("synthetic-cursor-passthrough=no") != std::string::npos &&
                 log.find("synthetic-overlay-passthrough=no") != std::string::npos &&
+                log.find("synthetic-suppressed-by-protection=no") != std::string::npos &&
                 log.find("synthetic-subtitle-current=no") != std::string::npos;
         });
     if (!has_synthetic_submission_log) {
@@ -109,6 +113,8 @@ int main() {
     if (!dropped_plan.armed || !dropped_plan.should_drop ||
         dropped_artifact.generated || !dropped_artifact.dropped ||
         dropped_submission.queued || !dropped_submission.dropped ||
+        dropped_submission.protected_content ||
+        dropped_submission.suppressed_by_protection ||
         !dropped_submission.placeholder_only ||
         dropped_submission.prefer_current_in_subtitle_band ||
         dropped_submission.cursor_passthrough() || dropped_submission.cursor_recomposite() ||
@@ -126,6 +132,9 @@ int main() {
         protected_plan.armed || protected_plan.should_drop ||
         protected_artifact.generated || protected_artifact.dropped ||
         protected_submission.queued || protected_submission.dropped ||
+        !protected_submission.protected_content ||
+        !protected_submission.suppressed_by_protection ||
+        !protected_submission.is_protected_suppressed() ||
         !protected_submission.placeholder_only ||
         protected_submission.prefer_current_in_subtitle_band ||
         protected_submission.cursor_passthrough() ||

@@ -273,8 +273,10 @@ struct SyntheticPresentSubmission {
     std::uint64_t target_present_timestamp_ns = 0;
     bool queued = false;
     bool dropped = false;
+    bool protected_content = false;
     ProtectionPlan protection_plan {};
     bool prefer_current_in_subtitle_band = false;
+    bool suppressed_by_protection = false;
     bool placeholder_only = true;
 
     [[nodiscard]] bool cursor_passthrough() const noexcept {
@@ -295,6 +297,11 @@ struct SyntheticPresentSubmission {
 
     [[nodiscard]] bool protection_placeholder_only() const noexcept {
         return protection_plan.placeholder_only;
+    }
+
+    [[nodiscard]] bool is_protected_suppressed() const noexcept {
+        return protected_content && suppressed_by_protection && !queued && !dropped &&
+            !prefer_current_in_subtitle_band;
     }
 };
 

@@ -121,9 +121,8 @@ struct OutputRuntimeObservationReport {
     }
 
     [[nodiscard]] bool synthetic_suppressed_by_protection() const noexcept {
-        return is_protected_bypass() && !synthetic_plan.armed && !synthetic_artifact.generated &&
-            !synthetic_submission.queued && !synthetic_submission.dropped &&
-            !synthetic_submission.prefer_current_in_subtitle_band;
+        return synthetic_submission.is_protected_suppressed() && is_protected_bypass() &&
+            !synthetic_plan.armed && !synthetic_artifact.generated;
     }
 
     [[nodiscard]] bool synthetic_cursor_passthrough() const noexcept {

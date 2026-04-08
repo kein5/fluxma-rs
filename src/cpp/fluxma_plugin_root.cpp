@@ -230,6 +230,8 @@ std::string OutputRuntimeObservationReport::summary() const {
     output += std::string(to_bool_string(synthetic_submission.dropped));
     output += " synthetic-subtitle-current=";
     output += std::string(to_bool_string(synthetic_submission.prefer_current_in_subtitle_band));
+    output += " synthetic-protected=";
+    output += std::string(to_bool_string(synthetic_submission.protected_content));
     output += " synthetic-suppressed-by-protection=";
     output += std::string(to_bool_string(synthetic_suppressed_by_protection()));
     output += " cursor-passthrough=";

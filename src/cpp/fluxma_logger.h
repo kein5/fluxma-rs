@@ -39,9 +39,11 @@ struct LogEvent {
     bool synthetic_generated = false;
     bool synthetic_queued = false;
     bool synthetic_placeholder_only = true;
+    bool synthetic_protected_content = false;
     bool synthetic_cursor_passthrough = false;
     bool synthetic_overlay_passthrough = false;
     bool synthetic_subtitle_current_priority = false;
+    bool synthetic_suppressed_by_protection = false;
     std::uint64_t synthetic_target_timestamp_ns = 0;
     std::uint64_t synthetic_deadline_timestamp_ns = 0;
     std::uint64_t expected_frame_id = 0;

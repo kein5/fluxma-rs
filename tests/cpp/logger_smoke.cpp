@@ -90,6 +90,7 @@ int main() {
             .target_present_timestamp_ns = 183333332,
             .queued = true,
             .dropped = false,
+            .protected_content = false,
             .placeholder_only = true,
         }
     );
@@ -98,8 +99,11 @@ int main() {
         submission_logs.back().find("synthetic-queued=yes") == std::string::npos ||
         submission_logs.back().find("synthetic-drop=no") == std::string::npos ||
         submission_logs.back().find("synthetic-placeholder=yes") == std::string::npos ||
+        submission_logs.back().find("synthetic-protected=no") == std::string::npos ||
         submission_logs.back().find("synthetic-cursor-passthrough=no") == std::string::npos ||
         submission_logs.back().find("synthetic-overlay-passthrough=no") == std::string::npos ||
+        submission_logs.back().find("synthetic-suppressed-by-protection=no") ==
+            std::string::npos ||
         submission_logs.back().find("synthetic-subtitle-current=no") == std::string::npos ||
         submission_logs.back().find("synthetic-frame-id=11") == std::string::npos) {
         std::cerr << "synthetic submission logger mismatch\n";
@@ -115,6 +119,7 @@ int main() {
             .target_present_timestamp_ns = 199999999,
             .queued = false,
             .dropped = true,
+            .protected_content = true,
             .protection_plan =
                 fluxma::ProtectionPlan {
                     .cursor_passthrough = true,
@@ -126,6 +131,7 @@ int main() {
                     .placeholder_only = true,
                 },
             .prefer_current_in_subtitle_band = true,
+            .suppressed_by_protection = true,
             .placeholder_only = true,
         }
     );
@@ -134,9 +140,12 @@ int main() {
         dropped_submission_logs.back().find("synthetic-queued=no") == std::string::npos ||
         dropped_submission_logs.back().find("synthetic-drop=yes") == std::string::npos ||
         dropped_submission_logs.back().find("synthetic-placeholder=yes") == std::string::npos ||
+        dropped_submission_logs.back().find("synthetic-protected=yes") == std::string::npos ||
         dropped_submission_logs.back().find("synthetic-cursor-passthrough=yes") ==
             std::string::npos ||
         dropped_submission_logs.back().find("synthetic-overlay-passthrough=yes") ==
+            std::string::npos ||
+        dropped_submission_logs.back().find("synthetic-suppressed-by-protection=yes") ==
             std::string::npos ||
         dropped_submission_logs.back().find("synthetic-subtitle-current=yes") ==
             std::string::npos ||
