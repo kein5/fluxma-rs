@@ -185,8 +185,9 @@ scheduler と synthetic present slot を接続する。
 - `KfiTexturePool` で placeholder texture lease を管理済み
 - `KfiLumaPyramidBuilder` で placeholder pyramid level を構築済み
 - `KfiFlowInputsBuilder` で prev/curr の placeholder flow input bundle を構築済み
+- `KfiConfidenceMapBuilder` で placeholder confidence map level を構築済み
 - overflow 時は fail-safe に acquire/build を止め、truncated として返す
-- まだ motion field / block matching / confidence map には進んでいない
+- まだ motion field / block matching には進んでいない
 
 ### Task 7.1
 texture pool を実装する。

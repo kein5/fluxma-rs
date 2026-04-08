@@ -439,6 +439,7 @@ real flow の前段として、C++ 側には次の placeholder GPU skeleton を�
 - `KfiTexturePool`
 - `KfiLumaPyramidBuilder`
 - `KfiFlowInputsBuilder`
+- `KfiConfidenceMapBuilder`
 
 `KfiTexturePool` は fixed-capacity の placeholder texture lease を管理し、
 overflow や invalid descriptor では fail-safe に acquire を拒否する。
@@ -446,6 +447,8 @@ overflow や invalid descriptor では fail-safe に acquire を拒否する。
 各 level 用の placeholder lease を pool から取る。
 `KfiFlowInputsBuilder` は prev/curr 2 frame 分の source texture と luma pyramid を束ね、
 real motion field の前段で必要になる GPU input bundle を placeholder として固定する。
+`KfiConfidenceMapBuilder` は usable な flow input bundle から level ごとの placeholder
+confidence bias を生成し、confidence map 導入前の形状と解像度契約だけを先に固定する。
 現段階では real luma extraction や real compute dispatch は行わず、
 pool 枯渇時や invalid descriptor では fail-safe に build を止め、lease を解放して空 bundle を返す。
 この bundle は `is_usable()` が真のときだけ次段へ渡す想定であり、
