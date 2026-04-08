@@ -488,6 +488,7 @@ cursor は補間しない。
 画面下部 18% を placeholder subtitle band として返す。
 placeholder `MidframeSynthesisResult` には
 `prefer_current_in_subtitle_band` を通しているが、
+さらに placeholder `SyntheticPresentSubmission` にも伝搬しているが、
 まだ real synth weighting / mask 適用には未接続で、HUD / observation / synth metadata のみ。
 
 ### overlay

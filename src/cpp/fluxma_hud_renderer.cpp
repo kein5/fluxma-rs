@@ -51,7 +51,10 @@ std::string KfiHudRenderer::compose_text(
     stream << "subtitle_band_bottom=" << protection_plan.subtitle_band_bottom << '\n';
     stream << "overlay_passthrough="
            << to_bool_string(protection_plan.transient_overlay_passthrough) << '\n';
-    stream << "protection_placeholder=" << to_bool_string(protection_plan.placeholder_only);
+    stream << "protection_placeholder=" << to_bool_string(protection_plan.placeholder_only)
+           << '\n';
+    stream << "synthetic_subtitle_current_priority="
+           << to_bool_string(synthetic_submission.prefer_current_in_subtitle_band);
     return stream.str();
 }
 

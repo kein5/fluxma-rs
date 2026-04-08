@@ -226,6 +226,8 @@ std::string OutputRuntimeObservationReport::summary() const {
     output += std::string(to_bool_string(synthetic_submission.queued));
     output += " synthetic-submission-drop=";
     output += std::string(to_bool_string(synthetic_submission.dropped));
+    output += " synthetic-subtitle-current=";
+    output += std::string(to_bool_string(synthetic_submission.prefer_current_in_subtitle_band));
     output += " cursor-passthrough=";
     output += std::string(to_bool_string(protection_plan.cursor_passthrough));
     output += " subtitle-band=";

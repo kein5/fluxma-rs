@@ -52,7 +52,12 @@ int main() {
     if (!submission.queued || submission.dropped || !submission.placeholder_only ||
         submission.output_id != 0 || submission.source_frame_id != 401 ||
         submission.synthetic_frame_id != 801 ||
-        submission.target_present_timestamp_ns != 250'000'000) {
+        submission.target_present_timestamp_ns != 250'000'000 ||
+        !submission.prefer_current_in_subtitle_band ||
+        !submission.protection_plan.cursor_passthrough ||
+        !submission.protection_plan.subtitle_band_active ||
+        submission.protection_plan.subtitle_band_top != 820 ||
+        submission.protection_plan.subtitle_band_bottom != 1080) {
         std::cerr << "midframe synth present submission mismatch\n";
         return EXIT_FAILURE;
     }
@@ -60,7 +65,9 @@ int main() {
     const auto invalid = synthesizer.synthesize(fluxma::MidframeSynthesisRequest {});
     const auto invalid_submission = present_queue.enqueue_synthesized_placeholder(0, invalid);
     if (invalid.synthesized || invalid.prefer_current_in_subtitle_band ||
-        invalid.protection_plan.subtitle_band_active || invalid_submission.queued) {
+        invalid.protection_plan.subtitle_band_active || invalid_submission.queued ||
+        invalid_submission.prefer_current_in_subtitle_band ||
+        invalid_submission.protection_plan.subtitle_band_active) {
         std::cerr << "midframe synth invalid request mismatch\n";
         return EXIT_FAILURE;
     }

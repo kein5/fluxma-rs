@@ -112,6 +112,10 @@ struct OutputRuntimeObservationReport {
         return synthetic_submission.placeholder_only;
     }
 
+    [[nodiscard]] bool synthetic_prefers_current_subtitle_band() const noexcept {
+        return synthetic_submission.prefer_current_in_subtitle_band;
+    }
+
     [[nodiscard]] bool cursor_passthrough() const noexcept {
         return protection_plan.cursor_passthrough;
     }

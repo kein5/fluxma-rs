@@ -250,16 +250,6 @@ struct SyntheticFrameArtifact {
     bool placeholder_only = true;
 };
 
-struct SyntheticPresentSubmission {
-    std::uint32_t output_id = 0;
-    std::uint64_t source_frame_id = 0;
-    std::uint64_t synthetic_frame_id = 0;
-    std::uint64_t target_present_timestamp_ns = 0;
-    bool queued = false;
-    bool dropped = false;
-    bool placeholder_only = true;
-};
-
 struct ProtectionPlan {
     bool cursor_passthrough = false;
     bool cursor_recomposite = false;
@@ -267,6 +257,18 @@ struct ProtectionPlan {
     bool transient_overlay_passthrough = false;
     std::uint32_t subtitle_band_top = 0;
     std::uint32_t subtitle_band_bottom = 0;
+    bool placeholder_only = true;
+};
+
+struct SyntheticPresentSubmission {
+    std::uint32_t output_id = 0;
+    std::uint64_t source_frame_id = 0;
+    std::uint64_t synthetic_frame_id = 0;
+    std::uint64_t target_present_timestamp_ns = 0;
+    bool queued = false;
+    bool dropped = false;
+    ProtectionPlan protection_plan {};
+    bool prefer_current_in_subtitle_band = false;
     bool placeholder_only = true;
 };
 
