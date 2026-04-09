@@ -55,6 +55,16 @@ std::string KcmRuntimeSnapshot::summary() const {
     output += std::string(to_bool_string(synthetic_queued));
     output += " synthetic-suppressed-by-protection=";
     output += std::string(to_bool_string(synthetic_suppressed_by_protection));
+    output += " cursor-passthrough=";
+    output += std::string(to_bool_string(cursor_passthrough));
+    output += " cursor-recomposite=";
+    output += std::string(to_bool_string(cursor_recomposite));
+    output += " subtitle-band=";
+    output += std::string(to_bool_string(subtitle_band_active));
+    output += " overlay-passthrough=";
+    output += std::string(to_bool_string(overlay_passthrough));
+    output += " protection-placeholder=";
+    output += std::string(to_bool_string(protection_placeholder_only));
     output += " state-transitions=";
     output += std::to_string(state_transition_count);
     output += " frame-taps=";
@@ -170,6 +180,11 @@ KcmRuntimeSnapshot KfiKcmBridge::runtime(std::uint64_t now_ns) const {
         .synthetic_armed = report.synthetic_armed(),
         .synthetic_queued = report.synthetic_queued(),
         .synthetic_suppressed_by_protection = report.synthetic_suppressed_by_protection(),
+        .cursor_passthrough = report.cursor_passthrough(),
+        .cursor_recomposite = report.cursor_recomposite(),
+        .subtitle_band_active = report.subtitle_band_active(),
+        .overlay_passthrough = report.overlay_passthrough(),
+        .protection_placeholder_only = report.protection_placeholder_only(),
         .state_transition_count = report.snapshot.state_transition_count,
         .frame_tap_count = report.snapshot.frame_tap_count,
         .present_feedback_count = report.snapshot.present_feedback_count,

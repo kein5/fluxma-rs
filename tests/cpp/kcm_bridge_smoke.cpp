@@ -272,6 +272,9 @@ int main() {
         runtime.protected_content || !runtime.passthrough_only ||
         !runtime.synthetic_armed || !runtime.synthetic_queued ||
         runtime.synthetic_suppressed_by_protection ||
+        !runtime.cursor_passthrough || !runtime.cursor_recomposite ||
+        !runtime.subtitle_band_active || !runtime.overlay_passthrough ||
+        !runtime.protection_placeholder_only ||
         runtime.state_transition_count != 3 ||
         runtime.frame_tap_count != 5 || runtime.present_feedback_count != 1 ||
         runtime.deadline_miss_count != 0 || runtime.dropped_synthetic_count != 0 ||
@@ -286,6 +289,10 @@ int main() {
         runtime.hud_text.find("scheduler=synthetic-2x") == std::string::npos ||
         runtime.summary().find("synthetic-armed=yes") == std::string::npos ||
         runtime.summary().find("classifier=yes") == std::string::npos ||
+        runtime.summary().find("cursor-passthrough=yes") == std::string::npos ||
+        runtime.summary().find("subtitle-band=yes") == std::string::npos ||
+        runtime.summary().find("overlay-passthrough=yes") == std::string::npos ||
+        runtime.summary().find("protection-placeholder=yes") == std::string::npos ||
         runtime.summary().find("state-transitions=") == std::string::npos ||
         runtime.summary().find("last-presented-frame=5") == std::string::npos ||
         runtime.summary().find("last-presented-ts=166666665") == std::string::npos ||
@@ -318,6 +325,9 @@ int main() {
         !protected_runtime.protected_content || !protected_runtime.passthrough_only ||
         protected_runtime.synthetic_armed || protected_runtime.synthetic_queued ||
         !protected_runtime.synthetic_suppressed_by_protection ||
+        !protected_runtime.cursor_passthrough || !protected_runtime.cursor_recomposite ||
+        protected_runtime.subtitle_band_active || !protected_runtime.overlay_passthrough ||
+        !protected_runtime.protection_placeholder_only ||
         protected_runtime.state_transition_count != 3 ||
         protected_runtime.frame_tap_count != 5 ||
         protected_runtime.present_feedback_count != 0 ||
@@ -333,6 +343,13 @@ int main() {
         protected_runtime.summary().find("synthetic-suppressed-by-protection=yes") ==
             std::string::npos ||
         protected_runtime.summary().find("classifier=no") == std::string::npos ||
+        protected_runtime.summary().find("cursor-passthrough=yes") ==
+            std::string::npos ||
+        protected_runtime.summary().find("subtitle-band=no") == std::string::npos ||
+        protected_runtime.summary().find("overlay-passthrough=yes") ==
+            std::string::npos ||
+        protected_runtime.summary().find("protection-placeholder=yes") ==
+            std::string::npos ||
         protected_runtime.summary().find("state-transitions=") == std::string::npos ||
         protected_runtime.summary().find("last-presented-frame=0") == std::string::npos ||
         protected_runtime.summary().find("last-presented-ts=0") == std::string::npos ||
@@ -385,6 +402,9 @@ int main() {
         disabled_runtime.classifier_allows_interpolation ||
         disabled_runtime.state_transition_count != 1 ||
         !disabled_runtime.passthrough_only ||
+        disabled_runtime.cursor_passthrough || disabled_runtime.cursor_recomposite ||
+        disabled_runtime.subtitle_band_active || disabled_runtime.overlay_passthrough ||
+        !disabled_runtime.protection_placeholder_only ||
         disabled_runtime.last_presentation_mode != fluxma::PresentationMode::VSync ||
         disabled_runtime.last_presented_frame_id != 0 ||
         disabled_runtime.last_presented_timestamp_ns != 0 ||
@@ -393,6 +413,13 @@ int main() {
         disabled_runtime.last_predicted_render_time_ns != 2'000'000 ||
         disabled_runtime.last_content_type != fluxma::ContentType::Video ||
         disabled_runtime.summary().find("classifier=no") == std::string::npos ||
+        disabled_runtime.summary().find("cursor-passthrough=no") ==
+            std::string::npos ||
+        disabled_runtime.summary().find("subtitle-band=no") == std::string::npos ||
+        disabled_runtime.summary().find("overlay-passthrough=no") ==
+            std::string::npos ||
+        disabled_runtime.summary().find("protection-placeholder=yes") ==
+            std::string::npos ||
         disabled_runtime.summary().find("state-transitions=") == std::string::npos ||
         disabled_runtime.summary().find("last-presented-frame=0") == std::string::npos ||
         disabled_runtime.summary().find("last-presented-ts=0") == std::string::npos ||
@@ -477,6 +504,9 @@ int main() {
         degraded_runtime.scheduler_mode != fluxma::SchedulerMode::Synthetic2x ||
         !degraded_runtime.classifier_allows_interpolation ||
         degraded_runtime.state_transition_count != 3 ||
+        !degraded_runtime.cursor_passthrough || !degraded_runtime.cursor_recomposite ||
+        !degraded_runtime.subtitle_band_active || !degraded_runtime.overlay_passthrough ||
+        !degraded_runtime.protection_placeholder_only ||
         degraded_runtime.last_presented_frame_id != 5 ||
         degraded_runtime.last_presented_timestamp_ns != 166'666'665 ||
         degraded_runtime.refresh_interval_ns != 16'666'667 ||
@@ -485,6 +515,13 @@ int main() {
         degraded_runtime.last_presentation_mode != fluxma::PresentationMode::VSync ||
         degraded_runtime.last_content_type != fluxma::ContentType::Video ||
         degraded_runtime.summary().find("classifier=yes") == std::string::npos ||
+        degraded_runtime.summary().find("cursor-passthrough=yes") ==
+            std::string::npos ||
+        degraded_runtime.summary().find("subtitle-band=yes") == std::string::npos ||
+        degraded_runtime.summary().find("overlay-passthrough=yes") ==
+            std::string::npos ||
+        degraded_runtime.summary().find("protection-placeholder=yes") ==
+            std::string::npos ||
         degraded_runtime.summary().find("state-transitions=") == std::string::npos ||
         degraded_runtime.summary().find("last-presented-frame=5") == std::string::npos ||
         degraded_runtime.summary().find("last-presented-ts=166666665") ==

@@ -31,6 +31,11 @@ struct KcmRuntimeSnapshot {
     bool synthetic_armed = false;
     bool synthetic_queued = false;
     bool synthetic_suppressed_by_protection = false;
+    bool cursor_passthrough = false;
+    bool cursor_recomposite = false;
+    bool subtitle_band_active = false;
+    bool overlay_passthrough = false;
+    bool protection_placeholder_only = false;
     std::uint64_t state_transition_count = 0;
     std::uint64_t frame_tap_count = 0;
     std::uint64_t present_feedback_count = 0;
