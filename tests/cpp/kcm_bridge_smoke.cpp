@@ -597,6 +597,68 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    const auto asymmetric_native_bridge = fluxma::KcmNativeBridgeSnapshot::from_observation(
+        fluxma::KwinNativeBridgeInstallObservationReport {
+            .state = fluxma::KwinNativeBridgeState::PlaceholderOnly,
+            .preflight = fluxma::KwinNativeCombinedPreflightReport {
+                .frame = fluxma::KwinNativeInstallPreflightReport {
+                    .gate = fluxma::KwinNativeInstallGateAssessment {
+                        .deferred_reason = fluxma::KwinNativeDeferredReason::PlaceholderOnly,
+                        .reason = "frame placeholder path",
+                        .context_summary = "kwin=6.3.93 backend=wayland",
+                        .version_blocked = false,
+                        .backend_blocked = true,
+                    },
+                },
+                .present = fluxma::KwinNativeInstallPreflightReport {
+                    .gate = fluxma::KwinNativeInstallGateAssessment {
+                        .deferred_reason = fluxma::KwinNativeDeferredReason::KwinVersionGate,
+                        .reason = "present version gate",
+                        .context_summary = "kwin=6.3.92 backend=drm",
+                        .version_blocked = true,
+                        .backend_blocked = false,
+                    },
+                },
+            },
+            .install = fluxma::KwinNativeCombinedInstallReport {
+                .frame = fluxma::KwinNativeInstallReport {
+                    .result = fluxma::KwinNativeInstallResult::Deferred,
+                    .deferred_reason = fluxma::KwinNativeDeferredReason::PlaceholderOnly,
+                },
+                .present = fluxma::KwinNativeInstallReport {
+                    .result = fluxma::KwinNativeInstallResult::Installed,
+                    .deferred_reason = fluxma::KwinNativeDeferredReason::PlaceholderOnly,
+                },
+            },
+        }
+    );
+    if (asymmetric_native_bridge.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
+        asymmetric_native_bridge.all_gates_match ||
+        asymmetric_native_bridge.all_installs_deferred ||
+        asymmetric_native_bridge.frame_deferred_reason !=
+            fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        asymmetric_native_bridge.present_deferred_reason !=
+            fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        asymmetric_native_bridge.frame_version_blocked ||
+        !asymmetric_native_bridge.present_version_blocked ||
+        !asymmetric_native_bridge.frame_backend_blocked ||
+        asymmetric_native_bridge.present_backend_blocked ||
+        asymmetric_native_bridge.summary().find("all-gates-match=no") ==
+            std::string::npos ||
+        asymmetric_native_bridge.summary().find("all-installs-deferred=no") ==
+            std::string::npos ||
+        asymmetric_native_bridge.summary().find("frame-backend-blocked=yes") ==
+            std::string::npos ||
+        asymmetric_native_bridge.summary().find("present-backend-blocked=no") ==
+            std::string::npos ||
+        asymmetric_native_bridge.summary().find("frame-version-blocked=no") ==
+            std::string::npos ||
+        asymmetric_native_bridge.summary().find("present-version-blocked=yes") ==
+            std::string::npos) {
+        std::cerr << "kcm asymmetric native bridge snapshot mismatch\n";
+        return EXIT_FAILURE;
+    }
+
     fluxma::KfiPluginRoot degraded_root(config);
     const fluxma::KfiKcmBridge degraded_bridge(degraded_root);
     for (std::uint64_t frame_id = 1; frame_id <= 5; ++frame_id) {

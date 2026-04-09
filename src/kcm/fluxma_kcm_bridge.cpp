@@ -120,6 +120,23 @@ std::string KcmNativeBridgeSnapshot::summary() const {
     return output;
 }
 
+KcmNativeBridgeSnapshot KcmNativeBridgeSnapshot::from_observation(
+    const KwinNativeBridgeInstallObservationReport& report
+) noexcept {
+    return KcmNativeBridgeSnapshot {
+        .state = report.state,
+        .all_gates_match = report.all_gates_match(),
+        .all_installs_deferred = report.all_installs_deferred(),
+        .frame_deferred_reason = report.frame_install_deferred_reason(),
+        .present_deferred_reason = report.present_install_deferred_reason(),
+        .frame_version_blocked = report.frame_preflight_version_blocked(),
+        .present_version_blocked = report.present_preflight_version_blocked(),
+        .frame_backend_blocked = report.frame_preflight_backend_blocked(),
+        .present_backend_blocked = report.present_preflight_backend_blocked(),
+        .install_summary = report.summary(),
+    };
+}
+
 std::string KcmNativeBringupSnapshot::summary() const {
     std::string output;
     output += "state=";
@@ -277,18 +294,7 @@ KcmNativeBridgeSnapshot KfiKcmBridge::native_bridge_install(
     const KwinNativeInstallContext& install_context
 ) const {
     const auto report = plugin_root_.observe_native_bridge_install(install_context);
-    return KcmNativeBridgeSnapshot {
-        .state = report.state,
-        .all_gates_match = report.all_gates_match(),
-        .all_installs_deferred = report.all_installs_deferred(),
-        .frame_deferred_reason = report.frame_install_deferred_reason(),
-        .present_deferred_reason = report.present_install_deferred_reason(),
-        .frame_version_blocked = report.frame_preflight_version_blocked(),
-        .present_version_blocked = report.present_preflight_version_blocked(),
-        .frame_backend_blocked = report.frame_preflight_backend_blocked(),
-        .present_backend_blocked = report.present_preflight_backend_blocked(),
-        .install_summary = report.summary(),
-    };
+    return KcmNativeBridgeSnapshot::from_observation(report);
 }
 
 }  // namespace fluxma

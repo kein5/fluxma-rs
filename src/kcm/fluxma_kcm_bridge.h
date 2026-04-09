@@ -66,6 +66,9 @@ struct KcmNativeBridgeSnapshot {
     bool present_backend_blocked = false;
     std::string install_summary {};
 
+    [[nodiscard]] static KcmNativeBridgeSnapshot from_observation(
+        const KwinNativeBridgeInstallObservationReport& report
+    ) noexcept;
     [[nodiscard]] std::string summary() const;
 };
 
