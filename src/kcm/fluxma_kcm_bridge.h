@@ -130,6 +130,7 @@ struct KcmOverviewSnapshot {
 
 struct KcmNativeOverviewSnapshot {
     bool atomic = false;
+    std::string install_context_summary {};
     KcmNativeBringupSnapshot bringup {};
     KcmNativeDiagnosticsSnapshot diagnostics {};
     KcmNativeBridgeSnapshot install {};

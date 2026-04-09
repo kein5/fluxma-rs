@@ -504,6 +504,7 @@ int main() {
         }
     );
     if (native_overview.atomic ||
+        native_overview.install_context_summary != "6.3.92/drm" ||
         native_overview.bringup.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
         !native_overview.bringup.frame_complete ||
         !native_overview.bringup.present_complete ||
@@ -515,13 +516,99 @@ int main() {
         native_overview.install.frame_deferred_reason !=
             fluxma::KwinNativeDeferredReason::KwinVersionGate ||
         native_overview.summary().find("atomic=no") == std::string::npos ||
+        native_overview.summary().find("install-context=6.3.92/drm") ==
+            std::string::npos ||
         native_overview.summary().find("bringup{state=placeholder-only") ==
             std::string::npos ||
+        native_overview.summary().find("all-gates-match=yes") == std::string::npos ||
         native_overview.summary().find("diagnostics{state=placeholder-only") ==
             std::string::npos ||
         native_overview.summary().find("install{state=placeholder-only") ==
             std::string::npos) {
         std::cerr << "kcm native overview snapshot mismatch\n";
+        return EXIT_FAILURE;
+    }
+
+    const auto placeholder_native_overview = kcm_bridge.native_overview(
+        fluxma::KwinCompositorFrameInputs {
+            .output_id = 0,
+            .frame_id = 12,
+            .timestamp_ns = 2'000'000,
+            .target_presentation_timestamp_ns = 18'000'000,
+            .predicted_render_time_ns = 2'000'000,
+            .content_type = fluxma::ContentType::Video,
+            .width = 1920,
+            .height = 1080,
+            .gpu_handle = fluxma::GpuFrameHandle {.backend_kind = 1, .handle_id = 212},
+        },
+        fluxma::KwinPresentFeedbackInputs {
+            .output_id = 0,
+            .frame_id = 12,
+            .presented_timestamp_ns = 3'000'000,
+            .refresh_interval_ns = 16'666'667,
+            .presentation_mode = fluxma::PresentationMode::VSync,
+            .present_success = true,
+            .dropped_synthetic = false,
+        },
+        fluxma::KwinNativeInstallContext {}
+    );
+    if (placeholder_native_overview.atomic ||
+        placeholder_native_overview.install_context_summary != "unspecified/unspecified" ||
+        !placeholder_native_overview.diagnostics.all_gates_match ||
+        !placeholder_native_overview.install.all_gates_match ||
+        placeholder_native_overview.install.frame_deferred_reason !=
+            fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        placeholder_native_overview.install.present_deferred_reason !=
+            fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        placeholder_native_overview.summary().find("install-context=unspecified/unspecified") ==
+            std::string::npos ||
+        placeholder_native_overview.summary().find("frame-deferred=placeholder-only") ==
+            std::string::npos) {
+        std::cerr << "kcm placeholder native overview snapshot mismatch\n";
+        return EXIT_FAILURE;
+    }
+
+    const auto backend_native_overview = kcm_bridge.native_overview(
+        fluxma::KwinCompositorFrameInputs {
+            .output_id = 0,
+            .frame_id = 13,
+            .timestamp_ns = 2'500'000,
+            .target_presentation_timestamp_ns = 18'500'000,
+            .predicted_render_time_ns = 2'000'000,
+            .content_type = fluxma::ContentType::Video,
+            .width = 1920,
+            .height = 1080,
+            .gpu_handle = fluxma::GpuFrameHandle {.backend_kind = 1, .handle_id = 213},
+        },
+        fluxma::KwinPresentFeedbackInputs {
+            .output_id = 0,
+            .frame_id = 13,
+            .presented_timestamp_ns = 3'500'000,
+            .refresh_interval_ns = 16'666'667,
+            .presentation_mode = fluxma::PresentationMode::VSync,
+            .present_success = true,
+            .dropped_synthetic = false,
+        },
+        fluxma::KwinNativeInstallContext {
+            .kwin_version_supported = true,
+            .backend_supported = false,
+            .kwin_version = "6.3.93",
+            .backend_name = "wayland",
+        }
+    );
+    if (backend_native_overview.atomic ||
+        backend_native_overview.install_context_summary != "6.3.93/wayland" ||
+        !backend_native_overview.diagnostics.all_gates_match ||
+        !backend_native_overview.install.all_gates_match ||
+        backend_native_overview.install.frame_deferred_reason !=
+            fluxma::KwinNativeDeferredReason::BackendGate ||
+        backend_native_overview.install.present_deferred_reason !=
+            fluxma::KwinNativeDeferredReason::BackendGate ||
+        backend_native_overview.summary().find("install-context=6.3.93/wayland") ==
+            std::string::npos ||
+        backend_native_overview.summary().find("frame-deferred=backend-gate") ==
+            std::string::npos) {
+        std::cerr << "kcm backend native overview snapshot mismatch\n";
         return EXIT_FAILURE;
     }
 
