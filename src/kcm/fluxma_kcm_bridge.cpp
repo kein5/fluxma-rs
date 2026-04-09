@@ -257,8 +257,18 @@ std::string KcmOverviewSnapshot::summary() const {
     std::string output;
     output += "atomic=";
     output += std::string(to_bool_string(atomic));
+    output += " split-reads=";
+    output += std::string(to_bool_string(assembled_from_split_reads));
     output += " runtime-observed-at-ns=";
     output += std::to_string(runtime_observed_at_ns);
+    output += " provenance=";
+    output += provenance_summary;
+    output += " settings-source=";
+    output += settings_provenance;
+    output += " runtime-source=";
+    output += runtime_provenance;
+    output += " native-install-source=";
+    output += native_install_provenance;
     output += " settings{";
     output += settings.summary();
     output += "} runtime{";
@@ -342,7 +352,12 @@ KcmOverviewSnapshot KfiKcmBridge::overview(
 ) const {
     return KcmOverviewSnapshot {
         .atomic = false,
+        .assembled_from_split_reads = true,
         .runtime_observed_at_ns = now_ns,
+        .provenance_summary = "settings+runtime+native-install",
+        .settings_provenance = "settings()",
+        .runtime_provenance = "runtime(now-ns)",
+        .native_install_provenance = "native_bridge_install(install-context)",
         .settings = settings(),
         .runtime = runtime(now_ns),
         .native_install = native_bridge_install(install_context),

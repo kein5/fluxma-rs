@@ -75,7 +75,13 @@ int main() {
         }
     );
     if (initial_overview.atomic ||
+        !initial_overview.assembled_from_split_reads ||
         initial_overview.runtime_observed_at_ns != 0 ||
+        initial_overview.provenance_summary != "settings+runtime+native-install" ||
+        initial_overview.settings_provenance != "settings()" ||
+        initial_overview.runtime_provenance != "runtime(now-ns)" ||
+        initial_overview.native_install_provenance !=
+            "native_bridge_install(install-context)" ||
         !initial_overview.settings.enabled ||
         initial_overview.settings.mode != fluxma::ModuleMode::Synthetic2x ||
         initial_overview.runtime.state != fluxma::OutputState::Bypass ||
@@ -86,8 +92,18 @@ int main() {
         initial_overview.native_install.present_deferred_reason !=
             fluxma::KwinNativeDeferredReason::BackendGate ||
         initial_overview.summary().find("atomic=no") == std::string::npos ||
+        initial_overview.summary().find("split-reads=yes") == std::string::npos ||
         initial_overview.summary().find("runtime-observed-at-ns=0") ==
             std::string::npos ||
+        initial_overview.summary().find("provenance=settings+runtime+native-install") ==
+            std::string::npos ||
+        initial_overview.summary().find("settings-source=settings()") ==
+            std::string::npos ||
+        initial_overview.summary().find("runtime-source=runtime(now-ns)") ==
+            std::string::npos ||
+        initial_overview.summary().find(
+            "native-install-source=native_bridge_install(install-context)"
+        ) == std::string::npos ||
         initial_overview.summary().find("settings{enabled=yes") == std::string::npos ||
         initial_overview.summary().find("runtime{state=bypass") == std::string::npos ||
         initial_overview.summary().find("native-install{state=placeholder-only") ==
@@ -1288,7 +1304,13 @@ int main() {
         fluxma::KwinNativeInstallContext {}
     );
     if (disabled_overview.atomic ||
+        !disabled_overview.assembled_from_split_reads ||
         disabled_overview.runtime_observed_at_ns != 10'000'000 ||
+        disabled_overview.provenance_summary != "settings+runtime+native-install" ||
+        disabled_overview.settings_provenance != "settings()" ||
+        disabled_overview.runtime_provenance != "runtime(now-ns)" ||
+        disabled_overview.native_install_provenance !=
+            "native_bridge_install(install-context)" ||
         disabled_overview.settings.enabled ||
         disabled_overview.settings.mode != fluxma::ModuleMode::PassthroughOnly ||
         disabled_overview.runtime.state != fluxma::OutputState::Disabled ||
@@ -1301,8 +1323,18 @@ int main() {
         !disabled_overview.native_install.all_gates_match ||
         !disabled_overview.native_install.all_installs_deferred ||
         disabled_overview.summary().find("atomic=no") == std::string::npos ||
+        disabled_overview.summary().find("split-reads=yes") == std::string::npos ||
         disabled_overview.summary().find("runtime-observed-at-ns=10000000") ==
             std::string::npos ||
+        disabled_overview.summary().find("provenance=settings+runtime+native-install") ==
+            std::string::npos ||
+        disabled_overview.summary().find("settings-source=settings()") ==
+            std::string::npos ||
+        disabled_overview.summary().find("runtime-source=runtime(now-ns)") ==
+            std::string::npos ||
+        disabled_overview.summary().find(
+            "native-install-source=native_bridge_install(install-context)"
+        ) == std::string::npos ||
         disabled_overview.summary().find("settings{enabled=no") == std::string::npos ||
         disabled_overview.summary().find("runtime{state=disabled") == std::string::npos ||
         disabled_overview.summary().find("native-install{state=placeholder-only") ==
@@ -1524,7 +1556,13 @@ int main() {
         }
     );
     if (degraded_overview.atomic ||
+        !degraded_overview.assembled_from_split_reads ||
         degraded_overview.runtime_observed_at_ns != 200'000'000 ||
+        degraded_overview.provenance_summary != "settings+runtime+native-install" ||
+        degraded_overview.settings_provenance != "settings()" ||
+        degraded_overview.runtime_provenance != "runtime(now-ns)" ||
+        degraded_overview.native_install_provenance !=
+            "native_bridge_install(install-context)" ||
         !degraded_overview.settings.enabled ||
         degraded_overview.runtime.state != fluxma::OutputState::Active2x ||
         degraded_overview.runtime.deadline_miss_count != 1 ||
@@ -1536,8 +1574,18 @@ int main() {
         !degraded_overview.native_install.all_gates_match ||
         !degraded_overview.native_install.all_installs_deferred ||
         degraded_overview.summary().find("atomic=no") == std::string::npos ||
+        degraded_overview.summary().find("split-reads=yes") == std::string::npos ||
         degraded_overview.summary().find("runtime-observed-at-ns=200000000") ==
             std::string::npos ||
+        degraded_overview.summary().find("provenance=settings+runtime+native-install") ==
+            std::string::npos ||
+        degraded_overview.summary().find("settings-source=settings()") ==
+            std::string::npos ||
+        degraded_overview.summary().find("runtime-source=runtime(now-ns)") ==
+            std::string::npos ||
+        degraded_overview.summary().find(
+            "native-install-source=native_bridge_install(install-context)"
+        ) == std::string::npos ||
         degraded_overview.summary().find("deadline-miss=1") == std::string::npos ||
         degraded_overview.summary().find("synthetic-dropped=1") == std::string::npos ||
         degraded_overview.summary().find("frame-deferred=kwin-version-gate") ==

@@ -120,7 +120,12 @@ struct KcmNativeDiagnosticsSnapshot {
 
 struct KcmOverviewSnapshot {
     bool atomic = false;
+    bool assembled_from_split_reads = true;
     std::uint64_t runtime_observed_at_ns = 0;
+    std::string provenance_summary {};
+    std::string settings_provenance = {};
+    std::string runtime_provenance = {};
+    std::string native_install_provenance = {};
     KcmSettingsSnapshot settings {};
     KcmRuntimeSnapshot runtime {};
     KcmNativeBridgeSnapshot native_install {};
