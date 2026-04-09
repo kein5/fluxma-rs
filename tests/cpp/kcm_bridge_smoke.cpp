@@ -628,6 +628,204 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    const auto direct_active_runtime = fluxma::KcmRuntimeSnapshot::from_observation(
+        fluxma::OutputRuntimeObservationReport {
+            .snapshot = fluxma::MetricsSnapshot {
+                .state = fluxma::OutputState::Active2x,
+                .bypass_reason = fluxma::BypassReason::None,
+                .protected_content = false,
+                .passthrough_only = true,
+                .classifier_allows_interpolation = true,
+                .frame_tap_count = 5,
+                .present_feedback_count = 1,
+                .deadline_miss_count = 0,
+                .dropped_synthetic_count = 0,
+                .last_presented_frame_id = 5,
+                .last_presented_timestamp_ns = 166'666'665,
+                .refresh_interval_ns = 16'666'667,
+                .last_target_presentation_timestamp_ns = 166'666'665,
+                .last_predicted_render_time_ns = 2'000'000,
+                .last_presentation_mode = fluxma::PresentationMode::VSync,
+                .last_content_type = fluxma::ContentType::Video,
+                .cadence_status = fluxma::CadenceStatus::Stable,
+                .governor_mode = fluxma::GovernorMode::QualityHigh,
+                .scheduler_mode = fluxma::SchedulerMode::Synthetic2x,
+                .cadence_hz_millihz = 30'000,
+                .state_transition_count = 3,
+            },
+            .synthetic_plan = fluxma::SyntheticFramePlan {
+                .armed = true,
+                .should_drop = false,
+            },
+            .synthetic_artifact = fluxma::SyntheticFrameArtifact {
+                .generated = true,
+                .dropped = false,
+                .placeholder_only = true,
+            },
+            .synthetic_submission = fluxma::SyntheticPresentSubmission {
+                .queued = true,
+                .dropped = false,
+                .protected_content = false,
+                .protection_plan =
+                    fluxma::ProtectionPlan {
+                        .cursor_passthrough = true,
+                        .cursor_recomposite = true,
+                        .subtitle_band_active = true,
+                        .transient_overlay_passthrough = true,
+                        .placeholder_only = true,
+                    },
+                .prefer_current_in_subtitle_band = true,
+                .suppressed_by_protection = false,
+                .placeholder_only = true,
+            },
+            .protection_plan =
+                fluxma::ProtectionPlan {
+                    .cursor_passthrough = true,
+                    .cursor_recomposite = true,
+                    .subtitle_band_active = true,
+                    .transient_overlay_passthrough = true,
+                    .placeholder_only = true,
+                },
+            .hud_text = "hud state=active-2x scheduler=synthetic-2x",
+        }
+    );
+    if (direct_active_runtime.state != fluxma::OutputState::Active2x ||
+        direct_active_runtime.bypass_reason != fluxma::BypassReason::None ||
+        direct_active_runtime.governor_mode != fluxma::GovernorMode::QualityHigh ||
+        direct_active_runtime.scheduler_mode != fluxma::SchedulerMode::Synthetic2x ||
+        !direct_active_runtime.classifier_allows_interpolation ||
+        direct_active_runtime.protected_content || !direct_active_runtime.passthrough_only ||
+        !direct_active_runtime.synthetic_armed || !direct_active_runtime.synthetic_queued ||
+        direct_active_runtime.synthetic_suppressed_by_protection ||
+        !direct_active_runtime.cursor_passthrough || !direct_active_runtime.cursor_recomposite ||
+        !direct_active_runtime.subtitle_band_active || !direct_active_runtime.overlay_passthrough ||
+        !direct_active_runtime.protection_placeholder_only ||
+        direct_active_runtime.state_transition_count != 3 ||
+        direct_active_runtime.frame_tap_count != 5 ||
+        direct_active_runtime.present_feedback_count != 1 ||
+        direct_active_runtime.deadline_miss_count != 0 ||
+        direct_active_runtime.dropped_synthetic_count != 0 ||
+        direct_active_runtime.last_presented_frame_id != 5 ||
+        direct_active_runtime.last_presented_timestamp_ns != 166'666'665 ||
+        direct_active_runtime.refresh_interval_ns != 16'666'667 ||
+        direct_active_runtime.last_target_presentation_timestamp_ns != 166'666'665 ||
+        direct_active_runtime.last_predicted_render_time_ns != 2'000'000 ||
+        direct_active_runtime.last_presentation_mode != fluxma::PresentationMode::VSync ||
+        direct_active_runtime.last_content_type != fluxma::ContentType::Video ||
+        direct_active_runtime.cadence_hz_millihz != 30'000 ||
+        direct_active_runtime.hud_text.find("state=active-2x") == std::string::npos ||
+        direct_active_runtime.summary().find("classifier=yes") == std::string::npos ||
+        direct_active_runtime.summary().find("cursor-passthrough=yes") ==
+            std::string::npos ||
+        direct_active_runtime.summary().find("subtitle-band=yes") == std::string::npos ||
+        direct_active_runtime.summary().find("overlay-passthrough=yes") ==
+            std::string::npos ||
+        direct_active_runtime.summary().find("protection-placeholder=yes") ==
+            std::string::npos) {
+        std::cerr << "kcm direct active runtime helper snapshot mismatch\n";
+        return EXIT_FAILURE;
+    }
+
+    const auto direct_degraded_runtime = fluxma::KcmRuntimeSnapshot::from_observation(
+        fluxma::OutputRuntimeObservationReport {
+            .snapshot = fluxma::MetricsSnapshot {
+                .state = fluxma::OutputState::Degraded,
+                .bypass_reason = fluxma::BypassReason::GpuPathNotReady,
+                .protected_content = false,
+                .passthrough_only = true,
+                .classifier_allows_interpolation = true,
+                .frame_tap_count = 7,
+                .present_feedback_count = 2,
+                .deadline_miss_count = 2,
+                .dropped_synthetic_count = 1,
+                .last_presented_frame_id = 7,
+                .last_presented_timestamp_ns = 233'333'331,
+                .refresh_interval_ns = 16'666'667,
+                .last_target_presentation_timestamp_ns = 233'333'331,
+                .last_predicted_render_time_ns = 2'500'000,
+                .last_presentation_mode = fluxma::PresentationMode::AdaptiveSync,
+                .last_content_type = fluxma::ContentType::Video,
+                .cadence_status = fluxma::CadenceStatus::Unstable,
+                .governor_mode = fluxma::GovernorMode::QualityLow,
+                .scheduler_mode = fluxma::SchedulerMode::Synthetic2x,
+                .cadence_hz_millihz = 24'000,
+                .state_transition_count = 5,
+            },
+            .synthetic_plan = fluxma::SyntheticFramePlan {
+                .armed = true,
+                .should_drop = true,
+            },
+            .synthetic_artifact = fluxma::SyntheticFrameArtifact {
+                .generated = false,
+                .dropped = true,
+                .placeholder_only = true,
+            },
+            .synthetic_submission = fluxma::SyntheticPresentSubmission {
+                .queued = false,
+                .dropped = true,
+                .protected_content = false,
+                .protection_plan =
+                    fluxma::ProtectionPlan {
+                        .cursor_passthrough = true,
+                        .cursor_recomposite = true,
+                        .subtitle_band_active = false,
+                        .transient_overlay_passthrough = true,
+                        .placeholder_only = true,
+                    },
+                .prefer_current_in_subtitle_band = false,
+                .suppressed_by_protection = false,
+                .placeholder_only = true,
+            },
+            .protection_plan =
+                fluxma::ProtectionPlan {
+                    .cursor_passthrough = true,
+                    .cursor_recomposite = true,
+                    .subtitle_band_active = false,
+                    .transient_overlay_passthrough = true,
+                    .placeholder_only = true,
+                },
+            .hud_text = "hud state=degraded scheduler=synthetic-2x",
+        }
+    );
+    if (direct_degraded_runtime.state != fluxma::OutputState::Degraded ||
+        direct_degraded_runtime.bypass_reason != fluxma::BypassReason::GpuPathNotReady ||
+        direct_degraded_runtime.governor_mode != fluxma::GovernorMode::QualityLow ||
+        direct_degraded_runtime.scheduler_mode != fluxma::SchedulerMode::Synthetic2x ||
+        !direct_degraded_runtime.classifier_allows_interpolation ||
+        direct_degraded_runtime.protected_content || !direct_degraded_runtime.passthrough_only ||
+        !direct_degraded_runtime.synthetic_armed || direct_degraded_runtime.synthetic_queued ||
+        direct_degraded_runtime.synthetic_suppressed_by_protection ||
+        !direct_degraded_runtime.cursor_passthrough ||
+        !direct_degraded_runtime.cursor_recomposite ||
+        direct_degraded_runtime.subtitle_band_active ||
+        !direct_degraded_runtime.overlay_passthrough ||
+        !direct_degraded_runtime.protection_placeholder_only ||
+        direct_degraded_runtime.state_transition_count != 5 ||
+        direct_degraded_runtime.frame_tap_count != 7 ||
+        direct_degraded_runtime.present_feedback_count != 2 ||
+        direct_degraded_runtime.deadline_miss_count != 2 ||
+        direct_degraded_runtime.dropped_synthetic_count != 1 ||
+        direct_degraded_runtime.last_presented_frame_id != 7 ||
+        direct_degraded_runtime.last_presented_timestamp_ns != 233'333'331 ||
+        direct_degraded_runtime.refresh_interval_ns != 16'666'667 ||
+        direct_degraded_runtime.last_target_presentation_timestamp_ns != 233'333'331 ||
+        direct_degraded_runtime.last_predicted_render_time_ns != 2'500'000 ||
+        direct_degraded_runtime.last_presentation_mode !=
+            fluxma::PresentationMode::AdaptiveSync ||
+        direct_degraded_runtime.last_content_type != fluxma::ContentType::Video ||
+        direct_degraded_runtime.cadence_hz_millihz != 24'000 ||
+        direct_degraded_runtime.hud_text.find("state=degraded") == std::string::npos ||
+        direct_degraded_runtime.summary().find("synthetic-queued=no") ==
+            std::string::npos ||
+        direct_degraded_runtime.summary().find("deadline-miss=2") == std::string::npos ||
+        direct_degraded_runtime.summary().find("synthetic-dropped=1") ==
+            std::string::npos ||
+        direct_degraded_runtime.summary().find("governor=quality-low") ==
+            std::string::npos) {
+        std::cerr << "kcm direct degraded runtime helper snapshot mismatch\n";
+        return EXIT_FAILURE;
+    }
+
     for (std::uint64_t frame_id = 1; frame_id <= 5; ++frame_id) {
         const auto _ = plugin_root.primary_output().on_frame_tapped(frame(frame_id));
     }
