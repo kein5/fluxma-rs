@@ -335,6 +335,7 @@ int main() {
         std::cerr << "kcm disabled settings snapshot mismatch\n";
         return EXIT_FAILURE;
     }
+    const auto _ = disabled_root.primary_output().on_frame_tapped(frame(1));
     const auto disabled_runtime = disabled_bridge.runtime(10'000'000);
     if (disabled_runtime.state != fluxma::OutputState::Bypass ||
         disabled_runtime.bypass_reason != fluxma::BypassReason::Disabled ||
