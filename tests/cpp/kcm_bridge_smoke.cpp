@@ -134,6 +134,12 @@ int main() {
             std::string::npos ||
         frame_only_incomplete_bringup.summary().find("present-complete=yes") ==
             std::string::npos ||
+        frame_only_incomplete_bringup.summary().find("frame-unresolved=yes") ==
+            std::string::npos ||
+        frame_only_incomplete_bringup.summary().find("present-unresolved=no") ==
+            std::string::npos ||
+        frame_only_incomplete_bringup.bringup_summary.find("present{hook=output-frame-presented") ==
+            std::string::npos ||
         frame_only_incomplete_bringup.bringup_summary.find("missing=gpu-handle") ==
             std::string::npos) {
         std::cerr << "kcm frame-only incomplete bringup snapshot mismatch\n";
@@ -164,6 +170,13 @@ int main() {
             std::string::npos ||
         present_only_incomplete_bringup.summary().find("present-complete=no") ==
             std::string::npos ||
+        present_only_incomplete_bringup.summary().find("frame-unresolved=no") ==
+            std::string::npos ||
+        present_only_incomplete_bringup.summary().find("present-unresolved=yes") ==
+            std::string::npos ||
+        present_only_incomplete_bringup.bringup_summary.find(
+            "frame{hook=compositor-output-frame-ready"
+        ) == std::string::npos ||
         present_only_incomplete_bringup.bringup_summary.find("missing=refresh-interval") ==
             std::string::npos) {
         std::cerr << "kcm present-only incomplete bringup snapshot mismatch\n";
