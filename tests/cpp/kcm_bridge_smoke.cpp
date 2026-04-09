@@ -54,6 +54,17 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    const auto direct_settings = fluxma::KcmSettingsSnapshot::from_plugin_root(plugin_root);
+    if (!direct_settings.enabled || direct_settings.mode != fluxma::ModuleMode::Synthetic2x ||
+        !direct_settings.show_hud || !direct_settings.subtitle_protection ||
+        !direct_settings.cursor_protection || direct_settings.log_interval_frames != 7 ||
+        direct_settings.max_log_messages != 9 ||
+        direct_settings.summary().find("mode=synthetic-2x") == std::string::npos ||
+        direct_settings.summary().find("cursor-protection=yes") == std::string::npos) {
+        std::cerr << "kcm direct settings helper snapshot mismatch\n";
+        return EXIT_FAILURE;
+    }
+
     const auto complete_bringup = kcm_bridge.native_bridge_bringup(
         fluxma::KwinCompositorFrameInputs {
             .output_id = 0,

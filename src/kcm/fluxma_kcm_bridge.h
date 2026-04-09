@@ -17,6 +17,9 @@ struct KcmSettingsSnapshot {
     std::size_t max_log_messages = 0;
 
     [[nodiscard]] static KcmSettingsSnapshot from_config(const ModuleConfig& config) noexcept;
+    [[nodiscard]] static KcmSettingsSnapshot from_plugin_root(
+        const KfiPluginRoot& plugin_root
+    ) noexcept;
     [[nodiscard]] std::string summary() const;
 };
 

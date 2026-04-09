@@ -14,6 +14,12 @@ KcmSettingsSnapshot KcmSettingsSnapshot::from_config(const ModuleConfig& config)
     };
 }
 
+KcmSettingsSnapshot KcmSettingsSnapshot::from_plugin_root(
+    const KfiPluginRoot& plugin_root
+) noexcept {
+    return from_config(plugin_root.config());
+}
+
 std::string KcmSettingsSnapshot::summary() const {
     std::string output;
     output += "enabled=";
@@ -276,7 +282,7 @@ KfiKcmBridge::KfiKcmBridge(const KfiPluginRoot& plugin_root) noexcept
     : plugin_root_(plugin_root) {}
 
 KcmSettingsSnapshot KfiKcmBridge::settings() const noexcept {
-    return KcmSettingsSnapshot::from_config(plugin_root_.config());
+    return KcmSettingsSnapshot::from_plugin_root(plugin_root_);
 }
 
 KcmRuntimeSnapshot KfiKcmBridge::runtime(std::uint64_t now_ns) const {
