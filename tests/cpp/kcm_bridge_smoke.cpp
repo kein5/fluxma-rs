@@ -413,9 +413,9 @@ int main() {
         degraded_runtime.present_feedback_count != 1 ||
         degraded_runtime.deadline_miss_count != 1 ||
         degraded_runtime.dropped_synthetic_count != 1 ||
-        degraded_runtime.governor_mode != fluxma::GovernorMode::QualityMedium ||
+        degraded_runtime.governor_mode != fluxma::GovernorMode::QualityHigh ||
         degraded_runtime.scheduler_mode != fluxma::SchedulerMode::Synthetic2x ||
-        degraded_runtime.summary().find("governor=quality-medium") ==
+        degraded_runtime.summary().find("governor=quality-high") ==
             std::string::npos ||
         degraded_runtime.summary().find("scheduler=synthetic-2x") ==
             std::string::npos ||
