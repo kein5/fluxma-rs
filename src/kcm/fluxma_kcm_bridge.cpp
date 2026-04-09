@@ -229,6 +229,10 @@ std::string KcmNativeDiagnosticsSnapshot::summary() const {
     output += std::string(to_bool_string(backend_supported));
     output += " install-context=";
     output += install_context_summary;
+    output += " frame-install-context=";
+    output += frame_install_context_summary;
+    output += " present-install-context=";
+    output += present_install_context_summary;
     output += " frame-gate-match=";
     output += std::string(to_bool_string(frame_gate_matches));
     output += " present-gate-match=";
@@ -318,10 +322,14 @@ std::string KcmNativeOverviewSnapshot::summary() const {
 KcmNativeDiagnosticsSnapshot KcmNativeDiagnosticsSnapshot::from_observation(
     const KwinNativeBridgeObservationReport& report
 ) noexcept {
-    std::string install_context_summary = report.preflight.frame.gate.context_summary;
-    if (report.preflight.present.gate.context_summary != install_context_summary) {
+    const std::string frame_install_context_summary = report.preflight.frame.gate.context_summary;
+    const std::string present_install_context_summary =
+        report.preflight.present.gate.context_summary;
+
+    std::string install_context_summary = frame_install_context_summary;
+    if (present_install_context_summary != install_context_summary) {
         install_context_summary += "|";
-        install_context_summary += report.preflight.present.gate.context_summary;
+        install_context_summary += present_install_context_summary;
     }
 
     return KcmNativeDiagnosticsSnapshot {
@@ -347,6 +355,8 @@ KcmNativeDiagnosticsSnapshot KcmNativeDiagnosticsSnapshot::from_observation(
         .frame_deferred_reason = report.frame_install_deferred_reason(),
         .present_deferred_reason = report.present_install_deferred_reason(),
         .install_context_summary = install_context_summary,
+        .frame_install_context_summary = frame_install_context_summary,
+        .present_install_context_summary = present_install_context_summary,
         .diagnostics_summary = report.summary(),
     };
 }

@@ -113,6 +113,8 @@ struct KcmNativeDiagnosticsSnapshot {
     KwinNativeDeferredReason frame_deferred_reason = KwinNativeDeferredReason::PlaceholderOnly;
     KwinNativeDeferredReason present_deferred_reason = KwinNativeDeferredReason::PlaceholderOnly;
     std::string install_context_summary {};
+    std::string frame_install_context_summary {};
+    std::string present_install_context_summary {};
     std::string diagnostics_summary {};
 
     [[nodiscard]] static KcmNativeDiagnosticsSnapshot from_observation(
