@@ -48,6 +48,8 @@ std::string KcmRuntimeSnapshot::summary() const {
     output += std::to_string(dropped_synthetic_count);
     output += " last-presented-frame=";
     output += std::to_string(last_presented_frame_id);
+    output += " last-presented-ts=";
+    output += std::to_string(last_presented_timestamp_ns);
     output += " refresh-ns=";
     output += std::to_string(refresh_interval_ns);
     output += " target-present-ns=";
@@ -155,6 +157,7 @@ KcmRuntimeSnapshot KfiKcmBridge::runtime(std::uint64_t now_ns) const {
         .deadline_miss_count = report.snapshot.deadline_miss_count,
         .dropped_synthetic_count = report.snapshot.dropped_synthetic_count,
         .last_presented_frame_id = report.snapshot.last_presented_frame_id,
+        .last_presented_timestamp_ns = report.snapshot.last_presented_timestamp_ns,
         .refresh_interval_ns = report.snapshot.refresh_interval_ns,
         .last_target_presentation_timestamp_ns =
             report.snapshot.last_target_presentation_timestamp_ns,

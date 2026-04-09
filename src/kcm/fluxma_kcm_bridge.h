@@ -36,6 +36,7 @@ struct KcmRuntimeSnapshot {
     std::uint64_t deadline_miss_count = 0;
     std::uint64_t dropped_synthetic_count = 0;
     std::uint64_t last_presented_frame_id = 0;
+    std::uint64_t last_presented_timestamp_ns = 0;
     std::uint64_t refresh_interval_ns = 0;
     std::uint64_t last_target_presentation_timestamp_ns = 0;
     std::uint64_t last_predicted_render_time_ns = 0;
