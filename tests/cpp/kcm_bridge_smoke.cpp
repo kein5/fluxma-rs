@@ -1059,6 +1059,34 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    const auto disabled_overview = disabled_bridge.overview(
+        10'000'000,
+        fluxma::KwinNativeInstallContext {}
+    );
+    if (disabled_overview.atomic ||
+        disabled_overview.runtime_observed_at_ns != 10'000'000 ||
+        disabled_overview.settings.enabled ||
+        disabled_overview.settings.mode != fluxma::ModuleMode::PassthroughOnly ||
+        disabled_overview.runtime.state != fluxma::OutputState::Disabled ||
+        disabled_overview.runtime.bypass_reason != fluxma::BypassReason::Disabled ||
+        disabled_overview.native_install.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
+        disabled_overview.native_install.frame_deferred_reason !=
+            fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        disabled_overview.native_install.present_deferred_reason !=
+            fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        !disabled_overview.native_install.all_gates_match ||
+        !disabled_overview.native_install.all_installs_deferred ||
+        disabled_overview.summary().find("atomic=no") == std::string::npos ||
+        disabled_overview.summary().find("runtime-observed-at-ns=10000000") ==
+            std::string::npos ||
+        disabled_overview.summary().find("settings{enabled=no") == std::string::npos ||
+        disabled_overview.summary().find("runtime{state=disabled") == std::string::npos ||
+        disabled_overview.summary().find("native-install{state=placeholder-only") ==
+            std::string::npos) {
+        std::cerr << "kcm disabled overview snapshot mismatch\n";
+        return EXIT_FAILURE;
+    }
+
     const auto placeholder_native_bridge =
         kcm_bridge.native_bridge_install(fluxma::KwinNativeInstallContext {});
     if (placeholder_native_bridge.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
