@@ -270,12 +270,14 @@ int main() {
         runtime.protected_content || !runtime.passthrough_only ||
         !runtime.synthetic_armed || !runtime.synthetic_queued ||
         runtime.synthetic_suppressed_by_protection ||
+        runtime.state_transition_count < 2 ||
         runtime.frame_tap_count != 5 || runtime.present_feedback_count != 1 ||
         runtime.deadline_miss_count != 0 || runtime.dropped_synthetic_count != 0 ||
         runtime.cadence_hz_millihz != 30000 ||
         runtime.hud_text.find("scheduler=synthetic-2x") == std::string::npos ||
         runtime.summary().find("synthetic-armed=yes") == std::string::npos ||
         runtime.summary().find("classifier=yes") == std::string::npos ||
+        runtime.summary().find("state-transitions=") == std::string::npos ||
         runtime.summary().find("governor=quality-high") == std::string::npos ||
         runtime.summary().find("scheduler=synthetic-2x") == std::string::npos ||
         runtime.summary().find("frame-taps=5") == std::string::npos ||
@@ -301,6 +303,7 @@ int main() {
         !protected_runtime.protected_content || !protected_runtime.passthrough_only ||
         protected_runtime.synthetic_armed || protected_runtime.synthetic_queued ||
         !protected_runtime.synthetic_suppressed_by_protection ||
+        protected_runtime.state_transition_count < 1 ||
         protected_runtime.frame_tap_count != 5 ||
         protected_runtime.present_feedback_count != 0 ||
         protected_runtime.deadline_miss_count != 0 ||
@@ -308,6 +311,7 @@ int main() {
         protected_runtime.summary().find("synthetic-suppressed-by-protection=yes") ==
             std::string::npos ||
         protected_runtime.summary().find("classifier=no") == std::string::npos ||
+        protected_runtime.summary().find("state-transitions=") == std::string::npos ||
         protected_runtime.summary().find("governor=bypass") == std::string::npos ||
         protected_runtime.summary().find("scheduler=passthrough-only") ==
             std::string::npos ||
@@ -346,8 +350,10 @@ int main() {
         disabled_runtime.governor_mode != fluxma::GovernorMode::Bypass ||
         disabled_runtime.scheduler_mode != fluxma::SchedulerMode::PassthroughOnly ||
         disabled_runtime.classifier_allows_interpolation ||
+        disabled_runtime.state_transition_count < 1 ||
         !disabled_runtime.passthrough_only ||
         disabled_runtime.summary().find("classifier=no") == std::string::npos ||
+        disabled_runtime.summary().find("state-transitions=") == std::string::npos ||
         disabled_runtime.summary().find("governor=bypass") == std::string::npos ||
         disabled_runtime.summary().find("scheduler=passthrough-only") ==
             std::string::npos) {
@@ -422,7 +428,9 @@ int main() {
         degraded_runtime.governor_mode != fluxma::GovernorMode::QualityHigh ||
         degraded_runtime.scheduler_mode != fluxma::SchedulerMode::Synthetic2x ||
         !degraded_runtime.classifier_allows_interpolation ||
+        degraded_runtime.state_transition_count < 2 ||
         degraded_runtime.summary().find("classifier=yes") == std::string::npos ||
+        degraded_runtime.summary().find("state-transitions=") == std::string::npos ||
         degraded_runtime.summary().find("governor=quality-high") ==
             std::string::npos ||
         degraded_runtime.summary().find("scheduler=synthetic-2x") ==

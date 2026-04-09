@@ -36,6 +36,8 @@ std::string KcmRuntimeSnapshot::summary() const {
     output += std::string(to_bool_string(synthetic_queued));
     output += " synthetic-suppressed-by-protection=";
     output += std::string(to_bool_string(synthetic_suppressed_by_protection));
+    output += " state-transitions=";
+    output += std::to_string(state_transition_count);
     output += " frame-taps=";
     output += std::to_string(frame_tap_count);
     output += " present-feedback=";
@@ -135,6 +137,7 @@ KcmRuntimeSnapshot KfiKcmBridge::runtime(std::uint64_t now_ns) const {
         .synthetic_armed = report.synthetic_armed(),
         .synthetic_queued = report.synthetic_queued(),
         .synthetic_suppressed_by_protection = report.synthetic_suppressed_by_protection(),
+        .state_transition_count = report.snapshot.state_transition_count,
         .frame_tap_count = report.snapshot.frame_tap_count,
         .present_feedback_count = report.snapshot.present_feedback_count,
         .deadline_miss_count = report.snapshot.deadline_miss_count,
