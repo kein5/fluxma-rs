@@ -1437,6 +1437,14 @@ int main() {
     if (placeholder_native_bridge.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
         !placeholder_native_bridge.all_gates_match ||
         !placeholder_native_bridge.all_installs_deferred ||
+        !placeholder_native_bridge.kwin_version_supported ||
+        !placeholder_native_bridge.backend_supported ||
+        placeholder_native_bridge.install_context_summary !=
+            "frame=kwin=unspecified backend=unspecified version_supported=true backend_supported=true" ||
+        placeholder_native_bridge.frame_install_context_summary !=
+            "kwin=unspecified backend=unspecified version_supported=true backend_supported=true" ||
+        placeholder_native_bridge.present_install_context_summary !=
+            "kwin=unspecified backend=unspecified version_supported=true backend_supported=true" ||
         placeholder_native_bridge.frame_deferred_reason !=
             fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
         placeholder_native_bridge.present_deferred_reason !=
@@ -1447,6 +1455,13 @@ int main() {
         placeholder_native_bridge.present_backend_blocked ||
         placeholder_native_bridge.summary().find("all-gates-match=yes") ==
             std::string::npos ||
+        placeholder_native_bridge.summary().find("kwin-version-supported=yes") ==
+            std::string::npos ||
+        placeholder_native_bridge.summary().find("backend-supported=yes") ==
+            std::string::npos ||
+        placeholder_native_bridge.summary().find(
+            "install-context=frame=kwin=unspecified backend=unspecified version_supported=true backend_supported=true"
+        ) == std::string::npos ||
         placeholder_native_bridge.summary().find("frame-deferred=placeholder-only") ==
             std::string::npos ||
         placeholder_native_bridge.install_summary.find("install{") == std::string::npos) {
@@ -1470,10 +1485,25 @@ int main() {
             fluxma::KwinNativeBridgeState::PlaceholderOnly ||
         !backend_blocked_native_bridge.all_gates_match ||
         !backend_blocked_native_bridge.all_installs_deferred ||
+        !backend_blocked_native_bridge.kwin_version_supported ||
+        backend_blocked_native_bridge.backend_supported ||
+        backend_blocked_native_bridge.install_context_summary !=
+            "frame=kwin=6.3.90 backend=wayland version_supported=true backend_supported=false" ||
+        backend_blocked_native_bridge.frame_install_context_summary !=
+            "kwin=6.3.90 backend=wayland version_supported=true backend_supported=false" ||
+        backend_blocked_native_bridge.present_install_context_summary !=
+            "kwin=6.3.90 backend=wayland version_supported=true backend_supported=false" ||
         backend_blocked_native_bridge.frame_version_blocked ||
         backend_blocked_native_bridge.present_version_blocked ||
         !backend_blocked_native_bridge.frame_backend_blocked ||
         !backend_blocked_native_bridge.present_backend_blocked ||
+        backend_blocked_native_bridge.summary().find("kwin-version-supported=yes") ==
+            std::string::npos ||
+        backend_blocked_native_bridge.summary().find("backend-supported=no") ==
+            std::string::npos ||
+        backend_blocked_native_bridge.summary().find(
+            "install-context=frame=kwin=6.3.90 backend=wayland version_supported=true backend_supported=false"
+        ) == std::string::npos ||
         backend_blocked_native_bridge.summary().find("frame-backend-blocked=yes") ==
             std::string::npos ||
         backend_blocked_native_bridge.install_summary.find("backend gate blocked install for wayland")
@@ -1520,6 +1550,14 @@ int main() {
     if (asymmetric_native_bridge.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
         asymmetric_native_bridge.all_gates_match ||
         asymmetric_native_bridge.all_installs_deferred ||
+        asymmetric_native_bridge.kwin_version_supported ||
+        asymmetric_native_bridge.backend_supported ||
+        asymmetric_native_bridge.install_context_summary !=
+            "frame=kwin=6.3.93 backend=wayland present=kwin=6.3.92 backend=drm" ||
+        asymmetric_native_bridge.frame_install_context_summary !=
+            "kwin=6.3.93 backend=wayland" ||
+        asymmetric_native_bridge.present_install_context_summary !=
+            "kwin=6.3.92 backend=drm" ||
         asymmetric_native_bridge.frame_deferred_reason !=
             fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
         asymmetric_native_bridge.present_deferred_reason !=
@@ -1528,6 +1566,13 @@ int main() {
         !asymmetric_native_bridge.present_version_blocked ||
         !asymmetric_native_bridge.frame_backend_blocked ||
         asymmetric_native_bridge.present_backend_blocked ||
+        asymmetric_native_bridge.summary().find("kwin-version-supported=no") ==
+            std::string::npos ||
+        asymmetric_native_bridge.summary().find("backend-supported=no") ==
+            std::string::npos ||
+        asymmetric_native_bridge.summary().find(
+            "install-context=frame=kwin=6.3.93 backend=wayland present=kwin=6.3.92 backend=drm"
+        ) == std::string::npos ||
         asymmetric_native_bridge.summary().find("all-gates-match=no") ==
             std::string::npos ||
         asymmetric_native_bridge.summary().find("all-installs-deferred=no") ==

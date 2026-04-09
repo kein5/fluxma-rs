@@ -64,12 +64,17 @@ struct KcmNativeBridgeSnapshot {
     KwinNativeBridgeState state = KwinNativeBridgeState::PlaceholderOnly;
     bool all_gates_match = false;
     bool all_installs_deferred = false;
+    bool kwin_version_supported = true;
+    bool backend_supported = true;
     KwinNativeDeferredReason frame_deferred_reason = KwinNativeDeferredReason::PlaceholderOnly;
     KwinNativeDeferredReason present_deferred_reason = KwinNativeDeferredReason::PlaceholderOnly;
     bool frame_version_blocked = false;
     bool present_version_blocked = false;
     bool frame_backend_blocked = false;
     bool present_backend_blocked = false;
+    std::string install_context_summary {};
+    std::string frame_install_context_summary {};
+    std::string present_install_context_summary {};
     std::string install_summary {};
 
     [[nodiscard]] static KcmNativeBridgeSnapshot from_observation(

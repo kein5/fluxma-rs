@@ -145,6 +145,16 @@ std::string KcmNativeBridgeSnapshot::summary() const {
     output += std::string(to_bool_string(all_gates_match));
     output += " all-installs-deferred=";
     output += std::string(to_bool_string(all_installs_deferred));
+    output += " kwin-version-supported=";
+    output += std::string(to_bool_string(kwin_version_supported));
+    output += " backend-supported=";
+    output += std::string(to_bool_string(backend_supported));
+    output += " install-context=";
+    output += install_context_summary;
+    output += " frame-install-context=";
+    output += frame_install_context_summary;
+    output += " present-install-context=";
+    output += present_install_context_summary;
     output += " frame-deferred=";
     output += std::string(to_string(frame_deferred_reason));
     output += " present-deferred=";
@@ -166,16 +176,34 @@ std::string KcmNativeBridgeSnapshot::summary() const {
 KcmNativeBridgeSnapshot KcmNativeBridgeSnapshot::from_observation(
     const KwinNativeBridgeInstallObservationReport& report
 ) noexcept {
+    const std::string frame_install_context_summary = report.preflight.frame.gate.context_summary;
+    const std::string present_install_context_summary =
+        report.preflight.present.gate.context_summary;
+
+    std::string install_context_summary = "frame=";
+    install_context_summary += frame_install_context_summary;
+    if (present_install_context_summary != frame_install_context_summary) {
+        install_context_summary += " present=";
+        install_context_summary += present_install_context_summary;
+    }
+
     return KcmNativeBridgeSnapshot {
         .state = report.state,
         .all_gates_match = report.all_gates_match(),
         .all_installs_deferred = report.all_installs_deferred(),
+        .kwin_version_supported = !report.frame_preflight_version_blocked() &&
+            !report.present_preflight_version_blocked(),
+        .backend_supported = !report.frame_preflight_backend_blocked() &&
+            !report.present_preflight_backend_blocked(),
         .frame_deferred_reason = report.frame_install_deferred_reason(),
         .present_deferred_reason = report.present_install_deferred_reason(),
         .frame_version_blocked = report.frame_preflight_version_blocked(),
         .present_version_blocked = report.present_preflight_version_blocked(),
         .frame_backend_blocked = report.frame_preflight_backend_blocked(),
         .present_backend_blocked = report.present_preflight_backend_blocked(),
+        .install_context_summary = install_context_summary,
+        .frame_install_context_summary = frame_install_context_summary,
+        .present_install_context_summary = present_install_context_summary,
         .install_summary = report.summary(),
     };
 }
