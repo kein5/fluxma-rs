@@ -326,8 +326,8 @@ int main() {
                     .deferred_reason = fluxma::KwinNativeDeferredReason::PlaceholderOnly,
                 },
                 .present = fluxma::KwinNativeInstallReport {
-                    .result = fluxma::KwinNativeInstallResult::Deferred,
-                    .deferred_reason = fluxma::KwinNativeDeferredReason::KwinVersionGate,
+                    .result = fluxma::KwinNativeInstallResult::Installed,
+                    .deferred_reason = fluxma::KwinNativeDeferredReason::PlaceholderOnly,
                 },
             },
         }
@@ -337,14 +337,16 @@ int main() {
         asymmetric_diagnostics.frame_version_blocked != false ||
         asymmetric_diagnostics.present_version_blocked != true ||
         asymmetric_diagnostics.all_gates_match ||
-        !asymmetric_diagnostics.all_installs_deferred ||
+        asymmetric_diagnostics.all_installs_deferred ||
         asymmetric_diagnostics.frame_deferred_reason !=
             fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
         asymmetric_diagnostics.present_deferred_reason !=
-            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+            fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
         !asymmetric_diagnostics.frame_install_deferred ||
-        !asymmetric_diagnostics.present_install_deferred ||
+        asymmetric_diagnostics.present_install_deferred ||
         asymmetric_diagnostics.summary().find("all-gates-match=no") ==
+            std::string::npos ||
+        asymmetric_diagnostics.summary().find("all-installs-deferred=no") ==
             std::string::npos ||
         asymmetric_diagnostics.summary().find("frame-backend-blocked=yes") ==
             std::string::npos ||
@@ -548,6 +550,8 @@ int main() {
     const auto placeholder_native_bridge =
         kcm_bridge.native_bridge_install(fluxma::KwinNativeInstallContext {});
     if (placeholder_native_bridge.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
+        !placeholder_native_bridge.all_gates_match ||
+        !placeholder_native_bridge.all_installs_deferred ||
         placeholder_native_bridge.frame_deferred_reason !=
             fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
         placeholder_native_bridge.present_deferred_reason !=
@@ -556,6 +560,8 @@ int main() {
         placeholder_native_bridge.present_version_blocked ||
         placeholder_native_bridge.frame_backend_blocked ||
         placeholder_native_bridge.present_backend_blocked ||
+        placeholder_native_bridge.summary().find("all-gates-match=yes") ==
+            std::string::npos ||
         placeholder_native_bridge.summary().find("frame-deferred=placeholder-only") ==
             std::string::npos ||
         placeholder_native_bridge.install_summary.find("install{") == std::string::npos) {
@@ -577,6 +583,8 @@ int main() {
             fluxma::KwinNativeDeferredReason::BackendGate ||
         backend_blocked_native_bridge.state !=
             fluxma::KwinNativeBridgeState::PlaceholderOnly ||
+        !backend_blocked_native_bridge.all_gates_match ||
+        !backend_blocked_native_bridge.all_installs_deferred ||
         backend_blocked_native_bridge.frame_version_blocked ||
         backend_blocked_native_bridge.present_version_blocked ||
         !backend_blocked_native_bridge.frame_backend_blocked ||
@@ -665,6 +673,8 @@ int main() {
             fluxma::KwinNativeDeferredReason::KwinVersionGate ||
         version_blocked_native_bridge.state !=
             fluxma::KwinNativeBridgeState::PlaceholderOnly ||
+        !version_blocked_native_bridge.all_gates_match ||
+        !version_blocked_native_bridge.all_installs_deferred ||
         !version_blocked_native_bridge.frame_version_blocked ||
         !version_blocked_native_bridge.present_version_blocked ||
         version_blocked_native_bridge.frame_backend_blocked ||

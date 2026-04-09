@@ -98,6 +98,10 @@ std::string KcmNativeBridgeSnapshot::summary() const {
     std::string output;
     output += "state=";
     output += std::string(to_string(state));
+    output += " all-gates-match=";
+    output += std::string(to_bool_string(all_gates_match));
+    output += " all-installs-deferred=";
+    output += std::string(to_bool_string(all_installs_deferred));
     output += " frame-deferred=";
     output += std::string(to_string(frame_deferred_reason));
     output += " present-deferred=";
@@ -275,6 +279,8 @@ KcmNativeBridgeSnapshot KfiKcmBridge::native_bridge_install(
     const auto report = plugin_root_.observe_native_bridge_install(install_context);
     return KcmNativeBridgeSnapshot {
         .state = report.state,
+        .all_gates_match = report.all_gates_match(),
+        .all_installs_deferred = report.all_installs_deferred(),
         .frame_deferred_reason = report.frame_install_deferred_reason(),
         .present_deferred_reason = report.present_install_deferred_reason(),
         .frame_version_blocked = report.frame_preflight_version_blocked(),

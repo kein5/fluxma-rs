@@ -56,6 +56,8 @@ struct KcmRuntimeSnapshot {
 
 struct KcmNativeBridgeSnapshot {
     KwinNativeBridgeState state = KwinNativeBridgeState::PlaceholderOnly;
+    bool all_gates_match = false;
+    bool all_installs_deferred = false;
     KwinNativeDeferredReason frame_deferred_reason = KwinNativeDeferredReason::PlaceholderOnly;
     KwinNativeDeferredReason present_deferred_reason = KwinNativeDeferredReason::PlaceholderOnly;
     bool frame_version_blocked = false;
