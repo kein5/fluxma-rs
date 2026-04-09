@@ -337,7 +337,7 @@ int main() {
     }
     const auto _ = disabled_root.primary_output().on_frame_tapped(frame(1));
     const auto disabled_runtime = disabled_bridge.runtime(10'000'000);
-    if (disabled_runtime.state != fluxma::OutputState::Bypass ||
+    if (disabled_runtime.state != fluxma::OutputState::Disabled ||
         disabled_runtime.bypass_reason != fluxma::BypassReason::Disabled ||
         disabled_runtime.governor_mode != fluxma::GovernorMode::Bypass ||
         disabled_runtime.scheduler_mode != fluxma::SchedulerMode::PassthroughOnly ||
