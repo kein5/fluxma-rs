@@ -504,9 +504,11 @@ int main() {
         }
     );
     if (native_overview.atomic ||
+        !native_overview.assembled_from_split_reads ||
         native_overview.kwin_version_supported ||
         !native_overview.backend_supported ||
         native_overview.install_context_summary != "6.3.92/drm" ||
+        native_overview.provenance_summary != "bringup+diagnostics+install" ||
         native_overview.bringup.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
         !native_overview.bringup.frame_complete ||
         !native_overview.bringup.present_complete ||
@@ -518,11 +520,14 @@ int main() {
         native_overview.install.frame_deferred_reason !=
             fluxma::KwinNativeDeferredReason::KwinVersionGate ||
         native_overview.summary().find("atomic=no") == std::string::npos ||
+        native_overview.summary().find("split-reads=yes") == std::string::npos ||
         native_overview.summary().find("kwin-version-supported=no") ==
             std::string::npos ||
         native_overview.summary().find("backend-supported=yes") ==
             std::string::npos ||
         native_overview.summary().find("install-context=6.3.92/drm") ==
+            std::string::npos ||
+        native_overview.summary().find("provenance=bringup+diagnostics+install") ==
             std::string::npos ||
         native_overview.summary().find("bringup{state=placeholder-only") ==
             std::string::npos ||
@@ -562,20 +567,26 @@ int main() {
         fluxma::KwinNativeInstallContext {}
     );
     if (placeholder_native_overview.atomic ||
+        !placeholder_native_overview.assembled_from_split_reads ||
         !placeholder_native_overview.kwin_version_supported ||
         !placeholder_native_overview.backend_supported ||
         placeholder_native_overview.install_context_summary != "unspecified/unspecified" ||
+        placeholder_native_overview.provenance_summary != "bringup+diagnostics+install" ||
         !placeholder_native_overview.diagnostics.all_gates_match ||
         !placeholder_native_overview.install.all_gates_match ||
         placeholder_native_overview.install.frame_deferred_reason !=
             fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
         placeholder_native_overview.install.present_deferred_reason !=
             fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        placeholder_native_overview.summary().find("split-reads=yes") ==
+            std::string::npos ||
         placeholder_native_overview.summary().find("kwin-version-supported=yes") ==
             std::string::npos ||
         placeholder_native_overview.summary().find("backend-supported=yes") ==
             std::string::npos ||
         placeholder_native_overview.summary().find("install-context=unspecified/unspecified") ==
+            std::string::npos ||
+        placeholder_native_overview.summary().find("provenance=bringup+diagnostics+install") ==
             std::string::npos ||
         placeholder_native_overview.summary().find("diagnostics{state=placeholder-only") ==
             std::string::npos ||
@@ -614,20 +625,26 @@ int main() {
         }
     );
     if (backend_native_overview.atomic ||
+        !backend_native_overview.assembled_from_split_reads ||
         !backend_native_overview.kwin_version_supported ||
         backend_native_overview.backend_supported ||
         backend_native_overview.install_context_summary != "6.3.93/wayland" ||
+        backend_native_overview.provenance_summary != "bringup+diagnostics+install" ||
         !backend_native_overview.diagnostics.all_gates_match ||
         !backend_native_overview.install.all_gates_match ||
         backend_native_overview.install.frame_deferred_reason !=
             fluxma::KwinNativeDeferredReason::BackendGate ||
         backend_native_overview.install.present_deferred_reason !=
             fluxma::KwinNativeDeferredReason::BackendGate ||
+        backend_native_overview.summary().find("split-reads=yes") ==
+            std::string::npos ||
         backend_native_overview.summary().find("kwin-version-supported=yes") ==
             std::string::npos ||
         backend_native_overview.summary().find("backend-supported=no") ==
             std::string::npos ||
         backend_native_overview.summary().find("install-context=6.3.93/wayland") ==
+            std::string::npos ||
+        backend_native_overview.summary().find("provenance=bringup+diagnostics+install") ==
             std::string::npos ||
         backend_native_overview.summary().find("diagnostics{state=placeholder-only") ==
             std::string::npos ||
