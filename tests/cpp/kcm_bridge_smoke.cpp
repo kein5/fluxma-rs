@@ -672,6 +672,21 @@ int main() {
     };
     fluxma::KfiPluginRoot disabled_root(disabled_config);
     const fluxma::KfiKcmBridge disabled_bridge(disabled_root);
+    const auto direct_disabled_settings =
+        fluxma::KcmSettingsSnapshot::from_plugin_root(disabled_root);
+    if (direct_disabled_settings.enabled ||
+        direct_disabled_settings.mode != fluxma::ModuleMode::PassthroughOnly ||
+        direct_disabled_settings.show_hud ||
+        direct_disabled_settings.subtitle_protection ||
+        direct_disabled_settings.cursor_protection ||
+        direct_disabled_settings.log_interval_frames != 3 ||
+        direct_disabled_settings.max_log_messages != 5 ||
+        direct_disabled_settings.summary().find("mode=passthrough-only") ==
+            std::string::npos ||
+        direct_disabled_settings.summary().find("show-hud=no") == std::string::npos) {
+        std::cerr << "kcm direct disabled settings helper mismatch\n";
+        return EXIT_FAILURE;
+    }
     const auto disabled_settings = disabled_bridge.settings();
     if (disabled_settings.enabled ||
         disabled_settings.mode != fluxma::ModuleMode::PassthroughOnly ||
