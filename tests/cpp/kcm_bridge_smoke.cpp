@@ -275,6 +275,8 @@ int main() {
         runtime.deadline_miss_count != 0 || runtime.dropped_synthetic_count != 0 ||
         runtime.last_presented_frame_id != 5 ||
         runtime.refresh_interval_ns != 16'666'667 ||
+        runtime.last_target_presentation_timestamp_ns != 166'666'665 ||
+        runtime.last_predicted_render_time_ns != 2'000'000 ||
         runtime.last_presentation_mode != fluxma::PresentationMode::VSync ||
         runtime.last_content_type != fluxma::ContentType::Video ||
         runtime.cadence_hz_millihz != 30000 ||
@@ -283,6 +285,8 @@ int main() {
         runtime.summary().find("classifier=yes") == std::string::npos ||
         runtime.summary().find("state-transitions=") == std::string::npos ||
         runtime.summary().find("last-presented-frame=5") == std::string::npos ||
+        runtime.summary().find("target-present-ns=166666665") == std::string::npos ||
+        runtime.summary().find("predicted-render-ns=2000000") == std::string::npos ||
         runtime.summary().find("present-mode=vsync") == std::string::npos ||
         runtime.summary().find("content-type=video") == std::string::npos ||
         runtime.summary().find("governor=quality-high") == std::string::npos ||
@@ -317,6 +321,8 @@ int main() {
         protected_runtime.dropped_synthetic_count != 0 ||
         protected_runtime.last_presented_frame_id != 0 ||
         protected_runtime.refresh_interval_ns != 0 ||
+        protected_runtime.last_target_presentation_timestamp_ns != 166'666'665 ||
+        protected_runtime.last_predicted_render_time_ns != 2'000'000 ||
         protected_runtime.last_presentation_mode != fluxma::PresentationMode::VSync ||
         protected_runtime.last_content_type != fluxma::ContentType::Video ||
         protected_runtime.summary().find("synthetic-suppressed-by-protection=yes") ==
@@ -324,6 +330,10 @@ int main() {
         protected_runtime.summary().find("classifier=no") == std::string::npos ||
         protected_runtime.summary().find("state-transitions=") == std::string::npos ||
         protected_runtime.summary().find("last-presented-frame=0") == std::string::npos ||
+        protected_runtime.summary().find("target-present-ns=166666665") ==
+            std::string::npos ||
+        protected_runtime.summary().find("predicted-render-ns=2000000") ==
+            std::string::npos ||
         protected_runtime.summary().find("present-mode=vsync") == std::string::npos ||
         protected_runtime.summary().find("content-type=video") == std::string::npos ||
         protected_runtime.summary().find("governor=bypass") == std::string::npos ||
@@ -369,10 +379,16 @@ int main() {
         disabled_runtime.last_presentation_mode != fluxma::PresentationMode::VSync ||
         disabled_runtime.last_presented_frame_id != 0 ||
         disabled_runtime.refresh_interval_ns != 0 ||
+        disabled_runtime.last_target_presentation_timestamp_ns != 33'333'333 ||
+        disabled_runtime.last_predicted_render_time_ns != 2'000'000 ||
         disabled_runtime.last_content_type != fluxma::ContentType::Video ||
         disabled_runtime.summary().find("classifier=no") == std::string::npos ||
         disabled_runtime.summary().find("state-transitions=") == std::string::npos ||
         disabled_runtime.summary().find("last-presented-frame=0") == std::string::npos ||
+        disabled_runtime.summary().find("target-present-ns=33333333") ==
+            std::string::npos ||
+        disabled_runtime.summary().find("predicted-render-ns=2000000") ==
+            std::string::npos ||
         disabled_runtime.summary().find("present-mode=vsync") == std::string::npos ||
         disabled_runtime.summary().find("content-type=video") == std::string::npos ||
         disabled_runtime.summary().find("governor=bypass") == std::string::npos ||
@@ -452,11 +468,17 @@ int main() {
         degraded_runtime.state_transition_count != 3 ||
         degraded_runtime.last_presented_frame_id != 5 ||
         degraded_runtime.refresh_interval_ns != 16'666'667 ||
+        degraded_runtime.last_target_presentation_timestamp_ns != 166'666'665 ||
+        degraded_runtime.last_predicted_render_time_ns != 2'000'000 ||
         degraded_runtime.last_presentation_mode != fluxma::PresentationMode::VSync ||
         degraded_runtime.last_content_type != fluxma::ContentType::Video ||
         degraded_runtime.summary().find("classifier=yes") == std::string::npos ||
         degraded_runtime.summary().find("state-transitions=") == std::string::npos ||
         degraded_runtime.summary().find("last-presented-frame=5") == std::string::npos ||
+        degraded_runtime.summary().find("target-present-ns=166666665") ==
+            std::string::npos ||
+        degraded_runtime.summary().find("predicted-render-ns=2000000") ==
+            std::string::npos ||
         degraded_runtime.summary().find("present-mode=vsync") == std::string::npos ||
         degraded_runtime.summary().find("content-type=video") == std::string::npos ||
         degraded_runtime.summary().find("governor=quality-high") ==

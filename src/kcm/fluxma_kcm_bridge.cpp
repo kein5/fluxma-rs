@@ -50,6 +50,10 @@ std::string KcmRuntimeSnapshot::summary() const {
     output += std::to_string(last_presented_frame_id);
     output += " refresh-ns=";
     output += std::to_string(refresh_interval_ns);
+    output += " target-present-ns=";
+    output += std::to_string(last_target_presentation_timestamp_ns);
+    output += " predicted-render-ns=";
+    output += std::to_string(last_predicted_render_time_ns);
     output += " present-mode=";
     output += std::string(to_string(last_presentation_mode));
     output += " content-type=";
@@ -152,6 +156,9 @@ KcmRuntimeSnapshot KfiKcmBridge::runtime(std::uint64_t now_ns) const {
         .dropped_synthetic_count = report.snapshot.dropped_synthetic_count,
         .last_presented_frame_id = report.snapshot.last_presented_frame_id,
         .refresh_interval_ns = report.snapshot.refresh_interval_ns,
+        .last_target_presentation_timestamp_ns =
+            report.snapshot.last_target_presentation_timestamp_ns,
+        .last_predicted_render_time_ns = report.snapshot.last_predicted_render_time_ns,
         .last_presentation_mode = report.snapshot.last_presentation_mode,
         .last_content_type = report.snapshot.last_content_type,
         .cadence_hz_millihz = report.snapshot.cadence_hz_millihz,
