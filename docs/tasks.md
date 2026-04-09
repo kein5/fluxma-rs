@@ -294,7 +294,7 @@ protected で補間を試みないことをテストする。
 
 現状:
 - `src/kcm/fluxma_kcm_bridge.*` で KCM 向け settings/runtime snapshot bridge を追加済み
-- `enabled/show_hud/subtitle_protection/cursor_protection/logging` を plain C++ settings snapshot として取得可能
+- `enabled/mode/show_hud/subtitle_protection/cursor_protection/logging` を plain C++ settings snapshot として取得可能
 - `state/bypass/protected/passthrough/synthetic/cadence/hud_text` を live runtime snapshot として取得可能
 - `frame_tap_count/present_feedback_count/deadline_miss_count/dropped_synthetic_count` も live runtime snapshot として取得可能
 - native bridge install diagnostics も `frame/present deferred reason` と `version/backend gate` だけ plain C++ snapshot として取得可能

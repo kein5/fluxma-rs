@@ -5,6 +5,7 @@ namespace fluxma {
 KcmSettingsSnapshot KcmSettingsSnapshot::from_config(const ModuleConfig& config) noexcept {
     return KcmSettingsSnapshot {
         .enabled = config.enabled,
+        .mode = config.mode,
         .show_hud = config.show_hud,
         .subtitle_protection = config.subtitle_protection,
         .cursor_protection = config.cursor_protection,

@@ -9,6 +9,7 @@ namespace fluxma {
 
 struct KcmSettingsSnapshot {
     bool enabled = true;
+    ModuleMode mode = ModuleMode::Synthetic2x;
     bool show_hud = true;
     bool subtitle_protection = true;
     bool cursor_protection = true;

@@ -33,6 +33,7 @@ fluxma::FrameDescriptor frame(std::uint64_t frame_id, bool protected_content = f
 int main() {
     const fluxma::ModuleConfig config {
         .enabled = true,
+        .mode = fluxma::ModuleMode::Synthetic2x,
         .show_hud = true,
         .subtitle_protection = true,
         .cursor_protection = true,
@@ -43,7 +44,8 @@ int main() {
     const fluxma::KfiKcmBridge kcm_bridge(plugin_root);
 
     const auto settings = kcm_bridge.settings();
-    if (!settings.enabled || !settings.show_hud || !settings.subtitle_protection ||
+    if (!settings.enabled || settings.mode != fluxma::ModuleMode::Synthetic2x ||
+        !settings.show_hud || !settings.subtitle_protection ||
         !settings.cursor_protection || settings.log_interval_frames != 7 ||
         settings.max_log_messages != 9) {
         std::cerr << "kcm settings snapshot mismatch\n";
@@ -305,6 +307,7 @@ int main() {
 
     const fluxma::ModuleConfig disabled_config {
         .enabled = false,
+        .mode = fluxma::ModuleMode::PassthroughOnly,
         .show_hud = false,
         .subtitle_protection = false,
         .cursor_protection = false,
@@ -314,7 +317,9 @@ int main() {
     fluxma::KfiPluginRoot disabled_root(disabled_config);
     const fluxma::KfiKcmBridge disabled_bridge(disabled_root);
     const auto disabled_settings = disabled_bridge.settings();
-    if (disabled_settings.enabled || disabled_settings.show_hud ||
+    if (disabled_settings.enabled ||
+        disabled_settings.mode != fluxma::ModuleMode::PassthroughOnly ||
+        disabled_settings.show_hud ||
         disabled_settings.subtitle_protection || disabled_settings.cursor_protection ||
         disabled_settings.log_interval_frames != 3 ||
         disabled_settings.max_log_messages != 5) {
