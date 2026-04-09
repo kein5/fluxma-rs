@@ -255,7 +255,11 @@ std::string KcmNativeDiagnosticsSnapshot::summary() const {
 
 std::string KcmOverviewSnapshot::summary() const {
     std::string output;
-    output += "settings{";
+    output += "atomic=";
+    output += std::string(to_bool_string(atomic));
+    output += " runtime-observed-at-ns=";
+    output += std::to_string(runtime_observed_at_ns);
+    output += " settings{";
     output += settings.summary();
     output += "} runtime{";
     output += runtime.summary();
@@ -307,6 +311,8 @@ KcmOverviewSnapshot KfiKcmBridge::overview(
     const KwinNativeInstallContext& install_context
 ) const {
     return KcmOverviewSnapshot {
+        .atomic = false,
+        .runtime_observed_at_ns = now_ns,
         .settings = settings(),
         .runtime = runtime(now_ns),
         .native_install = native_bridge_install(install_context),

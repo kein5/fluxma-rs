@@ -119,6 +119,8 @@ struct KcmNativeDiagnosticsSnapshot {
 };
 
 struct KcmOverviewSnapshot {
+    bool atomic = false;
+    std::uint64_t runtime_observed_at_ns = 0;
     KcmSettingsSnapshot settings {};
     KcmRuntimeSnapshot runtime {};
     KcmNativeBridgeSnapshot native_install {};

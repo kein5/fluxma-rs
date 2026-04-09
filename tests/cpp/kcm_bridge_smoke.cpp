@@ -74,15 +74,20 @@ int main() {
             .backend_name = "wayland",
         }
     );
-    if (!initial_overview.settings.enabled ||
+    if (initial_overview.atomic ||
+        initial_overview.runtime_observed_at_ns != 0 ||
+        !initial_overview.settings.enabled ||
         initial_overview.settings.mode != fluxma::ModuleMode::Synthetic2x ||
         initial_overview.runtime.state != fluxma::OutputState::Bypass ||
-        initial_overview.runtime.bypass_reason != fluxma::BypassReason::GpuPathNotReady ||
+        initial_overview.runtime.bypass_reason != fluxma::BypassReason::None ||
         initial_overview.native_install.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
         initial_overview.native_install.frame_deferred_reason !=
             fluxma::KwinNativeDeferredReason::BackendGate ||
         initial_overview.native_install.present_deferred_reason !=
             fluxma::KwinNativeDeferredReason::BackendGate ||
+        initial_overview.summary().find("atomic=no") == std::string::npos ||
+        initial_overview.summary().find("runtime-observed-at-ns=0") ==
+            std::string::npos ||
         initial_overview.summary().find("settings{enabled=yes") == std::string::npos ||
         initial_overview.summary().find("runtime{state=bypass") == std::string::npos ||
         initial_overview.summary().find("native-install{state=placeholder-only") ==
@@ -1266,7 +1271,9 @@ int main() {
             .backend_name = "drm",
         }
     );
-    if (!degraded_overview.settings.enabled ||
+    if (degraded_overview.atomic ||
+        degraded_overview.runtime_observed_at_ns != 200'000'000 ||
+        !degraded_overview.settings.enabled ||
         degraded_overview.runtime.state != fluxma::OutputState::Active2x ||
         degraded_overview.runtime.deadline_miss_count != 1 ||
         degraded_overview.runtime.dropped_synthetic_count != 1 ||
@@ -1276,6 +1283,9 @@ int main() {
             fluxma::KwinNativeDeferredReason::KwinVersionGate ||
         !degraded_overview.native_install.all_gates_match ||
         !degraded_overview.native_install.all_installs_deferred ||
+        degraded_overview.summary().find("atomic=no") == std::string::npos ||
+        degraded_overview.summary().find("runtime-observed-at-ns=200000000") ==
+            std::string::npos ||
         degraded_overview.summary().find("deadline-miss=1") == std::string::npos ||
         degraded_overview.summary().find("synthetic-dropped=1") == std::string::npos ||
         degraded_overview.summary().find("frame-deferred=kwin-version-gate") ==
