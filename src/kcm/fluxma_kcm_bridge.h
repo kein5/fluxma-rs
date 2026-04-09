@@ -128,6 +128,15 @@ struct KcmOverviewSnapshot {
     [[nodiscard]] std::string summary() const;
 };
 
+struct KcmNativeOverviewSnapshot {
+    bool atomic = false;
+    KcmNativeBringupSnapshot bringup {};
+    KcmNativeDiagnosticsSnapshot diagnostics {};
+    KcmNativeBridgeSnapshot install {};
+
+    [[nodiscard]] std::string summary() const;
+};
+
 class KfiKcmBridge {
   public:
     explicit KfiKcmBridge(const KfiPluginRoot& plugin_root) noexcept;
@@ -136,6 +145,11 @@ class KfiKcmBridge {
     [[nodiscard]] KcmRuntimeSnapshot runtime(std::uint64_t now_ns) const;
     [[nodiscard]] KcmOverviewSnapshot overview(
         std::uint64_t now_ns,
+        const KwinNativeInstallContext& install_context
+    ) const;
+    [[nodiscard]] KcmNativeOverviewSnapshot native_overview(
+        const KwinCompositorFrameInputs& frame_inputs,
+        const KwinPresentFeedbackInputs& present_inputs,
         const KwinNativeInstallContext& install_context
     ) const;
     [[nodiscard]] KcmNativeBringupSnapshot native_bridge_bringup(

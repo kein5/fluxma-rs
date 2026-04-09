@@ -475,6 +475,56 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    const auto native_overview = kcm_bridge.native_overview(
+        fluxma::KwinCompositorFrameInputs {
+            .output_id = 0,
+            .frame_id = 12,
+            .timestamp_ns = 2'000'000,
+            .target_presentation_timestamp_ns = 18'000'000,
+            .predicted_render_time_ns = 2'000'000,
+            .content_type = fluxma::ContentType::Video,
+            .width = 1920,
+            .height = 1080,
+            .gpu_handle = fluxma::GpuFrameHandle {.backend_kind = 1, .handle_id = 212},
+        },
+        fluxma::KwinPresentFeedbackInputs {
+            .output_id = 0,
+            .frame_id = 12,
+            .presented_timestamp_ns = 3'000'000,
+            .refresh_interval_ns = 16'666'667,
+            .presentation_mode = fluxma::PresentationMode::VSync,
+            .present_success = true,
+            .dropped_synthetic = false,
+        },
+        fluxma::KwinNativeInstallContext {
+            .kwin_version_supported = false,
+            .backend_supported = true,
+            .kwin_version = "6.3.92",
+            .backend_name = "drm",
+        }
+    );
+    if (native_overview.atomic ||
+        native_overview.bringup.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
+        !native_overview.bringup.frame_complete ||
+        !native_overview.bringup.present_complete ||
+        !native_overview.diagnostics.bringup_complete ||
+        !native_overview.diagnostics.all_gates_match ||
+        !native_overview.install.all_gates_match ||
+        native_overview.diagnostics.frame_deferred_reason !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        native_overview.install.frame_deferred_reason !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        native_overview.summary().find("atomic=no") == std::string::npos ||
+        native_overview.summary().find("bringup{state=placeholder-only") ==
+            std::string::npos ||
+        native_overview.summary().find("diagnostics{state=placeholder-only") ==
+            std::string::npos ||
+        native_overview.summary().find("install{state=placeholder-only") ==
+            std::string::npos) {
+        std::cerr << "kcm native overview snapshot mismatch\n";
+        return EXIT_FAILURE;
+    }
+
     const auto direct_runtime = fluxma::KcmRuntimeSnapshot::from_observation(
         fluxma::OutputRuntimeObservationReport {
             .snapshot = fluxma::MetricsSnapshot {

@@ -269,6 +269,20 @@ std::string KcmOverviewSnapshot::summary() const {
     return output;
 }
 
+std::string KcmNativeOverviewSnapshot::summary() const {
+    std::string output;
+    output += "atomic=";
+    output += std::string(to_bool_string(atomic));
+    output += " bringup{";
+    output += bringup.summary();
+    output += "} diagnostics{";
+    output += diagnostics.summary();
+    output += "} install{";
+    output += install.summary();
+    output += "}";
+    return output;
+}
+
 KcmNativeDiagnosticsSnapshot KcmNativeDiagnosticsSnapshot::from_observation(
     const KwinNativeBridgeObservationReport& report
 ) noexcept {
@@ -316,6 +330,19 @@ KcmOverviewSnapshot KfiKcmBridge::overview(
         .settings = settings(),
         .runtime = runtime(now_ns),
         .native_install = native_bridge_install(install_context),
+    };
+}
+
+KcmNativeOverviewSnapshot KfiKcmBridge::native_overview(
+    const KwinCompositorFrameInputs& frame_inputs,
+    const KwinPresentFeedbackInputs& present_inputs,
+    const KwinNativeInstallContext& install_context
+) const {
+    return KcmNativeOverviewSnapshot {
+        .atomic = false,
+        .bringup = native_bridge_bringup(frame_inputs, present_inputs),
+        .diagnostics = native_bridge_diagnostics(frame_inputs, present_inputs, install_context),
+        .install = native_bridge_install(install_context),
     };
 }
 
