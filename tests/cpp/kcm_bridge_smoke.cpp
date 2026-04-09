@@ -335,6 +335,18 @@ int main() {
         std::cerr << "kcm disabled settings snapshot mismatch\n";
         return EXIT_FAILURE;
     }
+    const auto disabled_runtime = disabled_bridge.runtime(10'000'000);
+    if (disabled_runtime.state != fluxma::OutputState::Bypass ||
+        disabled_runtime.bypass_reason != fluxma::BypassReason::Disabled ||
+        disabled_runtime.governor_mode != fluxma::GovernorMode::Bypass ||
+        disabled_runtime.scheduler_mode != fluxma::SchedulerMode::PassthroughOnly ||
+        !disabled_runtime.passthrough_only ||
+        disabled_runtime.summary().find("governor=bypass") == std::string::npos ||
+        disabled_runtime.summary().find("scheduler=passthrough-only") ==
+            std::string::npos) {
+        std::cerr << "kcm disabled runtime snapshot mismatch\n";
+        return EXIT_FAILURE;
+    }
 
     const auto placeholder_native_bridge =
         kcm_bridge.native_bridge_install(fluxma::KwinNativeInstallContext {});
