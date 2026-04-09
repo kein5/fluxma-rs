@@ -51,6 +51,9 @@ struct KcmRuntimeSnapshot {
     std::uint32_t cadence_hz_millihz = 0;
     std::string hud_text {};
 
+    [[nodiscard]] static KcmRuntimeSnapshot from_observation(
+        const OutputRuntimeObservationReport& report
+    ) noexcept;
     [[nodiscard]] std::string summary() const;
 };
 

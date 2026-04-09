@@ -433,6 +433,103 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    const auto direct_runtime = fluxma::KcmRuntimeSnapshot::from_observation(
+        fluxma::OutputRuntimeObservationReport {
+            .snapshot = fluxma::MetricsSnapshot {
+                .state = fluxma::OutputState::ProtectedBypass,
+                .bypass_reason = fluxma::BypassReason::ProtectedContent,
+                .protected_content = true,
+                .passthrough_only = true,
+                .classifier_allows_interpolation = false,
+                .frame_tap_count = 9,
+                .present_feedback_count = 2,
+                .deadline_miss_count = 1,
+                .dropped_synthetic_count = 1,
+                .last_presented_frame_id = 17,
+                .last_presented_timestamp_ns = 123'000'000,
+                .refresh_interval_ns = 16'666'667,
+                .last_target_presentation_timestamp_ns = 133'000'000,
+                .last_predicted_render_time_ns = 3'000'000,
+                .last_presentation_mode = fluxma::PresentationMode::AdaptiveSync,
+                .last_content_type = fluxma::ContentType::Game,
+                .cadence_status = fluxma::CadenceStatus::Unstable,
+                .governor_mode = fluxma::GovernorMode::Bypass,
+                .scheduler_mode = fluxma::SchedulerMode::PassthroughOnly,
+                .cadence_hz_millihz = 59'940,
+                .state_transition_count = 4,
+            },
+            .synthetic_plan = fluxma::SyntheticFramePlan {
+                .armed = false,
+                .should_drop = false,
+            },
+            .synthetic_artifact = fluxma::SyntheticFrameArtifact {
+                .generated = false,
+                .dropped = false,
+                .placeholder_only = true,
+            },
+            .synthetic_submission = fluxma::SyntheticPresentSubmission {
+                .queued = false,
+                .dropped = false,
+                .protected_content = true,
+                .protection_plan =
+                    fluxma::ProtectionPlan {
+                        .cursor_passthrough = false,
+                        .cursor_recomposite = true,
+                        .subtitle_band_active = false,
+                        .transient_overlay_passthrough = true,
+                        .placeholder_only = false,
+                    },
+                .prefer_current_in_subtitle_band = false,
+                .suppressed_by_protection = true,
+                .placeholder_only = true,
+            },
+            .protection_plan =
+                fluxma::ProtectionPlan {
+                    .cursor_passthrough = false,
+                    .cursor_recomposite = true,
+                    .subtitle_band_active = false,
+                    .transient_overlay_passthrough = true,
+                    .placeholder_only = false,
+                },
+            .hud_text = "hud state=protected-bypass scheduler=passthrough-only",
+        }
+    );
+    if (direct_runtime.state != fluxma::OutputState::ProtectedBypass ||
+        direct_runtime.bypass_reason != fluxma::BypassReason::ProtectedContent ||
+        direct_runtime.governor_mode != fluxma::GovernorMode::Bypass ||
+        direct_runtime.scheduler_mode != fluxma::SchedulerMode::PassthroughOnly ||
+        direct_runtime.classifier_allows_interpolation ||
+        !direct_runtime.protected_content || !direct_runtime.passthrough_only ||
+        direct_runtime.synthetic_armed || direct_runtime.synthetic_queued ||
+        !direct_runtime.synthetic_suppressed_by_protection ||
+        direct_runtime.cursor_passthrough || !direct_runtime.cursor_recomposite ||
+        direct_runtime.subtitle_band_active || !direct_runtime.overlay_passthrough ||
+        direct_runtime.protection_placeholder_only ||
+        direct_runtime.state_transition_count != 4 ||
+        direct_runtime.frame_tap_count != 9 ||
+        direct_runtime.present_feedback_count != 2 ||
+        direct_runtime.deadline_miss_count != 1 ||
+        direct_runtime.dropped_synthetic_count != 1 ||
+        direct_runtime.last_presented_frame_id != 17 ||
+        direct_runtime.last_presented_timestamp_ns != 123'000'000 ||
+        direct_runtime.refresh_interval_ns != 16'666'667 ||
+        direct_runtime.last_target_presentation_timestamp_ns != 133'000'000 ||
+        direct_runtime.last_predicted_render_time_ns != 3'000'000 ||
+        direct_runtime.last_presentation_mode != fluxma::PresentationMode::AdaptiveSync ||
+        direct_runtime.last_content_type != fluxma::ContentType::Game ||
+        direct_runtime.cadence_hz_millihz != 59'940 ||
+        direct_runtime.hud_text.find("state=protected-bypass") == std::string::npos ||
+        direct_runtime.summary().find("classifier=no") == std::string::npos ||
+        direct_runtime.summary().find("cursor-passthrough=no") == std::string::npos ||
+        direct_runtime.summary().find("cursor-recomposite=yes") == std::string::npos ||
+        direct_runtime.summary().find("overlay-passthrough=yes") == std::string::npos ||
+        direct_runtime.summary().find("protection-placeholder=no") == std::string::npos ||
+        direct_runtime.summary().find("present-mode=adaptive-sync") == std::string::npos ||
+        direct_runtime.summary().find("content-type=game") == std::string::npos) {
+        std::cerr << "kcm direct runtime helper snapshot mismatch\n";
+        return EXIT_FAILURE;
+    }
+
     for (std::uint64_t frame_id = 1; frame_id <= 5; ++frame_id) {
         const auto _ = plugin_root.primary_output().on_frame_tapped(frame(frame_id));
     }

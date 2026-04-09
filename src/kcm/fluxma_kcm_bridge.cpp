@@ -94,6 +94,43 @@ std::string KcmRuntimeSnapshot::summary() const {
     return output;
 }
 
+KcmRuntimeSnapshot KcmRuntimeSnapshot::from_observation(
+    const OutputRuntimeObservationReport& report
+) noexcept {
+    return KcmRuntimeSnapshot {
+        .state = report.snapshot.state,
+        .bypass_reason = report.snapshot.bypass_reason,
+        .governor_mode = report.snapshot.governor_mode,
+        .scheduler_mode = report.snapshot.scheduler_mode,
+        .classifier_allows_interpolation = report.snapshot.classifier_allows_interpolation,
+        .protected_content = report.snapshot.protected_content,
+        .passthrough_only = report.snapshot.passthrough_only,
+        .synthetic_armed = report.synthetic_armed(),
+        .synthetic_queued = report.synthetic_queued(),
+        .synthetic_suppressed_by_protection = report.synthetic_suppressed_by_protection(),
+        .cursor_passthrough = report.cursor_passthrough(),
+        .cursor_recomposite = report.cursor_recomposite(),
+        .subtitle_band_active = report.subtitle_band_active(),
+        .overlay_passthrough = report.overlay_passthrough(),
+        .protection_placeholder_only = report.protection_placeholder_only(),
+        .state_transition_count = report.snapshot.state_transition_count,
+        .frame_tap_count = report.snapshot.frame_tap_count,
+        .present_feedback_count = report.snapshot.present_feedback_count,
+        .deadline_miss_count = report.snapshot.deadline_miss_count,
+        .dropped_synthetic_count = report.snapshot.dropped_synthetic_count,
+        .last_presented_frame_id = report.snapshot.last_presented_frame_id,
+        .last_presented_timestamp_ns = report.snapshot.last_presented_timestamp_ns,
+        .refresh_interval_ns = report.snapshot.refresh_interval_ns,
+        .last_target_presentation_timestamp_ns =
+            report.snapshot.last_target_presentation_timestamp_ns,
+        .last_predicted_render_time_ns = report.snapshot.last_predicted_render_time_ns,
+        .last_presentation_mode = report.snapshot.last_presentation_mode,
+        .last_content_type = report.snapshot.last_content_type,
+        .cadence_hz_millihz = report.snapshot.cadence_hz_millihz,
+        .hud_text = report.hud_text,
+    };
+}
+
 std::string KcmNativeBridgeSnapshot::summary() const {
     std::string output;
     output += "state=";
@@ -244,38 +281,7 @@ KcmSettingsSnapshot KfiKcmBridge::settings() const noexcept {
 
 KcmRuntimeSnapshot KfiKcmBridge::runtime(std::uint64_t now_ns) const {
     const auto report = plugin_root_.observe_output_runtime(now_ns);
-    return KcmRuntimeSnapshot {
-        .state = report.snapshot.state,
-        .bypass_reason = report.snapshot.bypass_reason,
-        .governor_mode = report.snapshot.governor_mode,
-        .scheduler_mode = report.snapshot.scheduler_mode,
-        .classifier_allows_interpolation = report.snapshot.classifier_allows_interpolation,
-        .protected_content = report.snapshot.protected_content,
-        .passthrough_only = report.snapshot.passthrough_only,
-        .synthetic_armed = report.synthetic_armed(),
-        .synthetic_queued = report.synthetic_queued(),
-        .synthetic_suppressed_by_protection = report.synthetic_suppressed_by_protection(),
-        .cursor_passthrough = report.cursor_passthrough(),
-        .cursor_recomposite = report.cursor_recomposite(),
-        .subtitle_band_active = report.subtitle_band_active(),
-        .overlay_passthrough = report.overlay_passthrough(),
-        .protection_placeholder_only = report.protection_placeholder_only(),
-        .state_transition_count = report.snapshot.state_transition_count,
-        .frame_tap_count = report.snapshot.frame_tap_count,
-        .present_feedback_count = report.snapshot.present_feedback_count,
-        .deadline_miss_count = report.snapshot.deadline_miss_count,
-        .dropped_synthetic_count = report.snapshot.dropped_synthetic_count,
-        .last_presented_frame_id = report.snapshot.last_presented_frame_id,
-        .last_presented_timestamp_ns = report.snapshot.last_presented_timestamp_ns,
-        .refresh_interval_ns = report.snapshot.refresh_interval_ns,
-        .last_target_presentation_timestamp_ns =
-            report.snapshot.last_target_presentation_timestamp_ns,
-        .last_predicted_render_time_ns = report.snapshot.last_predicted_render_time_ns,
-        .last_presentation_mode = report.snapshot.last_presentation_mode,
-        .last_content_type = report.snapshot.last_content_type,
-        .cadence_hz_millihz = report.snapshot.cadence_hz_millihz,
-        .hud_text = report.hud_text,
-    };
+    return KcmRuntimeSnapshot::from_observation(report);
 }
 
 KcmNativeBringupSnapshot KfiKcmBridge::native_bridge_bringup(
