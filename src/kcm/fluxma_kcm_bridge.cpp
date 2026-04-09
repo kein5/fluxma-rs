@@ -150,6 +150,14 @@ std::string KcmNativeDiagnosticsSnapshot::summary() const {
     output += std::string(to_bool_string(frame_has_any_blocker));
     output += " present-blocked=";
     output += std::string(to_bool_string(present_has_any_blocker));
+    output += " frame-version-blocked=";
+    output += std::string(to_bool_string(frame_version_blocked));
+    output += " present-version-blocked=";
+    output += std::string(to_bool_string(present_version_blocked));
+    output += " frame-backend-blocked=";
+    output += std::string(to_bool_string(frame_backend_blocked));
+    output += " present-backend-blocked=";
+    output += std::string(to_bool_string(present_backend_blocked));
     output += " frame-deferred=";
     output += std::string(to_string(frame_deferred_reason));
     output += " present-deferred=";
@@ -233,6 +241,10 @@ KcmNativeDiagnosticsSnapshot KfiKcmBridge::native_bridge_diagnostics(
         .present_gate_matches = report.present_gate_matches(),
         .frame_has_any_blocker = report.frame_preflight_has_any_blocker(),
         .present_has_any_blocker = report.present_preflight_has_any_blocker(),
+        .frame_version_blocked = report.frame_preflight_version_blocked(),
+        .present_version_blocked = report.present_preflight_version_blocked(),
+        .frame_backend_blocked = report.frame_preflight_backend_blocked(),
+        .present_backend_blocked = report.present_preflight_backend_blocked(),
         .frame_deferred_reason = report.frame_install_deferred_reason(),
         .present_deferred_reason = report.present_install_deferred_reason(),
         .diagnostics_summary = report.summary(),

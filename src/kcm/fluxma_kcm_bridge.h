@@ -86,6 +86,10 @@ struct KcmNativeDiagnosticsSnapshot {
     bool present_gate_matches = false;
     bool frame_has_any_blocker = false;
     bool present_has_any_blocker = false;
+    bool frame_version_blocked = false;
+    bool present_version_blocked = false;
+    bool frame_backend_blocked = false;
+    bool present_backend_blocked = false;
     KwinNativeDeferredReason frame_deferred_reason = KwinNativeDeferredReason::PlaceholderOnly;
     KwinNativeDeferredReason present_deferred_reason = KwinNativeDeferredReason::PlaceholderOnly;
     std::string diagnostics_summary {};
