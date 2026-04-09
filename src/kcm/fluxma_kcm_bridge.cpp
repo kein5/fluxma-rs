@@ -326,9 +326,10 @@ KcmNativeDiagnosticsSnapshot KcmNativeDiagnosticsSnapshot::from_observation(
     const std::string present_install_context_summary =
         report.preflight.present.gate.context_summary;
 
-    std::string install_context_summary = frame_install_context_summary;
-    if (present_install_context_summary != install_context_summary) {
-        install_context_summary += "|";
+    std::string install_context_summary = "frame=";
+    install_context_summary += frame_install_context_summary;
+    if (present_install_context_summary != frame_install_context_summary) {
+        install_context_summary += " present=";
         install_context_summary += present_install_context_summary;
     }
 

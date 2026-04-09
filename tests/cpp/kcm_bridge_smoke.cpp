@@ -272,7 +272,7 @@ int main() {
         !placeholder_native_diagnostics.kwin_version_supported ||
         !placeholder_native_diagnostics.backend_supported ||
         placeholder_native_diagnostics.install_context_summary !=
-            "kwin=unspecified backend=unspecified version_supported=true backend_supported=true" ||
+            "frame=kwin=unspecified backend=unspecified version_supported=true backend_supported=true" ||
         placeholder_native_diagnostics.frame_install_context_summary !=
             "kwin=unspecified backend=unspecified version_supported=true backend_supported=true" ||
         placeholder_native_diagnostics.present_install_context_summary !=
@@ -302,7 +302,7 @@ int main() {
         placeholder_native_diagnostics.summary().find("backend-supported=yes") ==
             std::string::npos ||
         placeholder_native_diagnostics.summary().find(
-            "install-context=kwin=unspecified backend=unspecified version_supported=true backend_supported=true"
+            "install-context=frame=kwin=unspecified backend=unspecified version_supported=true backend_supported=true"
         ) == std::string::npos ||
         placeholder_native_diagnostics.summary().find(
             "frame-install-context=kwin=unspecified backend=unspecified version_supported=true backend_supported=true"
@@ -355,7 +355,7 @@ int main() {
         !backend_native_diagnostics.kwin_version_supported ||
         backend_native_diagnostics.backend_supported ||
         backend_native_diagnostics.install_context_summary !=
-            "kwin=6.3.93 backend=wayland version_supported=true backend_supported=false" ||
+            "frame=kwin=6.3.93 backend=wayland version_supported=true backend_supported=false" ||
         backend_native_diagnostics.frame_install_context_summary !=
             "kwin=6.3.93 backend=wayland version_supported=true backend_supported=false" ||
         backend_native_diagnostics.present_install_context_summary !=
@@ -383,7 +383,7 @@ int main() {
         backend_native_diagnostics.summary().find("backend-supported=no") ==
             std::string::npos ||
         backend_native_diagnostics.summary().find(
-            "install-context=kwin=6.3.93 backend=wayland version_supported=true backend_supported=false"
+            "install-context=frame=kwin=6.3.93 backend=wayland version_supported=true backend_supported=false"
         ) == std::string::npos ||
         backend_native_diagnostics.summary().find(
             "frame-install-context=kwin=6.3.93 backend=wayland version_supported=true backend_supported=false"
@@ -436,7 +436,7 @@ int main() {
         native_diagnostics.kwin_version_supported ||
         !native_diagnostics.backend_supported ||
         native_diagnostics.install_context_summary !=
-            "kwin=6.3.92 backend=drm version_supported=false backend_supported=true" ||
+            "frame=kwin=6.3.92 backend=drm version_supported=false backend_supported=true" ||
         native_diagnostics.frame_install_context_summary !=
             "kwin=6.3.92 backend=drm version_supported=false backend_supported=true" ||
         native_diagnostics.present_install_context_summary !=
@@ -463,7 +463,7 @@ int main() {
         native_diagnostics.summary().find("backend-supported=yes") ==
             std::string::npos ||
         native_diagnostics.summary().find(
-            "install-context=kwin=6.3.92 backend=drm version_supported=false backend_supported=true"
+            "install-context=frame=kwin=6.3.92 backend=drm version_supported=false backend_supported=true"
         ) == std::string::npos ||
         native_diagnostics.summary().find(
             "frame-install-context=kwin=6.3.92 backend=drm version_supported=false backend_supported=true"
@@ -499,7 +499,8 @@ int main() {
                     .gate = fluxma::KwinNativeInstallGateAssessment {
                         .deferred_reason = fluxma::KwinNativeDeferredReason::PlaceholderOnly,
                         .reason = "frame placeholder path",
-                        .context_summary = "kwin=6.3.93 backend=wayland",
+                        .context_summary =
+                            "kwin=6.3.93 backend=wayland version_supported=true backend_supported=false",
                         .version_blocked = false,
                         .backend_blocked = true,
                     },
@@ -508,7 +509,8 @@ int main() {
                     .gate = fluxma::KwinNativeInstallGateAssessment {
                         .deferred_reason = fluxma::KwinNativeDeferredReason::KwinVersionGate,
                         .reason = "present version gate",
-                        .context_summary = "kwin=6.3.92 backend=drm",
+                        .context_summary =
+                            "kwin=6.3.92 backend=drm version_supported=false backend_supported=true",
                         .version_blocked = true,
                         .backend_blocked = false,
                     },
@@ -529,11 +531,11 @@ int main() {
     if (asymmetric_diagnostics.kwin_version_supported ||
         asymmetric_diagnostics.backend_supported ||
         asymmetric_diagnostics.install_context_summary !=
-            "kwin=6.3.93 backend=wayland|kwin=6.3.92 backend=drm" ||
+            "frame=kwin=6.3.93 backend=wayland version_supported=true backend_supported=false present=kwin=6.3.92 backend=drm version_supported=false backend_supported=true" ||
         asymmetric_diagnostics.frame_install_context_summary !=
-            "kwin=6.3.93 backend=wayland" ||
+            "kwin=6.3.93 backend=wayland version_supported=true backend_supported=false" ||
         asymmetric_diagnostics.present_install_context_summary !=
-            "kwin=6.3.92 backend=drm" ||
+            "kwin=6.3.92 backend=drm version_supported=false backend_supported=true" ||
         asymmetric_diagnostics.frame_backend_blocked != true ||
         asymmetric_diagnostics.present_backend_blocked != false ||
         asymmetric_diagnostics.frame_version_blocked != false ||
@@ -563,15 +565,15 @@ int main() {
         asymmetric_diagnostics.summary().find("backend-supported=no") ==
             std::string::npos ||
         asymmetric_diagnostics.summary().find(
-            "install-context=kwin=6.3.93 backend=wayland|kwin=6.3.92 backend=drm"
+            "install-context=frame=kwin=6.3.93 backend=wayland version_supported=true backend_supported=false present=kwin=6.3.92 backend=drm version_supported=false backend_supported=true"
         ) ==
             std::string::npos ||
         asymmetric_diagnostics.summary().find(
-            "frame-install-context=kwin=6.3.93 backend=wayland"
+            "frame-install-context=kwin=6.3.93 backend=wayland version_supported=true backend_supported=false"
         ) ==
             std::string::npos ||
         asymmetric_diagnostics.summary().find(
-            "present-install-context=kwin=6.3.92 backend=drm"
+            "present-install-context=kwin=6.3.92 backend=drm version_supported=false backend_supported=true"
         ) ==
             std::string::npos) {
         std::cerr << "kcm asymmetric native diagnostics snapshot mismatch\n";
