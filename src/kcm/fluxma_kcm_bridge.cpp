@@ -150,6 +150,10 @@ std::string KcmNativeDiagnosticsSnapshot::summary() const {
     output += std::string(to_bool_string(frame_has_any_blocker));
     output += " present-blocked=";
     output += std::string(to_bool_string(present_has_any_blocker));
+    output += " frame-install-deferred=";
+    output += std::string(to_bool_string(frame_install_deferred));
+    output += " present-install-deferred=";
+    output += std::string(to_bool_string(present_install_deferred));
     output += " frame-version-blocked=";
     output += std::string(to_bool_string(frame_version_blocked));
     output += " present-version-blocked=";
@@ -241,6 +245,8 @@ KcmNativeDiagnosticsSnapshot KfiKcmBridge::native_bridge_diagnostics(
         .present_gate_matches = report.present_gate_matches(),
         .frame_has_any_blocker = report.frame_preflight_has_any_blocker(),
         .present_has_any_blocker = report.present_preflight_has_any_blocker(),
+        .frame_install_deferred = report.frame_install_deferred(),
+        .present_install_deferred = report.present_install_deferred(),
         .frame_version_blocked = report.frame_preflight_version_blocked(),
         .present_version_blocked = report.present_preflight_version_blocked(),
         .frame_backend_blocked = report.frame_preflight_backend_blocked(),

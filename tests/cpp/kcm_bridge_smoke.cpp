@@ -140,6 +140,8 @@ int main() {
         !placeholder_native_diagnostics.present_gate_matches ||
         placeholder_native_diagnostics.frame_has_any_blocker ||
         placeholder_native_diagnostics.present_has_any_blocker ||
+        !placeholder_native_diagnostics.frame_install_deferred ||
+        !placeholder_native_diagnostics.present_install_deferred ||
         placeholder_native_diagnostics.frame_version_blocked ||
         placeholder_native_diagnostics.present_version_blocked ||
         placeholder_native_diagnostics.frame_backend_blocked ||
@@ -149,6 +151,8 @@ int main() {
         placeholder_native_diagnostics.present_deferred_reason !=
             fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
         placeholder_native_diagnostics.summary().find("frame-blocked=no") ==
+            std::string::npos ||
+        placeholder_native_diagnostics.summary().find("frame-install-deferred=yes") ==
             std::string::npos ||
         placeholder_native_diagnostics.summary().find("frame-version-blocked=no") ==
             std::string::npos ||
@@ -194,6 +198,8 @@ int main() {
         !backend_native_diagnostics.present_gate_matches ||
         !backend_native_diagnostics.frame_has_any_blocker ||
         !backend_native_diagnostics.present_has_any_blocker ||
+        !backend_native_diagnostics.frame_install_deferred ||
+        !backend_native_diagnostics.present_install_deferred ||
         backend_native_diagnostics.frame_version_blocked ||
         backend_native_diagnostics.present_version_blocked ||
         !backend_native_diagnostics.frame_backend_blocked ||
@@ -203,6 +209,8 @@ int main() {
         backend_native_diagnostics.present_deferred_reason !=
             fluxma::KwinNativeDeferredReason::BackendGate ||
         backend_native_diagnostics.summary().find("present-blocked=yes") ==
+            std::string::npos ||
+        backend_native_diagnostics.summary().find("present-install-deferred=yes") ==
             std::string::npos ||
         backend_native_diagnostics.summary().find("present-backend-blocked=yes") ==
             std::string::npos ||
@@ -248,6 +256,8 @@ int main() {
         !native_diagnostics.present_gate_matches ||
         !native_diagnostics.frame_has_any_blocker ||
         !native_diagnostics.present_has_any_blocker ||
+        !native_diagnostics.frame_install_deferred ||
+        !native_diagnostics.present_install_deferred ||
         !native_diagnostics.frame_version_blocked ||
         !native_diagnostics.present_version_blocked ||
         native_diagnostics.frame_backend_blocked ||
@@ -257,6 +267,8 @@ int main() {
         native_diagnostics.present_deferred_reason !=
             fluxma::KwinNativeDeferredReason::KwinVersionGate ||
         native_diagnostics.summary().find("bringup-complete=yes") == std::string::npos ||
+        native_diagnostics.summary().find("frame-install-deferred=yes") ==
+            std::string::npos ||
         native_diagnostics.summary().find("frame-version-blocked=yes") ==
             std::string::npos ||
         native_diagnostics.diagnostics_summary.find("preflight{") == std::string::npos ||
