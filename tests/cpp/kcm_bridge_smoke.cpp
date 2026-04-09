@@ -136,6 +136,8 @@ int main() {
     if (placeholder_native_diagnostics.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
         !placeholder_native_diagnostics.bringup_complete ||
         !placeholder_native_diagnostics.has_unresolved_candidates ||
+        !placeholder_native_diagnostics.all_gates_match ||
+        !placeholder_native_diagnostics.all_installs_deferred ||
         !placeholder_native_diagnostics.frame_gate_matches ||
         !placeholder_native_diagnostics.present_gate_matches ||
         placeholder_native_diagnostics.frame_has_any_blocker ||
@@ -151,6 +153,8 @@ int main() {
         placeholder_native_diagnostics.present_deferred_reason !=
             fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
         placeholder_native_diagnostics.summary().find("frame-blocked=no") ==
+            std::string::npos ||
+        placeholder_native_diagnostics.summary().find("all-gates-match=yes") ==
             std::string::npos ||
         placeholder_native_diagnostics.summary().find("frame-install-deferred=yes") ==
             std::string::npos ||
@@ -194,6 +198,8 @@ int main() {
     if (backend_native_diagnostics.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
         !backend_native_diagnostics.bringup_complete ||
         !backend_native_diagnostics.has_unresolved_candidates ||
+        !backend_native_diagnostics.all_gates_match ||
+        !backend_native_diagnostics.all_installs_deferred ||
         !backend_native_diagnostics.frame_gate_matches ||
         !backend_native_diagnostics.present_gate_matches ||
         !backend_native_diagnostics.frame_has_any_blocker ||
@@ -252,6 +258,8 @@ int main() {
     if (native_diagnostics.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
         !native_diagnostics.bringup_complete ||
         !native_diagnostics.has_unresolved_candidates ||
+        !native_diagnostics.all_gates_match ||
+        !native_diagnostics.all_installs_deferred ||
         !native_diagnostics.frame_gate_matches ||
         !native_diagnostics.present_gate_matches ||
         !native_diagnostics.frame_has_any_blocker ||
@@ -328,12 +336,16 @@ int main() {
         asymmetric_diagnostics.present_backend_blocked != false ||
         asymmetric_diagnostics.frame_version_blocked != false ||
         asymmetric_diagnostics.present_version_blocked != true ||
+        asymmetric_diagnostics.all_gates_match ||
+        !asymmetric_diagnostics.all_installs_deferred ||
         asymmetric_diagnostics.frame_deferred_reason !=
             fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
         asymmetric_diagnostics.present_deferred_reason !=
             fluxma::KwinNativeDeferredReason::KwinVersionGate ||
         !asymmetric_diagnostics.frame_install_deferred ||
         !asymmetric_diagnostics.present_install_deferred ||
+        asymmetric_diagnostics.summary().find("all-gates-match=no") ==
+            std::string::npos ||
         asymmetric_diagnostics.summary().find("frame-backend-blocked=yes") ==
             std::string::npos ||
         asymmetric_diagnostics.summary().find("present-backend-blocked=no") ==

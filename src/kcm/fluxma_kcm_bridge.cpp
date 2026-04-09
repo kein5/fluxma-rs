@@ -142,6 +142,10 @@ std::string KcmNativeDiagnosticsSnapshot::summary() const {
     output += std::string(to_bool_string(bringup_complete));
     output += " unresolved-candidates=";
     output += std::string(to_bool_string(has_unresolved_candidates));
+    output += " all-gates-match=";
+    output += std::string(to_bool_string(all_gates_match));
+    output += " all-installs-deferred=";
+    output += std::string(to_bool_string(all_installs_deferred));
     output += " frame-gate-match=";
     output += std::string(to_bool_string(frame_gate_matches));
     output += " present-gate-match=";
@@ -179,6 +183,8 @@ KcmNativeDiagnosticsSnapshot KcmNativeDiagnosticsSnapshot::from_observation(
         .state = report.state,
         .bringup_complete = report.bringup_complete(),
         .has_unresolved_candidates = report.bringup_has_unresolved_candidates(),
+        .all_gates_match = report.all_gates_match(),
+        .all_installs_deferred = report.all_installs_deferred(),
         .frame_gate_matches = report.frame_gate_matches(),
         .present_gate_matches = report.present_gate_matches(),
         .frame_has_any_blocker = report.frame_preflight_has_any_blocker(),

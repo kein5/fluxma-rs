@@ -82,6 +82,8 @@ struct KcmNativeDiagnosticsSnapshot {
     KwinNativeBridgeState state = KwinNativeBridgeState::PlaceholderOnly;
     bool bringup_complete = false;
     bool has_unresolved_candidates = false;
+    bool all_gates_match = false;
+    bool all_installs_deferred = false;
     bool frame_gate_matches = false;
     bool present_gate_matches = false;
     bool frame_has_any_blocker = false;
