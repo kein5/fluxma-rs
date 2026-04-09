@@ -1462,6 +1462,12 @@ int main() {
         placeholder_native_bridge.summary().find(
             "install-context=frame=kwin=unspecified backend=unspecified version_supported=true backend_supported=true"
         ) == std::string::npos ||
+        placeholder_native_bridge.summary().find(
+            "frame-install-context=kwin=unspecified backend=unspecified version_supported=true backend_supported=true"
+        ) == std::string::npos ||
+        placeholder_native_bridge.summary().find(
+            "present-install-context=kwin=unspecified backend=unspecified version_supported=true backend_supported=true"
+        ) == std::string::npos ||
         placeholder_native_bridge.summary().find("frame-deferred=placeholder-only") ==
             std::string::npos ||
         placeholder_native_bridge.install_summary.find("install{") == std::string::npos) {
@@ -1504,6 +1510,12 @@ int main() {
         backend_blocked_native_bridge.summary().find(
             "install-context=frame=kwin=6.3.90 backend=wayland version_supported=true backend_supported=false"
         ) == std::string::npos ||
+        backend_blocked_native_bridge.summary().find(
+            "frame-install-context=kwin=6.3.90 backend=wayland version_supported=true backend_supported=false"
+        ) == std::string::npos ||
+        backend_blocked_native_bridge.summary().find(
+            "present-install-context=kwin=6.3.90 backend=wayland version_supported=true backend_supported=false"
+        ) == std::string::npos ||
         backend_blocked_native_bridge.summary().find("frame-backend-blocked=yes") ==
             std::string::npos ||
         backend_blocked_native_bridge.install_summary.find("backend gate blocked install for wayland")
@@ -1520,7 +1532,8 @@ int main() {
                     .gate = fluxma::KwinNativeInstallGateAssessment {
                         .deferred_reason = fluxma::KwinNativeDeferredReason::PlaceholderOnly,
                         .reason = "frame placeholder path",
-                        .context_summary = "kwin=6.3.93 backend=wayland",
+                        .context_summary =
+                            "kwin=6.3.93 backend=wayland version_supported=true backend_supported=false",
                         .version_blocked = false,
                         .backend_blocked = true,
                     },
@@ -1529,7 +1542,8 @@ int main() {
                     .gate = fluxma::KwinNativeInstallGateAssessment {
                         .deferred_reason = fluxma::KwinNativeDeferredReason::KwinVersionGate,
                         .reason = "present version gate",
-                        .context_summary = "kwin=6.3.92 backend=drm",
+                        .context_summary =
+                            "kwin=6.3.92 backend=drm version_supported=false backend_supported=true",
                         .version_blocked = true,
                         .backend_blocked = false,
                     },
@@ -1553,11 +1567,11 @@ int main() {
         asymmetric_native_bridge.kwin_version_supported ||
         asymmetric_native_bridge.backend_supported ||
         asymmetric_native_bridge.install_context_summary !=
-            "frame=kwin=6.3.93 backend=wayland present=kwin=6.3.92 backend=drm" ||
+            "frame=kwin=6.3.93 backend=wayland version_supported=true backend_supported=false present=kwin=6.3.92 backend=drm version_supported=false backend_supported=true" ||
         asymmetric_native_bridge.frame_install_context_summary !=
-            "kwin=6.3.93 backend=wayland" ||
+            "kwin=6.3.93 backend=wayland version_supported=true backend_supported=false" ||
         asymmetric_native_bridge.present_install_context_summary !=
-            "kwin=6.3.92 backend=drm" ||
+            "kwin=6.3.92 backend=drm version_supported=false backend_supported=true" ||
         asymmetric_native_bridge.frame_deferred_reason !=
             fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
         asymmetric_native_bridge.present_deferred_reason !=
@@ -1571,7 +1585,13 @@ int main() {
         asymmetric_native_bridge.summary().find("backend-supported=no") ==
             std::string::npos ||
         asymmetric_native_bridge.summary().find(
-            "install-context=frame=kwin=6.3.93 backend=wayland present=kwin=6.3.92 backend=drm"
+            "install-context=frame=kwin=6.3.93 backend=wayland version_supported=true backend_supported=false present=kwin=6.3.92 backend=drm version_supported=false backend_supported=true"
+        ) == std::string::npos ||
+        asymmetric_native_bridge.summary().find(
+            "frame-install-context=kwin=6.3.93 backend=wayland version_supported=true backend_supported=false"
+        ) == std::string::npos ||
+        asymmetric_native_bridge.summary().find(
+            "present-install-context=kwin=6.3.92 backend=drm version_supported=false backend_supported=true"
         ) == std::string::npos ||
         asymmetric_native_bridge.summary().find("all-gates-match=no") ==
             std::string::npos ||
