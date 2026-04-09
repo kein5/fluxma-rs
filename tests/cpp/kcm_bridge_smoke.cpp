@@ -269,6 +269,10 @@ int main() {
         !placeholder_native_diagnostics.has_unresolved_candidates ||
         !placeholder_native_diagnostics.all_gates_match ||
         !placeholder_native_diagnostics.all_installs_deferred ||
+        !placeholder_native_diagnostics.kwin_version_supported ||
+        !placeholder_native_diagnostics.backend_supported ||
+        placeholder_native_diagnostics.install_context_summary !=
+            "kwin=unspecified backend=unspecified" ||
         !placeholder_native_diagnostics.frame_gate_matches ||
         !placeholder_native_diagnostics.present_gate_matches ||
         placeholder_native_diagnostics.frame_has_any_blocker ||
@@ -289,6 +293,13 @@ int main() {
             std::string::npos ||
         placeholder_native_diagnostics.summary().find("frame-install-deferred=yes") ==
             std::string::npos ||
+        placeholder_native_diagnostics.summary().find("kwin-version-supported=yes") ==
+            std::string::npos ||
+        placeholder_native_diagnostics.summary().find("backend-supported=yes") ==
+            std::string::npos ||
+        placeholder_native_diagnostics.summary().find(
+            "install-context=kwin=unspecified backend=unspecified"
+        ) == std::string::npos ||
         placeholder_native_diagnostics.summary().find("frame-version-blocked=no") ==
             std::string::npos ||
         placeholder_native_diagnostics.diagnostics_summary.find(
@@ -331,6 +342,10 @@ int main() {
         !backend_native_diagnostics.has_unresolved_candidates ||
         !backend_native_diagnostics.all_gates_match ||
         !backend_native_diagnostics.all_installs_deferred ||
+        !backend_native_diagnostics.kwin_version_supported ||
+        backend_native_diagnostics.backend_supported ||
+        backend_native_diagnostics.install_context_summary !=
+            "kwin=6.3.93 backend=wayland" ||
         !backend_native_diagnostics.frame_gate_matches ||
         !backend_native_diagnostics.present_gate_matches ||
         !backend_native_diagnostics.frame_has_any_blocker ||
@@ -349,6 +364,13 @@ int main() {
             std::string::npos ||
         backend_native_diagnostics.summary().find("present-install-deferred=yes") ==
             std::string::npos ||
+        backend_native_diagnostics.summary().find("kwin-version-supported=yes") ==
+            std::string::npos ||
+        backend_native_diagnostics.summary().find("backend-supported=no") ==
+            std::string::npos ||
+        backend_native_diagnostics.summary().find(
+            "install-context=kwin=6.3.93 backend=wayland"
+        ) == std::string::npos ||
         backend_native_diagnostics.summary().find("present-backend-blocked=yes") ==
             std::string::npos ||
         backend_native_diagnostics.diagnostics_summary.find(
@@ -391,6 +413,9 @@ int main() {
         !native_diagnostics.has_unresolved_candidates ||
         !native_diagnostics.all_gates_match ||
         !native_diagnostics.all_installs_deferred ||
+        native_diagnostics.kwin_version_supported ||
+        !native_diagnostics.backend_supported ||
+        native_diagnostics.install_context_summary != "kwin=6.3.92 backend=drm" ||
         !native_diagnostics.frame_gate_matches ||
         !native_diagnostics.present_gate_matches ||
         !native_diagnostics.frame_has_any_blocker ||
@@ -407,6 +432,12 @@ int main() {
             fluxma::KwinNativeDeferredReason::KwinVersionGate ||
         native_diagnostics.summary().find("bringup-complete=yes") == std::string::npos ||
         native_diagnostics.summary().find("frame-install-deferred=yes") ==
+            std::string::npos ||
+        native_diagnostics.summary().find("kwin-version-supported=no") ==
+            std::string::npos ||
+        native_diagnostics.summary().find("backend-supported=yes") ==
+            std::string::npos ||
+        native_diagnostics.summary().find("install-context=kwin=6.3.92 backend=drm") ==
             std::string::npos ||
         native_diagnostics.summary().find("frame-version-blocked=yes") ==
             std::string::npos ||
@@ -463,7 +494,11 @@ int main() {
             },
         }
     );
-    if (asymmetric_diagnostics.frame_backend_blocked != true ||
+    if (asymmetric_diagnostics.kwin_version_supported ||
+        asymmetric_diagnostics.backend_supported ||
+        asymmetric_diagnostics.install_context_summary !=
+            "kwin=6.3.93 backend=wayland|kwin=6.3.92 backend=drm" ||
+        asymmetric_diagnostics.frame_backend_blocked != true ||
         asymmetric_diagnostics.present_backend_blocked != false ||
         asymmetric_diagnostics.frame_version_blocked != false ||
         asymmetric_diagnostics.present_version_blocked != true ||
@@ -486,6 +521,14 @@ int main() {
         asymmetric_diagnostics.summary().find("frame-version-blocked=no") ==
             std::string::npos ||
         asymmetric_diagnostics.summary().find("present-version-blocked=yes") ==
+            std::string::npos ||
+        asymmetric_diagnostics.summary().find("kwin-version-supported=no") ==
+            std::string::npos ||
+        asymmetric_diagnostics.summary().find("backend-supported=no") ==
+            std::string::npos ||
+        asymmetric_diagnostics.summary().find(
+            "install-context=kwin=6.3.93 backend=wayland|kwin=6.3.92 backend=drm"
+        ) ==
             std::string::npos) {
         std::cerr << "kcm asymmetric native diagnostics snapshot mismatch\n";
         return EXIT_FAILURE;

@@ -223,6 +223,12 @@ std::string KcmNativeDiagnosticsSnapshot::summary() const {
     output += std::string(to_bool_string(all_gates_match));
     output += " all-installs-deferred=";
     output += std::string(to_bool_string(all_installs_deferred));
+    output += " kwin-version-supported=";
+    output += std::string(to_bool_string(kwin_version_supported));
+    output += " backend-supported=";
+    output += std::string(to_bool_string(backend_supported));
+    output += " install-context=";
+    output += install_context_summary;
     output += " frame-gate-match=";
     output += std::string(to_bool_string(frame_gate_matches));
     output += " present-gate-match=";
@@ -312,12 +318,22 @@ std::string KcmNativeOverviewSnapshot::summary() const {
 KcmNativeDiagnosticsSnapshot KcmNativeDiagnosticsSnapshot::from_observation(
     const KwinNativeBridgeObservationReport& report
 ) noexcept {
+    std::string install_context_summary = report.preflight.frame.gate.context_summary;
+    if (report.preflight.present.gate.context_summary != install_context_summary) {
+        install_context_summary += "|";
+        install_context_summary += report.preflight.present.gate.context_summary;
+    }
+
     return KcmNativeDiagnosticsSnapshot {
         .state = report.state,
         .bringup_complete = report.bringup_complete(),
         .has_unresolved_candidates = report.bringup_has_unresolved_candidates(),
         .all_gates_match = report.all_gates_match(),
         .all_installs_deferred = report.all_installs_deferred(),
+        .kwin_version_supported = !report.frame_preflight_version_blocked() &&
+            !report.present_preflight_version_blocked(),
+        .backend_supported = !report.frame_preflight_backend_blocked() &&
+            !report.present_preflight_backend_blocked(),
         .frame_gate_matches = report.frame_gate_matches(),
         .present_gate_matches = report.present_gate_matches(),
         .frame_has_any_blocker = report.frame_preflight_has_any_blocker(),
@@ -330,6 +346,7 @@ KcmNativeDiagnosticsSnapshot KcmNativeDiagnosticsSnapshot::from_observation(
         .present_backend_blocked = report.present_preflight_backend_blocked(),
         .frame_deferred_reason = report.frame_install_deferred_reason(),
         .present_deferred_reason = report.present_install_deferred_reason(),
+        .install_context_summary = install_context_summary,
         .diagnostics_summary = report.summary(),
     };
 }

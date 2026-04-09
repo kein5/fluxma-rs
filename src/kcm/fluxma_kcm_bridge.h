@@ -98,6 +98,8 @@ struct KcmNativeDiagnosticsSnapshot {
     bool has_unresolved_candidates = false;
     bool all_gates_match = false;
     bool all_installs_deferred = false;
+    bool kwin_version_supported = true;
+    bool backend_supported = true;
     bool frame_gate_matches = false;
     bool present_gate_matches = false;
     bool frame_has_any_blocker = false;
@@ -110,6 +112,7 @@ struct KcmNativeDiagnosticsSnapshot {
     bool present_backend_blocked = false;
     KwinNativeDeferredReason frame_deferred_reason = KwinNativeDeferredReason::PlaceholderOnly;
     KwinNativeDeferredReason present_deferred_reason = KwinNativeDeferredReason::PlaceholderOnly;
+    std::string install_context_summary {};
     std::string diagnostics_summary {};
 
     [[nodiscard]] static KcmNativeDiagnosticsSnapshot from_observation(
