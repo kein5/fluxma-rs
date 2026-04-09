@@ -130,6 +130,8 @@ struct KcmOverviewSnapshot {
 
 struct KcmNativeOverviewSnapshot {
     bool atomic = false;
+    bool kwin_version_supported = true;
+    bool backend_supported = true;
     std::string install_context_summary {};
     KcmNativeBringupSnapshot bringup {};
     KcmNativeDiagnosticsSnapshot diagnostics {};

@@ -273,6 +273,10 @@ std::string KcmNativeOverviewSnapshot::summary() const {
     std::string output;
     output += "atomic=";
     output += std::string(to_bool_string(atomic));
+    output += " kwin-version-supported=";
+    output += std::string(to_bool_string(kwin_version_supported));
+    output += " backend-supported=";
+    output += std::string(to_bool_string(backend_supported));
     output += " install-context=";
     output += install_context_summary;
     output += " bringup{";
@@ -342,6 +346,8 @@ KcmNativeOverviewSnapshot KfiKcmBridge::native_overview(
 ) const {
     return KcmNativeOverviewSnapshot {
         .atomic = false,
+        .kwin_version_supported = install_context.kwin_version_supported,
+        .backend_supported = install_context.backend_supported,
         .install_context_summary = std::string(install_context.kwin_version) + "/" +
             std::string(install_context.backend_name),
         .bringup = native_bridge_bringup(frame_inputs, present_inputs),

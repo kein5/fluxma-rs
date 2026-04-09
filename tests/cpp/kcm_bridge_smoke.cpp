@@ -504,6 +504,8 @@ int main() {
         }
     );
     if (native_overview.atomic ||
+        native_overview.kwin_version_supported ||
+        !native_overview.backend_supported ||
         native_overview.install_context_summary != "6.3.92/drm" ||
         native_overview.bringup.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
         !native_overview.bringup.frame_complete ||
@@ -516,12 +518,19 @@ int main() {
         native_overview.install.frame_deferred_reason !=
             fluxma::KwinNativeDeferredReason::KwinVersionGate ||
         native_overview.summary().find("atomic=no") == std::string::npos ||
+        native_overview.summary().find("kwin-version-supported=no") ==
+            std::string::npos ||
+        native_overview.summary().find("backend-supported=yes") ==
+            std::string::npos ||
         native_overview.summary().find("install-context=6.3.92/drm") ==
             std::string::npos ||
         native_overview.summary().find("bringup{state=placeholder-only") ==
             std::string::npos ||
+        native_overview.summary().find("frame-complete=yes") == std::string::npos ||
         native_overview.summary().find("all-gates-match=yes") == std::string::npos ||
         native_overview.summary().find("diagnostics{state=placeholder-only") ==
+            std::string::npos ||
+        native_overview.summary().find("frame-version-blocked=yes") ==
             std::string::npos ||
         native_overview.summary().find("install{state=placeholder-only") ==
             std::string::npos) {
@@ -553,6 +562,8 @@ int main() {
         fluxma::KwinNativeInstallContext {}
     );
     if (placeholder_native_overview.atomic ||
+        !placeholder_native_overview.kwin_version_supported ||
+        !placeholder_native_overview.backend_supported ||
         placeholder_native_overview.install_context_summary != "unspecified/unspecified" ||
         !placeholder_native_overview.diagnostics.all_gates_match ||
         !placeholder_native_overview.install.all_gates_match ||
@@ -560,7 +571,13 @@ int main() {
             fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
         placeholder_native_overview.install.present_deferred_reason !=
             fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        placeholder_native_overview.summary().find("kwin-version-supported=yes") ==
+            std::string::npos ||
+        placeholder_native_overview.summary().find("backend-supported=yes") ==
+            std::string::npos ||
         placeholder_native_overview.summary().find("install-context=unspecified/unspecified") ==
+            std::string::npos ||
+        placeholder_native_overview.summary().find("diagnostics{state=placeholder-only") ==
             std::string::npos ||
         placeholder_native_overview.summary().find("frame-deferred=placeholder-only") ==
             std::string::npos) {
@@ -597,6 +614,8 @@ int main() {
         }
     );
     if (backend_native_overview.atomic ||
+        !backend_native_overview.kwin_version_supported ||
+        backend_native_overview.backend_supported ||
         backend_native_overview.install_context_summary != "6.3.93/wayland" ||
         !backend_native_overview.diagnostics.all_gates_match ||
         !backend_native_overview.install.all_gates_match ||
@@ -604,7 +623,13 @@ int main() {
             fluxma::KwinNativeDeferredReason::BackendGate ||
         backend_native_overview.install.present_deferred_reason !=
             fluxma::KwinNativeDeferredReason::BackendGate ||
+        backend_native_overview.summary().find("kwin-version-supported=yes") ==
+            std::string::npos ||
+        backend_native_overview.summary().find("backend-supported=no") ==
+            std::string::npos ||
         backend_native_overview.summary().find("install-context=6.3.93/wayland") ==
+            std::string::npos ||
+        backend_native_overview.summary().find("diagnostics{state=placeholder-only") ==
             std::string::npos ||
         backend_native_overview.summary().find("frame-deferred=backend-gate") ==
             std::string::npos) {
