@@ -65,6 +65,32 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    const auto initial_overview = kcm_bridge.overview(
+        0,
+        fluxma::KwinNativeInstallContext {
+            .kwin_version_supported = true,
+            .backend_supported = false,
+            .kwin_version = "6.3.93",
+            .backend_name = "wayland",
+        }
+    );
+    if (!initial_overview.settings.enabled ||
+        initial_overview.settings.mode != fluxma::ModuleMode::Synthetic2x ||
+        initial_overview.runtime.state != fluxma::OutputState::Bypass ||
+        initial_overview.runtime.bypass_reason != fluxma::BypassReason::GpuPathNotReady ||
+        initial_overview.native_install.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
+        initial_overview.native_install.frame_deferred_reason !=
+            fluxma::KwinNativeDeferredReason::BackendGate ||
+        initial_overview.native_install.present_deferred_reason !=
+            fluxma::KwinNativeDeferredReason::BackendGate ||
+        initial_overview.summary().find("settings{enabled=yes") == std::string::npos ||
+        initial_overview.summary().find("runtime{state=bypass") == std::string::npos ||
+        initial_overview.summary().find("native-install{state=placeholder-only") ==
+            std::string::npos) {
+        std::cerr << "kcm initial overview snapshot mismatch\n";
+        return EXIT_FAILURE;
+    }
+
     const auto complete_bringup = kcm_bridge.native_bridge_bringup(
         fluxma::KwinCompositorFrameInputs {
             .output_id = 0,
@@ -1228,6 +1254,33 @@ int main() {
             "kwin version gate blocked install for 6.3.91"
         ) == std::string::npos) {
         std::cerr << "kcm native bridge version gate snapshot mismatch\n";
+        return EXIT_FAILURE;
+    }
+
+    const auto degraded_overview = degraded_bridge.overview(
+        200'000'000,
+        fluxma::KwinNativeInstallContext {
+            .kwin_version_supported = false,
+            .backend_supported = true,
+            .kwin_version = "6.3.91",
+            .backend_name = "drm",
+        }
+    );
+    if (!degraded_overview.settings.enabled ||
+        degraded_overview.runtime.state != fluxma::OutputState::Active2x ||
+        degraded_overview.runtime.deadline_miss_count != 1 ||
+        degraded_overview.runtime.dropped_synthetic_count != 1 ||
+        degraded_overview.native_install.frame_deferred_reason !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        degraded_overview.native_install.present_deferred_reason !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        !degraded_overview.native_install.all_gates_match ||
+        !degraded_overview.native_install.all_installs_deferred ||
+        degraded_overview.summary().find("deadline-miss=1") == std::string::npos ||
+        degraded_overview.summary().find("synthetic-dropped=1") == std::string::npos ||
+        degraded_overview.summary().find("frame-deferred=kwin-version-gate") ==
+            std::string::npos) {
+        std::cerr << "kcm degraded overview snapshot mismatch\n";
         return EXIT_FAILURE;
     }
 

@@ -253,6 +253,18 @@ std::string KcmNativeDiagnosticsSnapshot::summary() const {
     return output;
 }
 
+std::string KcmOverviewSnapshot::summary() const {
+    std::string output;
+    output += "settings{";
+    output += settings.summary();
+    output += "} runtime{";
+    output += runtime.summary();
+    output += "} native-install{";
+    output += native_install.summary();
+    output += "}";
+    return output;
+}
+
 KcmNativeDiagnosticsSnapshot KcmNativeDiagnosticsSnapshot::from_observation(
     const KwinNativeBridgeObservationReport& report
 ) noexcept {
@@ -288,6 +300,17 @@ KcmSettingsSnapshot KfiKcmBridge::settings() const noexcept {
 KcmRuntimeSnapshot KfiKcmBridge::runtime(std::uint64_t now_ns) const {
     const auto report = plugin_root_.observe_output_runtime(now_ns);
     return KcmRuntimeSnapshot::from_observation(report);
+}
+
+KcmOverviewSnapshot KfiKcmBridge::overview(
+    std::uint64_t now_ns,
+    const KwinNativeInstallContext& install_context
+) const {
+    return KcmOverviewSnapshot {
+        .settings = settings(),
+        .runtime = runtime(now_ns),
+        .native_install = native_bridge_install(install_context),
+    };
 }
 
 KcmNativeBringupSnapshot KfiKcmBridge::native_bridge_bringup(

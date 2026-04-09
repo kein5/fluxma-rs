@@ -118,12 +118,24 @@ struct KcmNativeDiagnosticsSnapshot {
     [[nodiscard]] std::string summary() const;
 };
 
+struct KcmOverviewSnapshot {
+    KcmSettingsSnapshot settings {};
+    KcmRuntimeSnapshot runtime {};
+    KcmNativeBridgeSnapshot native_install {};
+
+    [[nodiscard]] std::string summary() const;
+};
+
 class KfiKcmBridge {
   public:
     explicit KfiKcmBridge(const KfiPluginRoot& plugin_root) noexcept;
 
     [[nodiscard]] KcmSettingsSnapshot settings() const noexcept;
     [[nodiscard]] KcmRuntimeSnapshot runtime(std::uint64_t now_ns) const;
+    [[nodiscard]] KcmOverviewSnapshot overview(
+        std::uint64_t now_ns,
+        const KwinNativeInstallContext& install_context
+    ) const;
     [[nodiscard]] KcmNativeBringupSnapshot native_bridge_bringup(
         const KwinCompositorFrameInputs& frame_inputs,
         const KwinPresentFeedbackInputs& present_inputs
