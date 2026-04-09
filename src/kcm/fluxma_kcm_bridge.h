@@ -24,6 +24,7 @@ struct KcmRuntimeSnapshot {
     BypassReason bypass_reason = BypassReason::None;
     GovernorMode governor_mode = GovernorMode::Bypass;
     SchedulerMode scheduler_mode = SchedulerMode::PassthroughOnly;
+    bool classifier_allows_interpolation = false;
     bool protected_content = false;
     bool passthrough_only = true;
     bool synthetic_armed = false;
