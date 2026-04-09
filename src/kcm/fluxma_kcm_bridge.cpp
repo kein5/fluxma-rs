@@ -20,6 +20,10 @@ std::string KcmRuntimeSnapshot::summary() const {
     output += std::string(to_string(state));
     output += " bypass=";
     output += std::string(to_string(bypass_reason));
+    output += " governor=";
+    output += std::string(to_string(governor_mode));
+    output += " scheduler=";
+    output += std::string(to_string(scheduler_mode));
     output += " protected=";
     output += std::string(to_bool_string(protected_content));
     output += " passthrough=";
@@ -121,6 +125,8 @@ KcmRuntimeSnapshot KfiKcmBridge::runtime(std::uint64_t now_ns) const {
     return KcmRuntimeSnapshot {
         .state = report.snapshot.state,
         .bypass_reason = report.snapshot.bypass_reason,
+        .governor_mode = report.snapshot.governor_mode,
+        .scheduler_mode = report.snapshot.scheduler_mode,
         .protected_content = report.snapshot.protected_content,
         .passthrough_only = report.snapshot.passthrough_only,
         .synthetic_armed = report.synthetic_armed(),

@@ -264,6 +264,8 @@ int main() {
     const auto runtime = kcm_bridge.runtime(47'999'999);
     if (runtime.state != fluxma::OutputState::Active2x ||
         runtime.bypass_reason != fluxma::BypassReason::None ||
+        runtime.governor_mode != fluxma::GovernorMode::QualityHigh ||
+        runtime.scheduler_mode != fluxma::SchedulerMode::Synthetic2x ||
         runtime.protected_content || !runtime.passthrough_only ||
         !runtime.synthetic_armed || !runtime.synthetic_queued ||
         runtime.synthetic_suppressed_by_protection ||
@@ -272,6 +274,8 @@ int main() {
         runtime.cadence_hz_millihz != 30000 ||
         runtime.hud_text.find("scheduler=synthetic-2x") == std::string::npos ||
         runtime.summary().find("synthetic-armed=yes") == std::string::npos ||
+        runtime.summary().find("governor=quality-high") == std::string::npos ||
+        runtime.summary().find("scheduler=synthetic-2x") == std::string::npos ||
         runtime.summary().find("frame-taps=5") == std::string::npos ||
         runtime.summary().find("present-feedback=1") == std::string::npos ||
         runtime.summary().find("synthetic-suppressed-by-protection=no") ==
@@ -289,6 +293,8 @@ int main() {
     const auto protected_runtime = protected_bridge.runtime(200'000'000);
     if (protected_runtime.state != fluxma::OutputState::ProtectedBypass ||
         protected_runtime.bypass_reason != fluxma::BypassReason::ProtectedContent ||
+        protected_runtime.governor_mode != fluxma::GovernorMode::Bypass ||
+        protected_runtime.scheduler_mode != fluxma::SchedulerMode::PassthroughOnly ||
         !protected_runtime.protected_content || !protected_runtime.passthrough_only ||
         protected_runtime.synthetic_armed || protected_runtime.synthetic_queued ||
         !protected_runtime.synthetic_suppressed_by_protection ||
@@ -297,6 +303,9 @@ int main() {
         protected_runtime.deadline_miss_count != 0 ||
         protected_runtime.dropped_synthetic_count != 0 ||
         protected_runtime.summary().find("synthetic-suppressed-by-protection=yes") ==
+            std::string::npos ||
+        protected_runtime.summary().find("governor=bypass") == std::string::npos ||
+        protected_runtime.summary().find("scheduler=passthrough-only") ==
             std::string::npos ||
         protected_runtime.summary().find("frame-taps=5") == std::string::npos ||
         protected_runtime.summary().find("present-feedback=0") == std::string::npos ||
@@ -391,6 +400,12 @@ int main() {
         degraded_runtime.present_feedback_count != 1 ||
         degraded_runtime.deadline_miss_count != 1 ||
         degraded_runtime.dropped_synthetic_count != 1 ||
+        degraded_runtime.governor_mode != fluxma::GovernorMode::QualityMedium ||
+        degraded_runtime.scheduler_mode != fluxma::SchedulerMode::Synthetic2x ||
+        degraded_runtime.summary().find("governor=quality-medium") ==
+            std::string::npos ||
+        degraded_runtime.summary().find("scheduler=synthetic-2x") ==
+            std::string::npos ||
         degraded_runtime.summary().find("deadline-miss=1") == std::string::npos ||
         degraded_runtime.summary().find("synthetic-dropped=1") == std::string::npos) {
         std::cerr << "kcm degraded runtime counters mismatch\n";

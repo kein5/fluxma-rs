@@ -22,6 +22,8 @@ struct KcmSettingsSnapshot {
 struct KcmRuntimeSnapshot {
     OutputState state = OutputState::Bypass;
     BypassReason bypass_reason = BypassReason::None;
+    GovernorMode governor_mode = GovernorMode::Bypass;
+    SchedulerMode scheduler_mode = SchedulerMode::PassthroughOnly;
     bool protected_content = false;
     bool passthrough_only = true;
     bool synthetic_armed = false;
