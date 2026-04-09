@@ -135,6 +135,9 @@ struct KcmNativeOverviewSnapshot {
     bool backend_supported = true;
     std::string install_context_summary {};
     std::string provenance_summary {};
+    std::string bringup_provenance = {};
+    std::string diagnostics_provenance = {};
+    std::string install_provenance = {};
     KcmNativeBringupSnapshot bringup {};
     KcmNativeDiagnosticsSnapshot diagnostics {};
     KcmNativeBridgeSnapshot install {};

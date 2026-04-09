@@ -283,6 +283,12 @@ std::string KcmNativeOverviewSnapshot::summary() const {
     output += install_context_summary;
     output += " provenance=";
     output += provenance_summary;
+    output += " bringup-source=";
+    output += bringup_provenance;
+    output += " diagnostics-source=";
+    output += diagnostics_provenance;
+    output += " install-source=";
+    output += install_provenance;
     output += " bringup{";
     output += bringup.summary();
     output += "} diagnostics{";
@@ -356,6 +362,9 @@ KcmNativeOverviewSnapshot KfiKcmBridge::native_overview(
         .install_context_summary = std::string(install_context.kwin_version) + "/" +
             std::string(install_context.backend_name),
         .provenance_summary = "bringup+diagnostics+install",
+        .bringup_provenance = "observe_native_bridge_bringup(frame,present)",
+        .diagnostics_provenance = "observe_native_bridge(frame,present,install-context)",
+        .install_provenance = "observe_native_bridge_install(install-context)",
         .bringup = native_bridge_bringup(frame_inputs, present_inputs),
         .diagnostics = native_bridge_diagnostics(frame_inputs, present_inputs, install_context),
         .install = native_bridge_install(install_context),
