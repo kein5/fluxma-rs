@@ -172,6 +172,29 @@ std::string KcmNativeDiagnosticsSnapshot::summary() const {
     return output;
 }
 
+KcmNativeDiagnosticsSnapshot KcmNativeDiagnosticsSnapshot::from_observation(
+    const KwinNativeBridgeObservationReport& report
+) noexcept {
+    return KcmNativeDiagnosticsSnapshot {
+        .state = report.state,
+        .bringup_complete = report.bringup_complete(),
+        .has_unresolved_candidates = report.bringup_has_unresolved_candidates(),
+        .frame_gate_matches = report.frame_gate_matches(),
+        .present_gate_matches = report.present_gate_matches(),
+        .frame_has_any_blocker = report.frame_preflight_has_any_blocker(),
+        .present_has_any_blocker = report.present_preflight_has_any_blocker(),
+        .frame_install_deferred = report.frame_install_deferred(),
+        .present_install_deferred = report.present_install_deferred(),
+        .frame_version_blocked = report.frame_preflight_version_blocked(),
+        .present_version_blocked = report.present_preflight_version_blocked(),
+        .frame_backend_blocked = report.frame_preflight_backend_blocked(),
+        .present_backend_blocked = report.present_preflight_backend_blocked(),
+        .frame_deferred_reason = report.frame_install_deferred_reason(),
+        .present_deferred_reason = report.present_install_deferred_reason(),
+        .diagnostics_summary = report.summary(),
+    };
+}
+
 KfiKcmBridge::KfiKcmBridge(const KfiPluginRoot& plugin_root) noexcept
     : plugin_root_(plugin_root) {}
 
@@ -237,24 +260,7 @@ KcmNativeDiagnosticsSnapshot KfiKcmBridge::native_bridge_diagnostics(
 ) const {
     const auto report =
         plugin_root_.observe_native_bridge(frame_inputs, present_inputs, install_context);
-    return KcmNativeDiagnosticsSnapshot {
-        .state = report.state,
-        .bringup_complete = report.bringup_complete(),
-        .has_unresolved_candidates = report.bringup_has_unresolved_candidates(),
-        .frame_gate_matches = report.frame_gate_matches(),
-        .present_gate_matches = report.present_gate_matches(),
-        .frame_has_any_blocker = report.frame_preflight_has_any_blocker(),
-        .present_has_any_blocker = report.present_preflight_has_any_blocker(),
-        .frame_install_deferred = report.frame_install_deferred(),
-        .present_install_deferred = report.present_install_deferred(),
-        .frame_version_blocked = report.frame_preflight_version_blocked(),
-        .present_version_blocked = report.present_preflight_version_blocked(),
-        .frame_backend_blocked = report.frame_preflight_backend_blocked(),
-        .present_backend_blocked = report.present_preflight_backend_blocked(),
-        .frame_deferred_reason = report.frame_install_deferred_reason(),
-        .present_deferred_reason = report.present_install_deferred_reason(),
-        .diagnostics_summary = report.summary(),
-    };
+    return KcmNativeDiagnosticsSnapshot::from_observation(report);
 }
 
 KcmNativeBridgeSnapshot KfiKcmBridge::native_bridge_install(

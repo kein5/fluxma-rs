@@ -279,6 +279,73 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    const auto asymmetric_diagnostics = fluxma::KcmNativeDiagnosticsSnapshot::from_observation(
+        fluxma::KwinNativeBridgeObservationReport {
+            .state = fluxma::KwinNativeBridgeState::PlaceholderOnly,
+            .bringup = fluxma::KwinNativeBringupReport {
+                .frame = fluxma::KwinFrameHookReadiness {
+                    .plan = fluxma::KfiKwinHookCandidates::compositor_output_frame_ready(),
+                    .ready = true,
+                },
+                .present = fluxma::KwinPresentHookReadiness {
+                    .plan = fluxma::KfiKwinHookCandidates::output_frame_presented(),
+                    .ready = true,
+                },
+            },
+            .preflight = fluxma::KwinNativeCombinedPreflightReport {
+                .frame = fluxma::KwinNativeInstallPreflightReport {
+                    .gate = fluxma::KwinNativeInstallGateAssessment {
+                        .deferred_reason = fluxma::KwinNativeDeferredReason::PlaceholderOnly,
+                        .reason = "frame placeholder path",
+                        .context_summary = "kwin=6.3.93 backend=wayland",
+                        .version_blocked = false,
+                        .backend_blocked = true,
+                    },
+                },
+                .present = fluxma::KwinNativeInstallPreflightReport {
+                    .gate = fluxma::KwinNativeInstallGateAssessment {
+                        .deferred_reason = fluxma::KwinNativeDeferredReason::KwinVersionGate,
+                        .reason = "present version gate",
+                        .context_summary = "kwin=6.3.92 backend=drm",
+                        .version_blocked = true,
+                        .backend_blocked = false,
+                    },
+                },
+            },
+            .install = fluxma::KwinNativeCombinedInstallReport {
+                .frame = fluxma::KwinNativeInstallReport {
+                    .result = fluxma::KwinNativeInstallResult::Deferred,
+                    .deferred_reason = fluxma::KwinNativeDeferredReason::PlaceholderOnly,
+                },
+                .present = fluxma::KwinNativeInstallReport {
+                    .result = fluxma::KwinNativeInstallResult::Deferred,
+                    .deferred_reason = fluxma::KwinNativeDeferredReason::KwinVersionGate,
+                },
+            },
+        }
+    );
+    if (asymmetric_diagnostics.frame_backend_blocked != true ||
+        asymmetric_diagnostics.present_backend_blocked != false ||
+        asymmetric_diagnostics.frame_version_blocked != false ||
+        asymmetric_diagnostics.present_version_blocked != true ||
+        asymmetric_diagnostics.frame_deferred_reason !=
+            fluxma::KwinNativeDeferredReason::PlaceholderOnly ||
+        asymmetric_diagnostics.present_deferred_reason !=
+            fluxma::KwinNativeDeferredReason::KwinVersionGate ||
+        !asymmetric_diagnostics.frame_install_deferred ||
+        !asymmetric_diagnostics.present_install_deferred ||
+        asymmetric_diagnostics.summary().find("frame-backend-blocked=yes") ==
+            std::string::npos ||
+        asymmetric_diagnostics.summary().find("present-backend-blocked=no") ==
+            std::string::npos ||
+        asymmetric_diagnostics.summary().find("frame-version-blocked=no") ==
+            std::string::npos ||
+        asymmetric_diagnostics.summary().find("present-version-blocked=yes") ==
+            std::string::npos) {
+        std::cerr << "kcm asymmetric native diagnostics snapshot mismatch\n";
+        return EXIT_FAILURE;
+    }
+
     for (std::uint64_t frame_id = 1; frame_id <= 5; ++frame_id) {
         const auto _ = plugin_root.primary_output().on_frame_tapped(frame(frame_id));
     }

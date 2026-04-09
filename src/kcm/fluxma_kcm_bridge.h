@@ -96,6 +96,9 @@ struct KcmNativeDiagnosticsSnapshot {
     KwinNativeDeferredReason present_deferred_reason = KwinNativeDeferredReason::PlaceholderOnly;
     std::string diagnostics_summary {};
 
+    [[nodiscard]] static KcmNativeDiagnosticsSnapshot from_observation(
+        const KwinNativeBridgeObservationReport& report
+    ) noexcept;
     [[nodiscard]] std::string summary() const;
 };
 
