@@ -47,6 +47,8 @@ int main() {
     if (!settings.enabled || settings.mode != fluxma::ModuleMode::Synthetic2x ||
         !settings.show_hud || !settings.subtitle_protection ||
         !settings.cursor_protection || settings.log_interval_frames != 7 ||
+        settings.summary().find("mode=synthetic-2x") == std::string::npos ||
+        settings.summary().find("show-hud=yes") == std::string::npos ||
         settings.max_log_messages != 9) {
         std::cerr << "kcm settings snapshot mismatch\n";
         return EXIT_FAILURE;
@@ -367,6 +369,9 @@ int main() {
         disabled_settings.show_hud ||
         disabled_settings.subtitle_protection || disabled_settings.cursor_protection ||
         disabled_settings.log_interval_frames != 3 ||
+        disabled_settings.summary().find("mode=passthrough-only") ==
+            std::string::npos ||
+        disabled_settings.summary().find("show-hud=no") == std::string::npos ||
         disabled_settings.max_log_messages != 5) {
         std::cerr << "kcm disabled settings snapshot mismatch\n";
         return EXIT_FAILURE;

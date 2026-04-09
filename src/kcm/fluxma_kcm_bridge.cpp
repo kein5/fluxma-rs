@@ -14,6 +14,25 @@ KcmSettingsSnapshot KcmSettingsSnapshot::from_config(const ModuleConfig& config)
     };
 }
 
+std::string KcmSettingsSnapshot::summary() const {
+    std::string output;
+    output += "enabled=";
+    output += std::string(to_bool_string(enabled));
+    output += " mode=";
+    output += std::string(to_string(mode));
+    output += " show-hud=";
+    output += std::string(to_bool_string(show_hud));
+    output += " subtitle-protection=";
+    output += std::string(to_bool_string(subtitle_protection));
+    output += " cursor-protection=";
+    output += std::string(to_bool_string(cursor_protection));
+    output += " log-interval=";
+    output += std::to_string(log_interval_frames);
+    output += " max-log-messages=";
+    output += std::to_string(max_log_messages);
+    return output;
+}
+
 std::string KcmRuntimeSnapshot::summary() const {
     std::string output;
     output += "state=";

@@ -17,6 +17,7 @@ struct KcmSettingsSnapshot {
     std::size_t max_log_messages = 0;
 
     [[nodiscard]] static KcmSettingsSnapshot from_config(const ModuleConfig& config) noexcept;
+    [[nodiscard]] std::string summary() const;
 };
 
 struct KcmRuntimeSnapshot {
