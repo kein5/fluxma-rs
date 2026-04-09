@@ -46,6 +46,14 @@ std::string KcmRuntimeSnapshot::summary() const {
     output += std::to_string(deadline_miss_count);
     output += " synthetic-dropped=";
     output += std::to_string(dropped_synthetic_count);
+    output += " last-presented-frame=";
+    output += std::to_string(last_presented_frame_id);
+    output += " refresh-ns=";
+    output += std::to_string(refresh_interval_ns);
+    output += " present-mode=";
+    output += std::string(to_string(last_presentation_mode));
+    output += " content-type=";
+    output += std::string(to_string(last_content_type));
     output += " cadence-millihz=";
     output += std::to_string(cadence_hz_millihz);
     return output;
@@ -142,6 +150,10 @@ KcmRuntimeSnapshot KfiKcmBridge::runtime(std::uint64_t now_ns) const {
         .present_feedback_count = report.snapshot.present_feedback_count,
         .deadline_miss_count = report.snapshot.deadline_miss_count,
         .dropped_synthetic_count = report.snapshot.dropped_synthetic_count,
+        .last_presented_frame_id = report.snapshot.last_presented_frame_id,
+        .refresh_interval_ns = report.snapshot.refresh_interval_ns,
+        .last_presentation_mode = report.snapshot.last_presentation_mode,
+        .last_content_type = report.snapshot.last_content_type,
         .cadence_hz_millihz = report.snapshot.cadence_hz_millihz,
         .hud_text = report.hud_text,
     };

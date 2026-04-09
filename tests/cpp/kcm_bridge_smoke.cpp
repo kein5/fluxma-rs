@@ -273,11 +273,18 @@ int main() {
         runtime.state_transition_count != 3 ||
         runtime.frame_tap_count != 5 || runtime.present_feedback_count != 1 ||
         runtime.deadline_miss_count != 0 || runtime.dropped_synthetic_count != 0 ||
+        runtime.last_presented_frame_id != 5 ||
+        runtime.refresh_interval_ns != 16'666'667 ||
+        runtime.last_presentation_mode != fluxma::PresentationMode::VSync ||
+        runtime.last_content_type != fluxma::ContentType::Video ||
         runtime.cadence_hz_millihz != 30000 ||
         runtime.hud_text.find("scheduler=synthetic-2x") == std::string::npos ||
         runtime.summary().find("synthetic-armed=yes") == std::string::npos ||
         runtime.summary().find("classifier=yes") == std::string::npos ||
         runtime.summary().find("state-transitions=") == std::string::npos ||
+        runtime.summary().find("last-presented-frame=5") == std::string::npos ||
+        runtime.summary().find("present-mode=vsync") == std::string::npos ||
+        runtime.summary().find("content-type=video") == std::string::npos ||
         runtime.summary().find("governor=quality-high") == std::string::npos ||
         runtime.summary().find("scheduler=synthetic-2x") == std::string::npos ||
         runtime.summary().find("frame-taps=5") == std::string::npos ||
@@ -308,10 +315,15 @@ int main() {
         protected_runtime.present_feedback_count != 0 ||
         protected_runtime.deadline_miss_count != 0 ||
         protected_runtime.dropped_synthetic_count != 0 ||
+        protected_runtime.last_presented_frame_id != 0 ||
+        protected_runtime.refresh_interval_ns != 0 ||
+        protected_runtime.last_content_type != fluxma::ContentType::Video ||
         protected_runtime.summary().find("synthetic-suppressed-by-protection=yes") ==
             std::string::npos ||
         protected_runtime.summary().find("classifier=no") == std::string::npos ||
         protected_runtime.summary().find("state-transitions=") == std::string::npos ||
+        protected_runtime.summary().find("last-presented-frame=0") == std::string::npos ||
+        protected_runtime.summary().find("content-type=video") == std::string::npos ||
         protected_runtime.summary().find("governor=bypass") == std::string::npos ||
         protected_runtime.summary().find("scheduler=passthrough-only") ==
             std::string::npos ||
@@ -352,8 +364,13 @@ int main() {
         disabled_runtime.classifier_allows_interpolation ||
         disabled_runtime.state_transition_count != 1 ||
         !disabled_runtime.passthrough_only ||
+        disabled_runtime.last_presented_frame_id != 0 ||
+        disabled_runtime.refresh_interval_ns != 0 ||
+        disabled_runtime.last_content_type != fluxma::ContentType::Video ||
         disabled_runtime.summary().find("classifier=no") == std::string::npos ||
         disabled_runtime.summary().find("state-transitions=") == std::string::npos ||
+        disabled_runtime.summary().find("last-presented-frame=0") == std::string::npos ||
+        disabled_runtime.summary().find("content-type=video") == std::string::npos ||
         disabled_runtime.summary().find("governor=bypass") == std::string::npos ||
         disabled_runtime.summary().find("scheduler=passthrough-only") ==
             std::string::npos) {
@@ -429,8 +446,15 @@ int main() {
         degraded_runtime.scheduler_mode != fluxma::SchedulerMode::Synthetic2x ||
         !degraded_runtime.classifier_allows_interpolation ||
         degraded_runtime.state_transition_count != 3 ||
+        degraded_runtime.last_presented_frame_id != 5 ||
+        degraded_runtime.refresh_interval_ns != 16'666'667 ||
+        degraded_runtime.last_presentation_mode != fluxma::PresentationMode::VSync ||
+        degraded_runtime.last_content_type != fluxma::ContentType::Video ||
         degraded_runtime.summary().find("classifier=yes") == std::string::npos ||
         degraded_runtime.summary().find("state-transitions=") == std::string::npos ||
+        degraded_runtime.summary().find("last-presented-frame=5") == std::string::npos ||
+        degraded_runtime.summary().find("present-mode=vsync") == std::string::npos ||
+        degraded_runtime.summary().find("content-type=video") == std::string::npos ||
         degraded_runtime.summary().find("governor=quality-high") ==
             std::string::npos ||
         degraded_runtime.summary().find("scheduler=synthetic-2x") ==

@@ -35,6 +35,10 @@ struct KcmRuntimeSnapshot {
     std::uint64_t present_feedback_count = 0;
     std::uint64_t deadline_miss_count = 0;
     std::uint64_t dropped_synthetic_count = 0;
+    std::uint64_t last_presented_frame_id = 0;
+    std::uint64_t refresh_interval_ns = 0;
+    PresentationMode last_presentation_mode = PresentationMode::VSync;
+    ContentType last_content_type = ContentType::None;
     std::uint32_t cadence_hz_millihz = 0;
     std::string hud_text {};
 
