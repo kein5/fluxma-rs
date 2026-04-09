@@ -80,6 +80,9 @@ struct KcmNativeBringupSnapshot {
     bool present_has_unresolved = false;
     std::string bringup_summary {};
 
+    [[nodiscard]] static KcmNativeBringupSnapshot from_report(
+        const KwinNativeBringupReport& report
+    ) noexcept;
     [[nodiscard]] std::string summary() const;
 };
 

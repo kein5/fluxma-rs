@@ -110,6 +110,66 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    const auto frame_only_incomplete_bringup = fluxma::KcmNativeBringupSnapshot::from_report(
+        fluxma::KwinNativeBringupReport {
+            .state = fluxma::KwinNativeBridgeState::PlaceholderOnly,
+            .frame = fluxma::KwinFrameHookReadiness {
+                .plan = fluxma::KfiKwinHookCandidates::compositor_output_frame_ready(),
+                .missing_fields = fluxma::KwinFrameInputField::GpuHandle,
+                .unresolved_fields = fluxma::KwinFrameInputField::FrameId,
+                .ready = false,
+            },
+            .present = fluxma::KwinPresentHookReadiness {
+                .plan = fluxma::KfiKwinHookCandidates::output_frame_presented(),
+                .ready = true,
+            },
+        }
+    );
+    if (frame_only_incomplete_bringup.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
+        frame_only_incomplete_bringup.frame_complete ||
+        !frame_only_incomplete_bringup.present_complete ||
+        !frame_only_incomplete_bringup.frame_has_unresolved ||
+        frame_only_incomplete_bringup.present_has_unresolved ||
+        frame_only_incomplete_bringup.summary().find("frame-complete=no") ==
+            std::string::npos ||
+        frame_only_incomplete_bringup.summary().find("present-complete=yes") ==
+            std::string::npos ||
+        frame_only_incomplete_bringup.bringup_summary.find("missing=gpu-handle") ==
+            std::string::npos) {
+        std::cerr << "kcm frame-only incomplete bringup snapshot mismatch\n";
+        return EXIT_FAILURE;
+    }
+
+    const auto present_only_incomplete_bringup = fluxma::KcmNativeBringupSnapshot::from_report(
+        fluxma::KwinNativeBringupReport {
+            .state = fluxma::KwinNativeBridgeState::PlaceholderOnly,
+            .frame = fluxma::KwinFrameHookReadiness {
+                .plan = fluxma::KfiKwinHookCandidates::compositor_output_frame_ready(),
+                .ready = true,
+            },
+            .present = fluxma::KwinPresentHookReadiness {
+                .plan = fluxma::KfiKwinHookCandidates::output_frame_presented(),
+                .missing_fields = fluxma::KwinPresentInputField::RefreshInterval,
+                .unresolved_fields = fluxma::KwinPresentInputField::FrameId,
+                .ready = false,
+            },
+        }
+    );
+    if (present_only_incomplete_bringup.state != fluxma::KwinNativeBridgeState::PlaceholderOnly ||
+        !present_only_incomplete_bringup.frame_complete ||
+        present_only_incomplete_bringup.present_complete ||
+        present_only_incomplete_bringup.frame_has_unresolved ||
+        !present_only_incomplete_bringup.present_has_unresolved ||
+        present_only_incomplete_bringup.summary().find("frame-complete=yes") ==
+            std::string::npos ||
+        present_only_incomplete_bringup.summary().find("present-complete=no") ==
+            std::string::npos ||
+        present_only_incomplete_bringup.bringup_summary.find("missing=refresh-interval") ==
+            std::string::npos) {
+        std::cerr << "kcm present-only incomplete bringup snapshot mismatch\n";
+        return EXIT_FAILURE;
+    }
+
     const auto placeholder_native_diagnostics = kcm_bridge.native_bridge_diagnostics(
         fluxma::KwinCompositorFrameInputs {
             .output_id = 0,

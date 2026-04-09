@@ -155,6 +155,19 @@ std::string KcmNativeBringupSnapshot::summary() const {
     return output;
 }
 
+KcmNativeBringupSnapshot KcmNativeBringupSnapshot::from_report(
+    const KwinNativeBringupReport& report
+) noexcept {
+    return KcmNativeBringupSnapshot {
+        .state = report.state,
+        .frame_complete = report.frame_complete(),
+        .present_complete = report.present_complete(),
+        .frame_has_unresolved = report.frame_has_unresolved(),
+        .present_has_unresolved = report.present_has_unresolved(),
+        .bringup_summary = report.combined_summary(),
+    };
+}
+
 std::string KcmNativeDiagnosticsSnapshot::summary() const {
     std::string output;
     output += "state=";
@@ -270,14 +283,7 @@ KcmNativeBringupSnapshot KfiKcmBridge::native_bridge_bringup(
     const KwinPresentFeedbackInputs& present_inputs
 ) const {
     const auto report = plugin_root_.observe_native_bridge_bringup(frame_inputs, present_inputs);
-    return KcmNativeBringupSnapshot {
-        .state = report.state,
-        .frame_complete = report.frame_complete(),
-        .present_complete = report.present_complete(),
-        .frame_has_unresolved = report.frame_has_unresolved(),
-        .present_has_unresolved = report.present_has_unresolved(),
-        .bringup_summary = report.combined_summary(),
-    };
+    return KcmNativeBringupSnapshot::from_report(report);
 }
 
 KcmNativeDiagnosticsSnapshot KfiKcmBridge::native_bridge_diagnostics(
