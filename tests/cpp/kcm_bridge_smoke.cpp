@@ -317,12 +317,14 @@ int main() {
         protected_runtime.dropped_synthetic_count != 0 ||
         protected_runtime.last_presented_frame_id != 0 ||
         protected_runtime.refresh_interval_ns != 0 ||
+        protected_runtime.last_presentation_mode != fluxma::PresentationMode::VSync ||
         protected_runtime.last_content_type != fluxma::ContentType::Video ||
         protected_runtime.summary().find("synthetic-suppressed-by-protection=yes") ==
             std::string::npos ||
         protected_runtime.summary().find("classifier=no") == std::string::npos ||
         protected_runtime.summary().find("state-transitions=") == std::string::npos ||
         protected_runtime.summary().find("last-presented-frame=0") == std::string::npos ||
+        protected_runtime.summary().find("present-mode=vsync") == std::string::npos ||
         protected_runtime.summary().find("content-type=video") == std::string::npos ||
         protected_runtime.summary().find("governor=bypass") == std::string::npos ||
         protected_runtime.summary().find("scheduler=passthrough-only") ==
@@ -364,12 +366,14 @@ int main() {
         disabled_runtime.classifier_allows_interpolation ||
         disabled_runtime.state_transition_count != 1 ||
         !disabled_runtime.passthrough_only ||
+        disabled_runtime.last_presentation_mode != fluxma::PresentationMode::VSync ||
         disabled_runtime.last_presented_frame_id != 0 ||
         disabled_runtime.refresh_interval_ns != 0 ||
         disabled_runtime.last_content_type != fluxma::ContentType::Video ||
         disabled_runtime.summary().find("classifier=no") == std::string::npos ||
         disabled_runtime.summary().find("state-transitions=") == std::string::npos ||
         disabled_runtime.summary().find("last-presented-frame=0") == std::string::npos ||
+        disabled_runtime.summary().find("present-mode=vsync") == std::string::npos ||
         disabled_runtime.summary().find("content-type=video") == std::string::npos ||
         disabled_runtime.summary().find("governor=bypass") == std::string::npos ||
         disabled_runtime.summary().find("scheduler=passthrough-only") ==
