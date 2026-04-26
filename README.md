@@ -38,6 +38,15 @@ ctest --test-dir build --output-on-failure
 cargo test --manifest-path src/rust/Cargo.toml
 ```
 
+## License
+
+Fluxma is dual-licensed as `MIT OR GPL-2.0-or-later`.
+
+Standalone source may be used under MIT. Builds that link against or derive
+from GPL-covered KWin internals must use the GPL-2.0-or-later side. See
+[docs/licensing.md](docs/licensing.md) before adding Qt/KWin integration code
+or new dependencies.
+
 ## Release notes
 
 This repository uses cocogitto for Conventional Commits and changelog generation.
