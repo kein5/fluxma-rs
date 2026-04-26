@@ -37,3 +37,21 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 cargo test --manifest-path src/rust/Cargo.toml
 ```
+
+## Release notes
+
+This repository uses cocogitto for Conventional Commits and changelog generation.
+
+```bash
+cog install-hook commit-msg
+cog check --from-latest-tag
+cog bump --auto
+```
+
+Commits must use one of the standard Conventional Commit types accepted by
+cocogitto: `build`, `chore`, `ci`, `docs`, `feat`, `fix`, `perf`, `refactor`,
+`revert`, `style`, or `test`.
+
+`v0.1.0` is the baseline tag for the pre-cocogitto history. Generate future
+release entries with `cog bump` from commits after that tag rather than
+re-rendering the old non-conventional history.
